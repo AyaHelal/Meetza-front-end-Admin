@@ -57,14 +57,15 @@ export default function SignUpForm() {
         if (validateForm()) {
             setApiError(""); // Clear previous errors
             try {
-                const response = await axios.post('http://localhost:4000/api/auth/register', {
+                const response = await axios.post('https://meetza-backend.vercel.app/api/auth/register', {
                     name: formData.name,
                     password: formData.password,
                     email: formData.email,
                     role: 'Administrator'
                 });
                 console.log(response);
-                // Handle successful registration here (redirect, show success message, etc.)
+                // Navigate to verify email page after successful registration
+                navigate('/verify-email');
             } catch (error) {
                 console.log(error);
                 // Display API error message to user
