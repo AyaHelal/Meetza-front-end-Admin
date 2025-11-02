@@ -10,9 +10,19 @@ import Home from "./pages/Home/Home";
 import { AnimatePresence } from 'framer-motion';
 import { Navigate } from "react-router-dom";
 import Dashboard from './pages/Dashboard/Dashboard';
+import PageLoader from './components/PageLoader/PageLoader';
+import { useState, useEffect} from "react";
 
 function AnimatedRoutes() {
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (loading) return <PageLoader />;
 
   return (
     <AnimatePresence mode="wait">
