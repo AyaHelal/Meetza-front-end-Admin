@@ -108,7 +108,7 @@ export default function VerifyResetCode() {
         <div className="container-fluid">
             <div className="row py-2">
                 <motion.div
-                    className="col-md-6 d-flex justify-content-center align-items-center"
+                    className="col-md d-flex justify-content-center align-items-center"
                     initial={{ opacity: 0, x: -100 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 100 }}
@@ -208,15 +208,7 @@ export default function VerifyResetCode() {
                     </motion.div>
                 </motion.div>
 
-                <motion.div
-                    className="col-md-6 d-none d-md-flex justify-content-center align-items-center"
-                    initial={{ opacity: 0, x: 100 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -100 }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                >
-                    {/* Add image component here if needed */}
-                </motion.div>
+
             </div>
         </div>
     );

@@ -36,7 +36,7 @@ export default function ForgotPasswordForm() {
 
         try {
             setLoading(true);
-            const response = await axios.post("https://meetza-backend.vercel.app/api/auth/forgot-password", {
+            const response = await axios.post("https://meetza-backend.vercel.app/api/auth/forgot_password", {
                 email: email
             });
 

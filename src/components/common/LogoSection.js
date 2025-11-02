@@ -8,7 +8,7 @@ const LogoSection = ({
     wordAlt = "Logo picture",
     className = "",
     logoClassName = "",
-    wordClassName = "px-3"
+    wordClassName = ""
 }) => {
     return (
         <motion.div

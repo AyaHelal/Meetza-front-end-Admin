@@ -11,8 +11,11 @@ export default function VerifyEmailCode() {
     const inputsRef = useRef([]);
     const navigate = useNavigate();
 
-    // 📩 يفضل تحفظي الإيميل اللي المستخدم كتبوه في signup
     const email = localStorage.getItem("userEmail");
+
+    // Debug: Check what's in localStorage
+    console.log("Email from localStorage:", email);
+    console.log("All localStorage items:", { ...localStorage });
 
     // === handle inputs ===
     const handleChange = (index, value) => {
@@ -48,7 +51,7 @@ export default function VerifyEmailCode() {
     const handleResend = async () => {
         try {
             setLoading(true);
-            const res = await axios.post("/api/auth/resend-code", { email });
+            const res = await axios.post("https://meetza-backend.vercel.app/api/auth/resend-code", { email });
             alert(res.data.message || "Verification code resent!");
         } catch (err) {
             console.error(err);
@@ -63,9 +66,24 @@ export default function VerifyEmailCode() {
         const otp = code.join("");
         if (otp.length < 4) return alert("Please enter the 4-digit code");
 
+        // Check if email exists
+        if (!email) {
+            alert("Email not found. Please try signing up again.");
+            return;
+        }
+
         try {
             setLoading(true);
-            const res = await axios.post("/api/auth/verify-email", { email, code: otp });
+            console.log("Sending verification request:", { email, code: otp });
+
+            const res = await axios.post(
+                "https://meetza-backend.vercel.app/api/auth/verify",
+                { email, code: otp },
+                { headers: { "Content-Type": "application/json" } }
+            );
+
+
+            console.log("Backend response:", res.data);
 
             if (res.data.success) {
                 alert("Email verified successfully!");
@@ -74,8 +92,18 @@ export default function VerifyEmailCode() {
                 alert(res.data.message || "Invalid verification code");
             }
         } catch (err) {
-            console.error(err);
-            alert("Error verifying code");
+            console.error("Verification error:", err);
+            console.error("Error details:", err.response?.data);
+
+            if (err.response?.status === 404) {
+                alert("API endpoint not found. Please check the backend URL.");
+            } else if (err.response?.status === 500) {
+                alert("Server error. Please try again later.");
+            } else if (err.code === 'NETWORK_ERROR') {
+                alert("Network error. Please check your internet connection.");
+            } else {
+                alert(`Error verifying code: ${err.message}`);
+            }
         } finally {
             setLoading(false);
         }
@@ -102,8 +130,11 @@ export default function VerifyEmailCode() {
                 </motion.h2>
 
                 <p className="text-888888 mb-4" style={{ maxWidth: 420, fontSize: "18px" }}>
-                    We’ve sent a verification code to <b>{email}</b>.
-                    Please enter it below.
+                    {email ? (
+                        <>We've sent a verification code to <b>{email}</b>. Please enter it below.</>
+                    ) : (
+                        <>No email found. Please <a href="/signup">sign up again</a>.</>
+                    )}
                 </p>
 
                 <div className="d-flex gap-2 mb-3" onPaste={handlePaste}>

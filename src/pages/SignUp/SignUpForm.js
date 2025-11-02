@@ -64,6 +64,8 @@ export default function SignUpForm() {
                     role: 'Administrator'
                 });
                 console.log(response);
+                // Save email to localStorage for verification
+                localStorage.setItem("userEmail", formData.email);
                 // Navigate to verify email page after successful registration
                 navigate('/verify-email');
             } catch (error) {

@@ -23,13 +23,17 @@ export default function LoginForm() {
         loginValidationRules
     );
 
+    // API error state
+    const [apiError, setApiError] = useState("");
+
+    // Remember me state
+    const [rememberMe, setRememberMe] = useState(false);
+
     // Enhanced handleChange that clears API errors
     const handleChange = (e) => {
         originalHandleChange(e);
-        // Clear API error when user starts typing
-        if (apiError) {
-            setApiError("");
-        }
+        if (apiError) setApiError("");
+        
     };
 
     const { showPassword, togglePasswordVisibility } = usePasswordVisibility();
@@ -47,20 +51,24 @@ export default function LoginForm() {
         handleFormSubmission();
     };
 
-    // API error state
-    const [apiError, setApiError] = useState("");
-
     // Handle form submission logic
     const handleFormSubmission = async () => {
         if (validateForm()) {
-            setApiError(""); // Clear previous errors
+            setApiError("");
             try {
-                const response = await axios.post('http://localhost:4000/api/auth/login', formData);
+                const response = await axios.post('https://meetza-backend.vercel.app/api/auth/login', {
+                    ...formData,
+                    remember_me: rememberMe.toString() // "true" or "false"
+                });
                 console.log(response);
-                // Handle successful login here (redirect, store token, etc.)
+
+                if (response.data.token) {
+                    localStorage.setItem('authToken', response.data.token);
+                }
+
+                navigate('/home');
             } catch (error) {
                 console.log(error);
-                // Display API error message to user
                 if (error.response?.data?.message) {
                     setApiError(error.response.data.message);
                 } else if (error.message) {
@@ -143,6 +151,7 @@ export default function LoginForm() {
                                 {apiError}
                             </motion.div>
                         )}
+
                         <FormInput
                             name="email"
                             value={formData.email}
@@ -178,8 +187,9 @@ export default function LoginForm() {
                                 <input
                                     className="form-check-input"
                                     type="checkbox"
-                                    value=""
                                     id="rememberMe"
+                                    checked={rememberMe}
+                                    onChange={(e) => setRememberMe(e.target.checked)}
                                 />
                                 <label className="form-check-label" htmlFor="rememberMe" style={{ fontSize: "12px" }}>
                                     Remember me
@@ -205,9 +215,7 @@ export default function LoginForm() {
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.5, delay: 0.4 }}
                         >
-                            <span className="text-888888">
-                                or continue with
-                            </span>
+                            <span className="text-888888">or continue with</span>
                         </motion.div>
 
                         <SocialLoginButtons onProviderClick={handleSocialLogin} />

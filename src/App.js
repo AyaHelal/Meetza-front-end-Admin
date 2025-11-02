@@ -6,28 +6,30 @@ import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import VerifyResetCode from "./pages/VerifyResetCode/VerifyResetCode";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
+import Home from "./pages/Home/Home";
 import { AnimatePresence } from 'framer-motion';
 import { Navigate } from "react-router-dom";
-
+import Dashboard from './pages/Dashboard/Dashboard';
 
 function AnimatedRoutes() {
   const location = useLocation();
 
   return (
-    // <AnimatePresence mode="wait">
-    //   <Routes location={location} key={location.pathname}>
-    //     <Route path="/" element={<Navigate to="/login" replace />} />
-    //     <Route path="/login" element={<Login />} />
-    //     <Route path="/signup" element={<Signup />} />
-    //     <Route path="/verify-email" element={<VerifyEmail />} />
-    //     <Route path="/forgot-password" element={<ForgotPassword />} />
-    //     <Route path="/verify-reset-code" element={<VerifyResetCode />} />
-    //     <Route path="/reset-password" element={<ResetPassword />} />
-    //   </Routes>
-    // </AnimatePresence>
-    <VerifyResetCode />
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verify-reset-code" element={<VerifyResetCode />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/home" element={<Dashboard />} />
+      </Routes>
+    </AnimatePresence>
+    // <VerifyEmail />
     // <ResetPassword />
-
+    // <ForgotPassword />
   );
 }
 
