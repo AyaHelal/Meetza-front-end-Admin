@@ -12,7 +12,6 @@ import { Navigate } from "react-router-dom";
 import Dashboard from './pages/Dashboard/Dashboard';
 import PageLoader from './components/PageLoader/PageLoader';
 import { useState, useEffect} from "react";
-
 function AnimatedRoutes() {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
@@ -40,6 +39,8 @@ function AnimatedRoutes() {
     // <VerifyEmail />
     // <ResetPassword />
     // <ForgotPassword />
+
+    // <Dashboard />
   );
 }
 

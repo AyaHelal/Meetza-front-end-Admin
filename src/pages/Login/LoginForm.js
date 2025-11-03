@@ -33,7 +33,7 @@ export default function LoginForm() {
     const handleChange = (e) => {
         originalHandleChange(e);
         if (apiError) setApiError("");
-        
+
     };
 
     const { showPassword, togglePasswordVisibility } = usePasswordVisibility();
@@ -62,8 +62,24 @@ export default function LoginForm() {
                 });
                 console.log(response);
 
-                if (response.data.token) {
-                    localStorage.setItem('authToken', response.data.token);
+                if (response?.data?.data?.token) {
+                    localStorage.setItem('authToken', response?.data?.data?.token);
+                    console.log("authToken", response?.data?.data?.token);
+                }
+                try {
+                    const userName = response?.data?.data?.user?.name || response?.data?.name;
+                    if (userName) {
+                        localStorage.setItem('userName', userName);
+                    }
+                    const userRole = response?.data?.data?.user?.role || response?.data?.role;
+                    if (userRole) {
+                        localStorage.setItem('userRole', userRole);
+                    }
+                    const userPayload = response?.data?.data?.user || { name: userName, role: userRole };
+                    localStorage.setItem('user', JSON.stringify(userPayload));
+                    console.log("Login successful:", userName);
+                } catch (e) {
+                    // ignore storage errors
                 }
 
                 navigate('/home');
