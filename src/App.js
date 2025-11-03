@@ -10,7 +10,6 @@ import Home from "./pages/Home/Home";
 import { AnimatePresence } from 'framer-motion';
 import { Navigate } from "react-router-dom";
 import Dashboard from './pages/Dashboard/Dashboard';
-
 function AnimatedRoutes() {
   const location = useLocation();
 
@@ -30,6 +29,8 @@ function AnimatedRoutes() {
     // <VerifyEmail />
     // <ResetPassword />
     // <ForgotPassword />
+
+    // <Dashboard />
   );
 }
 
