@@ -14,6 +14,7 @@ import {
 } from "phosphor-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import UserMainContent from "../../components/DashBoard/UserMainContent";
+import Position from "../../components/DashBoard/Position/Position";
 
 const UserDashboard = () => {
     // ---------- STATE ----------
@@ -69,6 +70,21 @@ const UserDashboard = () => {
         return item ? item.label : "";
     };
 
+    const handleLogout = () => {
+        try {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('remember');
+            sessionStorage.removeItem('authToken');
+            sessionStorage.removeItem('user');
+            sessionStorage.removeItem('userName');
+            sessionStorage.removeItem('userRole');
+        } catch (_) { /* ignore */ }
+        window.location.href = '/login';
+    };
+
     return (
         <div className="d-flex min-vh-100 bg-light">
             {/* SIDEBAR */}
@@ -113,7 +129,8 @@ const UserDashboard = () => {
                         <Gear size={24} />
                     </button>
                     <button className="btn btn-light d-flex align-items-center rounded-5"
-                        style={{ width: "fit-content", backgroundColor: "#F4F6F8" }}>
+                        style={{ width: "fit-content", backgroundColor: "#F4F6F8" }}
+                        onClick={handleLogout}>
                         <SignOut size={24} style={{ color: "#EB4335" }} />
                     </button>
                 </div>
@@ -121,9 +138,13 @@ const UserDashboard = () => {
 
             {/* MAIN AREA */}
             <div className="flex-fill">
-                {activeMenu === "user" ? (
+                {activeMenu === "user" && (
                     <UserMainContent currentUser={currentUser} users={users} setUsers={setUsers} />
-                ) : (
+                )}
+                {activeMenu === "position" && (
+                    <Position />
+                )}
+                {activeMenu !== "user" && activeMenu !== "position" && (
                     <div className="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
                         <h4 className="mb-2">{getMenuLabel(activeMenu)}</h4>
                         <p className="mb-0">Main component for {getMenuLabel(activeMenu)} goes here.</p>

@@ -16,6 +16,7 @@ import "./LoginForm.css";
 export default function LoginForm() {
     const [isLogin, setIsLogin] = useState(true);
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
     // Custom hooks
     const { formData, errors, touched, handleChange: originalHandleChange, validateForm } = useFormValidation(
@@ -55,10 +56,12 @@ export default function LoginForm() {
     const handleFormSubmission = async () => {
         if (validateForm()) {
             setApiError("");
+            setIsLoading(true);
             try {
                 const response = await axios.post('https://meetza-backend.vercel.app/api/auth/login', {
                     ...formData,
-                    remember_me: rememberMe.toString() // "true" or "false"
+                    remember_me: rememberMe.toString(), // "true" or "false"
+                    role: 'Administrator'
                 });
                 console.log(response);
 
@@ -82,7 +85,7 @@ export default function LoginForm() {
                     // ignore storage errors
                 }
 
-                navigate('/home');
+                navigate('/dashboard');
             } catch (error) {
                 console.log(error);
                 if (error.response?.data?.message) {
@@ -92,6 +95,8 @@ export default function LoginForm() {
                 } else {
                     setApiError("Login failed. Please try again.");
                 }
+            } finally {
+                setIsLoading(false);
             }
         }
     };
@@ -219,11 +224,19 @@ export default function LoginForm() {
 
                         <motion.button
                             type="submit"
-                            className="btn btn-primary w-100 py-3 mt-3 mb-3 rounded-4"
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                            className="btn btn-primary w-100 py-3 mt-3 mb-3 rounded-4 d-inline-flex align-items-center justify-content-center"
+                            whileHover={!isLoading ? { scale: 1.02 } : {}}
+                            whileTap={!isLoading ? { scale: 0.98 } : {}}
+                            disabled={isLoading}
                         >
-                            continue
+                            {isLoading ? (
+                                <>
+                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Signing in...
+                                </>
+                            ) : (
+                                'continue'
+                            )}
                         </motion.button>
 
                         <motion.div

@@ -33,7 +33,7 @@ function AnimatedRoutes() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify-reset-code" element={<VerifyResetCode />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/home" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </AnimatePresence>
     // <VerifyEmail />

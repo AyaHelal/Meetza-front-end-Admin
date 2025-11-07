@@ -51,11 +51,13 @@ export default function SignUpForm() {
 
     // API error state
     const [apiError, setApiError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     // Handle form submission logic
     const handleFormSubmission = async () => {
         if (validateForm()) {
             setApiError(""); // Clear previous errors
+            setIsLoading(true);
             try {
                 const response = await axios.post('https://meetza-backend.vercel.app/api/auth/register', {
                     name: formData.name,
@@ -78,6 +80,8 @@ export default function SignUpForm() {
                 } else {
                     setApiError("Registration failed. Please try again.");
                 }
+            } finally {
+                setIsLoading(false);
             }
         }
     };
@@ -216,31 +220,21 @@ export default function SignUpForm() {
                             />
                         )}
 
-                        <div className="d-flex justify-content-between align-items-center mt-2">
-                            <div className="form-check">
-                                <input
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    value=""
-                                    id="rememberMe"
-                                />
-                                <label className="form-check-label" htmlFor="rememberMe" style={{ fontSize: "12px" }}>
-                                    Remember me
-                                </label>
-                            </div>
-
-                            <a href="/forgot-password" className="text-decoration-none text-888888" style={{ fontSize: "12px" }}>
-                                Forgot Password?
-                            </a>
-                        </div>
-
                         <motion.button
                             type="submit"
-                            className="btn btn-primary w-100 py-3 mt-3 mb-3 rounded-4"
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                            className="btn btn-primary w-100 py-3 mt-3 mb-3 rounded-4 d-inline-flex align-items-center justify-content-center"
+                            whileHover={!isLoading ? { scale: 1.02 } : {}}
+                            whileTap={!isLoading ? { scale: 0.98 } : {}}
+                            disabled={isLoading}
                         >
-                            continue
+                            {isLoading ? (
+                                <>
+                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Creating account...
+                                </>
+                            ) : (
+                                'continue'
+                            )}
                         </motion.button>
 
                         <motion.div
