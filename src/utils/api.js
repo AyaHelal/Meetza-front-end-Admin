@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = process.env.REACT_APP_API_BASE || "{{url1}}";
+const API_BASE = process.env.REACT_APP_API_BASE || "https://meetza-backend.vercel.app/api";
 
 export const api = axios.create({
     baseURL: API_BASE,
