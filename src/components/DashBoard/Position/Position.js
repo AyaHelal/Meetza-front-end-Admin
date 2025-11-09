@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { usePositionData } from "./hooks/usePositionData";
-import { PositionHeader } from "./components/PositionHeader";
 import { PositionTable } from "./components/PositionTable";
-import { SearchBar } from "./components/SearchBar";
+import UserWelcomeHeader from "../shared/UserWelcomeHeader";
 import "../UserMainComponent.css";
 
 export default function Position() {
-  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const [currentUser, setCurrentUser] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      setCurrentUser({
+        name: user.name || user.fullName || 'User',
+        role: user.role || ''
+      });
+    }
+  }, []);
+  
   const userId = currentUser?.id;
 
   const {
@@ -20,7 +31,6 @@ export default function Position() {
     fetchData,
   } = usePositionData(userId);
 
-  const [searchQuery, setSearchQuery] = useState("");
   const [editing, setEditing] = useState({});
   const [addingNew, setAddingNew] = useState(false);
 
@@ -82,29 +92,10 @@ export default function Position() {
 
   return (
     <main className="flex-fill">
-      <PositionHeader />
-
-      <div className="d-flex justify-content-between align-items-center mx-4 my-3">
-        <button
-          className="btn btn-success rounded-4"
-          onClick={handleAdd}
-          disabled={addingNew}
-          style={{
-            background: "linear-gradient(to right, #0076EA, #00DC85)",
-            border: "2px solid #E9ECEF",
-            paddingTop: "0.75rem",
-            paddingBottom: "0.75rem",
-          }}
-        >
-          + Add Position
-        </button>
-        <SearchBar
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search by position name..."
-        />
-      </div>
-
+      <UserWelcomeHeader 
+        userName={currentUser?.name || 'User'} 
+        description="Welcome back! Manage your positions efficiently." 
+      />
       <PositionTable
         currentUser={currentUser}
         positions={filteredPositions}
@@ -113,6 +104,9 @@ export default function Position() {
         onSave={handleSave}
         onDelete={handleDelete}
         onEdit={handleEdit}
+        onAdd={handleAdd}
+        searchTerm={searchQuery}
+        onSearchChange={setSearchQuery}
         editing={editing}
         addingNew={addingNew}
       />

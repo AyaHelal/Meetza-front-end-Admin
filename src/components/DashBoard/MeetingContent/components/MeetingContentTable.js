@@ -1,10 +1,9 @@
-import { PositionRow } from "./PositionRow";
+import { MeetingContentRow } from "./MeetingContentRow";
 import { Plus } from "phosphor-react";
-import { SearchBar } from "./SearchBar";
+import { SearchBar } from "../../Position/components/SearchBar";
 
-export const PositionTable = ({
-  currentUser,
-  positions,
+export const MeetingContentTable = ({
+  contents,
   loading,
   error,
   onSave,
@@ -13,19 +12,19 @@ export const PositionTable = ({
   onAdd,
   searchTerm,
   onSearchChange,
-  editing,
   addingNew,
+  editing,
 }) => {
   return (
     <div className="m-4 rounded-3" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
       <div className="card shadow-sm rounded-3 border-0">
         <div className="d-flex justify-content-between align-items-center p-4">
-          <h2 className="h4 m-0 fw-semibold" style={{ color: "#010101" }}>Position Management</h2>
+          <h2 className="h4 m-0 fw-semibold" style={{ color: "#010101" }}>Meeting Management</h2>
           <div className="d-flex gap-3 align-items-center">
             <SearchBar
               value={searchTerm}
               onChange={onSearchChange}
-              placeholder="Search positions..."
+              placeholder="Search contents..."
             />
             <button
               className="btn btn-success rounded-4 d-flex align-items-center gap-2"
@@ -39,7 +38,7 @@ export const PositionTable = ({
               }}
             >
               <Plus size={20} weight="bold" />
-              Add Position
+              Add Content
             </button>
           </div>
         </div>
@@ -48,10 +47,10 @@ export const PositionTable = ({
             <thead style={{ borderBottom: "5px solid #F4F4F4" }}>
               <tr>
                 <th className="fw-semibold px-4" style={{ color: "#888888" }}>
-                  Administrator
+                  Content Name
                 </th>
                 <th className="fw-semibold" style={{ color: "#888888" }}>
-                  Position
+                  Content Description
                 </th>
                 <th className="fw-semibold" style={{ color: "#888888" }}>
                   Actions
@@ -71,32 +70,30 @@ export const PositionTable = ({
                     {error}
                   </td>
                 </tr>
-              ) : positions.length === 0 && !addingNew ? (
+              ) : contents.length === 0 && !addingNew ? (
                 <tr>
                   <td colSpan="3" className="text-center py-4 text-muted">
-                    No positions found
+                    No contents found
                   </td>
                 </tr>
               ) : (
                 <>
-                  {positions.map((pos) => (
-                    <PositionRow
-                      key={pos.id}
-                      user={currentUser}
-                      position={pos}
+                  {contents.map((content) => (
+                    <MeetingContentRow
+                      key={content.id}
+                      content={content}
                       onSave={onSave}
                       onEdit={onEdit}
                       onDelete={onDelete}
-                      isEditing={editing[pos.id]}
+                      isEditing={editing[content.id]}
                     />
                   ))}
                   {addingNew && (
-                    <PositionRow
+                    <MeetingContentRow
                       key="new"
-                      user={currentUser}
-                      position={null}
+                      content={null}
                       onSave={onSave}
-                      isEditing={editing["new"]}
+                      isEditing={true}
                     />
                   )}
                 </>
