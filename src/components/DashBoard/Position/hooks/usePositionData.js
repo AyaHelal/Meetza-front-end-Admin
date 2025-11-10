@@ -6,6 +6,7 @@ export const usePositionData = (userId) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   // 🟩 Get only current user positions
   const fetchData = useCallback(async  () => {
@@ -35,6 +36,7 @@ export const usePositionData = (userId) => {
       );
 
       setUsers([{ ...currentUser, positions: myPositions }]);
+      setCurrentUser(currentUser);
       setPositions(myPositions);
     } catch (err) {
       console.error("Fetch error:", err);
@@ -99,6 +101,7 @@ export const usePositionData = (userId) => {
   return {
     positions,
     users,
+    currentUser,
     loading,
     error,
     deletePosition,

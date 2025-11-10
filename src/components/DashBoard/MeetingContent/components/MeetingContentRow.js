@@ -33,40 +33,45 @@ export const MeetingContentRow = ({
     }
   };
 
+  const inputStyle = {
+    fontSize: "16px",
+    border: "2px solid #E9ECEF",
+    borderRadius: "8px",
+    padding: "0.5rem",
+    width: "100%",
+  };
+
+  const textStyle = {
+    fontSize: "16px",
+    fontWeight: 500,
+    padding: "8px 0",
+  };
+
   return (
     <tr className="align-middle">
-      <td className="px-4">
-        {showInput ? (
-          <input
-            type="text"
-            className="form-control rounded-3"
-            placeholder="Enter content name..."
-            value={contentData.content_name}
-            onChange={(e) =>
-              setContentData({ ...contentData, content_name: e.target.value })
-            }
-            onKeyPress={(e) => e.key === "Enter" && handleSave()}
-            style={{
-              fontSize: "16px",
-              border: "2px solid #E9ECEF",
-              padding: "0.5rem",
-              width: "100%",
-            }}
-          />
-        ) : (
-          <div className="d-flex align-items-center">
-            <span style={{ fontSize: 16, fontWeight: 500 }}>
-              {contentData.content_name || "—"}
-            </span>
-          </div>
-        )}
-      </td>
+      {/* Content Name */}
       <td>
         {showInput ? (
           <input
             type="text"
-            className="form-control rounded-3"
-            placeholder="Enter description..."
+            value={contentData.content_name}
+            onChange={(e) =>
+              setContentData({ ...contentData, content_name: e.target.value })
+            }
+            placeholder="Enter content name..."
+            style={inputStyle}
+            onKeyPress={(e) => e.key === "Enter" && handleSave()}
+          />
+        ) : (
+          <div style={textStyle}>{contentData.content_name || "—"}</div>
+        )}
+      </td>
+
+      {/* Content Description */}
+      <td>
+        {showInput ? (
+          <input
+            type="text"
             value={contentData.content_description}
             onChange={(e) =>
               setContentData({
@@ -74,75 +79,55 @@ export const MeetingContentRow = ({
                 content_description: e.target.value,
               })
             }
+            placeholder="Enter description..."
+            style={inputStyle}
             onKeyPress={(e) => e.key === "Enter" && handleSave()}
-            style={{
-              fontSize: "16px",
-              border: "2px solid #E9ECEF",
-              padding: "0.5rem",
-              width: "100%",
-            }}
           />
         ) : (
-          <div
-            style={{
-              fontSize: 16,
-              padding: "8px 0",
-              display: "inline-block",
-            }}
-          >
-            {contentData.content_description || "—"}
-          </div>
+          <div style={textStyle}>{contentData.content_description || "—"}</div>
         )}
       </td>
-      <td>
-        <div className="d-flex gap-2">
-          {showInput ? (
+
+      {/* Actions */}
+      <td className="d-flex gap-2">
+        {showInput ? (
+          <button
+            className="btn btn-sm"
+            style={{
+              backgroundColor: "#00DC85",
+              borderRadius: 12,
+              color: "#fff",
+            }}
+            onClick={handleSave}
+          >
+            <CheckCircle size={20} />
+          </button>
+        ) : (
+          <>
             <button
               className="btn btn-sm"
               style={{
                 backgroundColor: "#00DC85",
                 borderRadius: 12,
+                color: "#fff",
               }}
-              onClick={handleSave}
-              title="Save content"
+              onClick={() => onEdit(content.id)}
             >
-              <span style={{ color: "white" }}>
-                <CheckCircle size={20} />
-              </span>
+              <PencilSimpleLine size={18} />
             </button>
-          ) : null}
-
-          {hasContent && !showInput && onDelete && (
-            <>
-              <button
-                className="btn btn-sm"
-                title="Edit content"
-                onClick={() => onEdit(content.id)}
-                style={{
-                  backgroundColor: "#00DC85",
-                  borderRadius: 12,
-                }}
-              >
-                <span style={{ color: "white" }}>
-                  <PencilSimpleLine size={18} />
-                </span>
-              </button>
-              <button
-                className="btn btn-sm"
-                style={{
-                  backgroundColor: "#FF0000",
-                  borderRadius: 12,
-                }}
-                onClick={() => onDelete(content.id)}
-                title="Delete content"
-              >
-                <span style={{ color: "white" }}>
-                  <Trash size={18} />
-                </span>
-              </button>
-            </>
-          )}
-        </div>
+            <button
+              className="btn btn-sm"
+              style={{
+                backgroundColor: "#FF0000",
+                borderRadius: 12,
+                color: "#fff",
+              }}
+              onClick={() => onDelete(content.id)}
+            >
+              <Trash size={18} />
+            </button>
+          </>
+        )}
       </td>
     </tr>
   );

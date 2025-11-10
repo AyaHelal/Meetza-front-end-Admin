@@ -1,6 +1,6 @@
 import { PositionRow } from "./PositionRow";
 import { Plus } from "phosphor-react";
-import { SearchBar } from "./SearchBar";
+import { SearchBar } from "../../shared/SearchBar";
 
 export const PositionTable = ({
   currentUser,

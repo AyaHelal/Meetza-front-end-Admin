@@ -8,17 +8,18 @@ import "../UserMainComponent.css";
 export default function Position() {
   const [currentUser, setCurrentUser] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
-  
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user) {
-      setCurrentUser({
-        name: user.name || user.fullName || 'User',
-        role: user.role || ''
-      });
-    }
-  }, []);
-  
+
+useEffect(() => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (user) {
+    setCurrentUser({
+      id: user.id,
+      name: user.name || user.fullName || 'User',
+      role: user.role || ''
+    });
+  }
+}, []);
+
   const userId = currentUser?.id;
 
   const {
@@ -92,9 +93,9 @@ export default function Position() {
 
   return (
     <main className="flex-fill">
-      <UserWelcomeHeader 
-        userName={currentUser?.name || 'User'} 
-        description="Welcome back! Manage your positions efficiently." 
+      <UserWelcomeHeader
+        userName={currentUser?.name || 'User'}
+        description="Welcome back! Manage your positions efficiently."
       />
       <PositionTable
         currentUser={currentUser}
