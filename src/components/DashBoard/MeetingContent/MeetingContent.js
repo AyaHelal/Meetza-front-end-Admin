@@ -62,9 +62,8 @@ export default function MeetingContent() {
             setAddingNew(false);
             await fetchData();
             await fetchMeetings();
-            toast.success("Content saved successfully!");
-        } catch {
-            toast.error("Failed to save content");
+        } catch(error) {
+            console.error("Failed to save content",error);
         }
     };
 

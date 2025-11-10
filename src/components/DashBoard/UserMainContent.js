@@ -7,6 +7,8 @@ import UserDetails from "./UserDetails";
 import { UsersThree, PlusCircle, PencilSimpleLine, Trash } from "phosphor-react";
 import { UserCheck } from "lucide-react";
 import "./UserMainComponent.css";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const UserMainContent = ({ currentUser, users, setUsers }) => {
     console.log("Current User in UserMainContent:", currentUser);
     const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator";
@@ -70,10 +72,10 @@ const UserMainContent = ({ currentUser, users, setUsers }) => {
             };
             setUsers([...users, createdUser]);
             setShowModal(false);
-            alert("User created successfully");
+            toast.success("User created successfully");
         } catch (error) {
             const msg = error?.response?.data?.message || error.message || "Failed to create user";
-            alert(msg);
+            toast.error(msg);
         }
     };
 
@@ -114,10 +116,10 @@ const UserMainContent = ({ currentUser, users, setUsers }) => {
             );
             setUsers(nextUsers);
             setShowModal(false);
-            alert("User updated successfully");
+            toast.success("User updated successfully");
         } catch (error) {
             const msg = error?.response?.data?.message || error.message || "Failed to update user";
-            alert(msg);
+            toast.error(msg);
         }
     };
 
@@ -141,10 +143,10 @@ const UserMainContent = ({ currentUser, users, setUsers }) => {
             });
 
             setUsers(users.filter((u) => u.id !== id));
-            alert("User deleted successfully");
+            toast.success("User deleted successfully");
         } catch (error) {
             const msg = error?.response?.data?.message || error.message || "Failed to delete user";
-            alert(msg);
+            toast.error(msg);
         }
     };
 
@@ -181,7 +183,7 @@ const UserMainContent = ({ currentUser, users, setUsers }) => {
             setUsers(normalized);
         } catch (error) {
             const msg = error?.response?.data?.message || error.message || "Failed to search users";
-            alert(msg);
+            toast.error(msg);
         }
     };
 
@@ -216,7 +218,7 @@ const UserMainContent = ({ currentUser, users, setUsers }) => {
             setUsers(normalized);
         } catch (error) {
             const msg = error?.response?.data?.message || error.message || "Failed to fetch users";
-            alert(msg);
+            toast.error(msg);
         }
     };
 
@@ -239,7 +241,7 @@ const UserMainContent = ({ currentUser, users, setUsers }) => {
             });
             const u = res?.data?.data || res?.data || null;
             if (!u) {
-                alert("User not found!");
+                toast.error("User not found!");
                 return;
             }
             const normalized = mapUserFromApi(u);
@@ -249,7 +251,7 @@ const UserMainContent = ({ currentUser, users, setUsers }) => {
             setGetUserId("");
         } catch (error) {
             const msg = error?.response?.data?.message || error.message || "Failed to get user";
-            alert(msg);
+            toast.error(msg);
         }
     };
 
