@@ -43,8 +43,9 @@ export const MeetingContentRow = ({
 
   const textStyle = {
     fontSize: "16px",
-    fontWeight: 500,
-    padding: "8px 0",
+    fontWeight: 600,
+    padding: "8px 20px",
+    color:"#6C757D"
   };
 
   return (

@@ -33,7 +33,7 @@ const handleSave = () => {
   return (
     <tr className="align-middle">
       <td className="px-4">
-        <div className="d-flex align-items-center gap-2">
+        <div className="d-flex align-items-center  gap-2">
           <div
             className="rounded-3 d-flex align-items-center justify-content-center"
             style={{
@@ -47,7 +47,7 @@ const handleSave = () => {
             {user.name?.charAt(0)?.toUpperCase() || "U"}
           </div>
           <div>
-            <div className="fw-semibold" style={{ fontSize: 16 }}>
+            <div className="fw-semibold" style={{ fontSize: 16}}>
               {user.name}
             </div>
             <div className="text-muted" style={{ fontSize: 13 }}>
@@ -56,7 +56,7 @@ const handleSave = () => {
           </div>
         </div>
       </td>
-      <td style={{ minWidth: 320 }}>
+      <td style={{ minWidth: 180 }}>
         <div className="d-flex gap-2 align-items-center">
           {showInput ? (
             <input
@@ -77,11 +77,10 @@ const handleSave = () => {
             <span
               style={{
                 fontSize: 16,
-                fontWeight: 500,
-                padding: "8px 12px",
-                backgroundColor: "#F4F6F8",
-                borderRadius: "8px",
+                fontWeight: 600,
+                padding: "8px 0",
                 display: "inline-block",
+                color:"#6C757D"
               }}
             >
               {positionTitle || "—"}

@@ -53,7 +53,7 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, conte
         width: "100%",
     };
 
-    const textStyle = { fontSize: "16px", fontWeight: 500, padding: "8px 0" };
+    const textStyle = { fontSize: "16px", fontWeight: 600, padding: "8px 20px",color:"#6C757D"};
 
     const selectedContent = contents?.find((c) => c.id === data.meeting_content_id);
 
@@ -68,6 +68,7 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, conte
                         placeholder="Enter title"
                         onChange={(e) => setData({ ...data, title: e.target.value })}
                         style={inputStyle}
+                        onKeyPress={(e) => e.key === "Enter" && handleSave()}
                     />
                 ) : (
                     <div style={textStyle}>{data.title}</div>
