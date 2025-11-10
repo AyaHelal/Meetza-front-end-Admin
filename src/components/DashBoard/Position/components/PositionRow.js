@@ -70,44 +70,28 @@ const handleSave = () => {
                 fontSize: "16px",
                 border: "2px solid #E9ECEF",
                 padding: "0.5rem",
+                width: "100%",
               }}
             />
           ) : (
-            <>
-              <span
-                style={{
-                  fontSize: 16,
-                  fontWeight: 500,
-                  padding: "8px 12px",
-                  backgroundColor: "#F4F6F8",
-                  borderRadius: "8px",
-                  display: "inline-block",
-                }}
-              >
-                {positionTitle || "—"}
-              </span>
-              {hasPosition && (
-                <button
-                  className="btn btn-sm"
-                  title="Edit position"
-                  onClick={() => onEdit(position.id)}
-                  style={{
-                    backgroundColor: "#00DC85",
-                    borderRadius: 12,
-                  }}
-                >
-                  <span style={{ color: "white" }}>
-                    <PencilSimpleLine size={18} />
-                  </span>
-                </button>
-              )}
-            </>
+            <span
+              style={{
+                fontSize: 16,
+                fontWeight: 500,
+                padding: "8px 12px",
+                backgroundColor: "#F4F6F8",
+                borderRadius: "8px",
+                display: "inline-block",
+              }}
+            >
+              {positionTitle || "—"}
+            </span>
           )}
         </div>
       </td>
       <td>
         <div className="d-flex gap-2">
-          {(showInput || positionTitle.trim()) && (
+          {showInput ? (
             <button
               className="btn btn-sm"
               style={{
@@ -118,28 +102,41 @@ const handleSave = () => {
               title="Save position"
             >
               <span style={{ color: "white" }}>
-                <CheckCircle size={20} />
+                <CheckCircle size={18} />
               </span>
             </button>
-          )}
-          {hasPosition && !showInput && (
-            <button
-              className="btn btn-sm"
-              style={{
-                backgroundColor: "#FF0000",
-                borderRadius: 12,
-              }}
-              onClick={() =>  onDelete(position.id, user.id)}
-              title="Delete position"
-            >
-              <span style={{ color: "white" }}>
-                <Trash size={18} />
-              </span>
-            </button>
-          )}
+          ) : hasPosition ? (
+            <>
+              <button
+                className="btn btn-sm"
+                style={{
+                  backgroundColor: "#00DC85",
+                  borderRadius: 12,
+                }}
+                onClick={() => onEdit(position.id)}
+                title="Edit position"
+              >
+                <span style={{ color: "white" }}>
+                  <PencilSimpleLine size={18} />
+                </span>
+              </button>
+              <button
+                className="btn btn-sm"
+                style={{
+                  backgroundColor: "#FF0000",
+                  borderRadius: 12,
+                }}
+                onClick={() => onDelete(position.id, user.id)}
+                title="Delete position"
+              >
+                <span style={{ color: "white" }}>
+                  <Trash size={18} />
+                </span>
+              </button>
+            </>
+          ) : null}
         </div>
       </td>
     </tr>
   );
 };
-

@@ -15,6 +15,8 @@ import {
 import "bootstrap/dist/css/bootstrap.min.css";
 import UserMainContent from "../../components/DashBoard/UserMainContent";
 import Position from "../../components/DashBoard/Position/Position";
+import MeetingContent from "../../components/DashBoard/MeetingContent/MeetingContent.js";
+import Meeting from "../../components/DashBoard/Meeting/Meeting.js";
 
 const UserDashboard = () => {
     // ---------- STATE ----------
@@ -144,7 +146,13 @@ const UserDashboard = () => {
                 {activeMenu === "position" && (
                     <Position />
                 )}
-                {activeMenu !== "user" && activeMenu !== "position" && (
+                {activeMenu === "content" && (
+                    <MeetingContent />
+                )}
+                {activeMenu === "meeting" && (
+                    <Meeting />
+                )}
+                {activeMenu !== "user" && activeMenu !== "position" && activeMenu !== "content" &&activeMenu !== "meeting"&&(
                     <div className="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
                         <h4 className="mb-2">{getMenuLabel(activeMenu)}</h4>
                         <p className="mb-0">Main component for {getMenuLabel(activeMenu)} goes here.</p>
