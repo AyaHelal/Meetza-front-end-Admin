@@ -17,6 +17,8 @@ import UserMainContent from "../../components/DashBoard/UserMainContent";
 import Position from "../../components/DashBoard/Position/Position";
 import MeetingContent from "../../components/DashBoard/MeetingContent/MeetingContent.js";
 import Meeting from "../../components/DashBoard/Meeting/Meeting.js";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const UserDashboard = () => {
     // ---------- STATE ----------
@@ -158,6 +160,14 @@ const UserDashboard = () => {
                         <p className="mb-0">Main component for {getMenuLabel(activeMenu)} goes here.</p>
                     </div>
                 )}
+                    <ToastContainer
+                        position="top-right"
+                        autoClose={3000}
+                        hideProgressBar={false}
+                        newestOnTop
+                        closeOnClick
+                        pauseOnHover
+                    />
             </div>
         </div>
     );
