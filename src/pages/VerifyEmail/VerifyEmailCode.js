@@ -51,7 +51,7 @@ export default function VerifyEmailCode() {
     const handleResend = async () => {
         try {
             setLoading(true);
-            const res = await axios.post("https://meetza-backend.vercel.app/api/auth/resend-code", { email });
+            const res = await axios.post("https://meetza-backend.vercel.app/api/auth/forgot-password", { email });
             alert(res.data.message || "Verification code resent!");
         } catch (err) {
             console.error(err);

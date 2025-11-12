@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Envelope, Password, Eye, EyeSlash } from "phosphor-react";
@@ -122,7 +123,7 @@ export default function LoginForm() {
 
     return (
         <motion.div
-            className="align-items-center text-center"
+            className="align-items-center text-center "
             initial={{ opacity: 0, x: -100 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 100 }}
@@ -130,7 +131,7 @@ export default function LoginForm() {
         >
             <LogoSection />
 
-            <div className="justify-content-center p-8">
+            <div className="justify-content-center p-8 ff">
                 <motion.h2
                     className="fw-semibold"
                     initial={{ opacity: 0, y: 20 }}
@@ -158,7 +159,7 @@ export default function LoginForm() {
                         />
                     </div>
 
-                    <form className="form" onSubmit={handleSubmit} onKeyPress={handleKeyPress} noValidate>
+                    <form className="form " onSubmit={handleSubmit} onKeyPress={handleKeyPress} noValidate>
                         {/* API Error Display */}
                         {apiError && (
                             <motion.div

@@ -4,7 +4,7 @@ import { usePositionData } from "./hooks/usePositionData";
 import { PositionHeader } from "./components/PositionHeader";
 import { PositionTable } from "./components/PositionTable";
 import { SearchBar } from "./components/SearchBar";
-import "../UserMainComponent.css";
+import "../User/UserMainComponent.css";
 
 export default function Position() {
   const currentUser = JSON.parse(localStorage.getItem("user"));
@@ -27,7 +27,7 @@ export default function Position() {
 
   useEffect(() => {
     if (userId) fetchData();
-  }, [userId,fetchData]);
+  }, [userId, fetchData]);
 
   const handleSave = async (positionId, title, adminId) => {
     if (!title.trim()) {

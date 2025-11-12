@@ -12,7 +12,7 @@ const LogoSection = ({
 }) => {
     return (
         <motion.div
-            className={`py-5 ${className}`}
+            className={`pt-5 pb-4 ${className}`}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}

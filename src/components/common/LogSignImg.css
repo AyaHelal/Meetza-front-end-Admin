@@ -1,0 +1,13 @@
+.image-section {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+@media (min-width: 1500px) {
+  .image-section {
+    width: 868px !important;
+    height: 710px;
+    border-radius: 12px;
+  }
+}

@@ -3,16 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { Envelope, User, Password, Eye, EyeSlash } from "phosphor-react";
 import { motion } from "framer-motion";
 import axios from "axios";
-
-
+import "../Login/LoginForm.css";
 // Import reusable components
 import { FormInput, ToggleButton, LogoSection, SocialLoginButtons } from "../../components";
 
 // Import custom hooks and utilities
 import { useFormValidation, usePasswordVisibility } from "../../hooks";
 import { signupValidationRules } from "../../utils";
-
 import '../Login/LoginForm.css';
+import PasswordStrengthIndicator from "../../components/common/StrongPassword";
 
 export default function SignUpForm() {
     const [isSignUp, setIsSignUp] = useState(true);
@@ -115,7 +114,7 @@ export default function SignUpForm() {
         >
             <LogoSection />
 
-            <div className="justify-content-center p-8">
+            <div className="justify-content-center p-8 ff">
                 <motion.h2
                     className="fw-semibold"
                     initial={{ opacity: 0, y: 20 }}
@@ -199,6 +198,7 @@ export default function SignUpForm() {
                             onTogglePassword={togglePasswordVisibility}
                             showPassword={showPassword}
                         />
+                        <PasswordStrengthIndicator password={formData.password} />
 
                         {/* Confirm Password Field - Only shows when password field has content */}
                         {formData.password.length > 0 && (
