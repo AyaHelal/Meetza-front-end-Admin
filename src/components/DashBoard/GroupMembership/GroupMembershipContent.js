@@ -1,3 +1,4 @@
+
 // GroupMembershipContent.jsx
 import React, { useState } from "react";
 import { toast } from "react-toastify";
@@ -5,11 +6,12 @@ import { useGroupMembershipData } from "./hooks/useGroupMembershipData";
 import { GroupMembershipHeader } from "./components/GroupMembershipHeader";
 import { GroupMembershipTable } from "./components/GroupMembershipTable";
 import { SearchBar } from "../Position/components/SearchBar";
-import { PlusCircle, ArrowLeft } from "phosphor-react";
+import { PlusCircle } from "phosphor-react";
+import GroupMembershipModal from "./GroupMembershipModal";
 import "../User/UserMainComponent.css";
 
 const GroupMembershipContent = ({ currentUser }) => {
-    const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator";
+    const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator" || (currentUser?.role || "").toLowerCase() === "super_admin";
 
     const {
         memberships,
@@ -19,12 +21,15 @@ const GroupMembershipContent = ({ currentUser }) => {
         error,
         createMembership,
         deleteMembership,
+        updateMembership,
         searchMemberships,
         fetchData,
     } = useGroupMembershipData();
 
     const [showForm, setShowForm] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [formData, setFormData] = useState({ group_id: "", member_email: "" });
+    const [editingMembership, setEditingMembership] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
 
     const openCreateForm = () => {
@@ -32,6 +37,22 @@ const GroupMembershipContent = ({ currentUser }) => {
         setShowForm(true);
     };
 
+    const openEditForm = (membership) => {
+        setEditingMembership(membership);
+        const memberEmail = getMemberEmail(membership.member_id) || "";
+        setFormData({
+            group_id: membership.group_id || membership.groupId || "",
+            member_email: memberEmail,
+        });
+        setShowEditModal(true);
+    };
+
+    const getMemberEmail = (memberId) => {
+        const u = users.find((x) => x.user_id === memberId || x.id === memberId || String(x.id) === String(memberId));
+        return u?.email || "";
+    };
+
+    // form changes are handled directly by modal via setFormData
     const handleFormChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -57,9 +78,17 @@ const GroupMembershipContent = ({ currentUser }) => {
             // Use user_id from member table (required by foreign key constraint)
             const memberId = selectedMember.user_id || selectedMember.id;
 
-            await createMembership(formData.group_id, memberId);
+            if (editingMembership) {
+                // update existing membership
+                await updateMembership(editingMembership.id, formData.group_id, memberId);
+                toast.success("Group membership updated successfully");
+                setEditingMembership(null);
+                setShowEditModal(false);
+            } else {
+                await createMembership(formData.group_id, memberId);
+                toast.success("Group membership created successfully");
+            }
             setShowForm(false);
-            toast.success("Group membership created successfully");
         } catch (error) {
             const msg = error?.response?.data?.message || error.message || "Failed to create group membership";
             toast.error(msg);
@@ -113,10 +142,7 @@ const GroupMembershipContent = ({ currentUser }) => {
         return group?.name || group?.group_name || `Group ${groupId}`;
     };
 
-    const filteredMemberships = memberships.filter((m) =>
-        getGroupName(m.group_id, m.group_name).toLowerCase().includes(searchQuery.toLowerCase()) ||
-        getMemberName(m.member_id, m.member_name).toLowerCase().includes(searchQuery.toLowerCase())
-    );
+
 
     return (
         <main className="flex-fill">
@@ -155,12 +181,13 @@ const GroupMembershipContent = ({ currentUser }) => {
                             </div>
 
                             <GroupMembershipTable
-                                memberships={filteredMemberships}
+                                memberships={memberships}
                                 groups={groups}
                                 users={users}
                                 loading={loading}
                                 error={error}
                                 onDelete={handleDeleteMembership}
+                                onEdit={openEditForm}
                                 getGroupName={getGroupName}
                                 getMemberName={getMemberName}
                                 isAdmin={isAdmin}
@@ -181,7 +208,6 @@ const GroupMembershipContent = ({ currentUser }) => {
                                             borderRadius: "12px",
                                         }}
                                     >
-                                        <ArrowLeft size={20} weight="bold" />
                                         Back
                                     </button>
                                     <h2 className="h5 mb-0 fw-semibold" style={{ fontSize: "24px" }}>
@@ -269,9 +295,21 @@ const GroupMembershipContent = ({ currentUser }) => {
                                     </div>
                                 </div>
                             </div>
+
                         </>
                     )}
                 </div>
+
+                {showEditModal && editingMembership && (
+                    <GroupMembershipModal
+                        mode="edit"
+                        formData={formData}
+                        setFormData={setFormData}
+                        groups={groups}
+                        onSave={handleCreateMembership}
+                        onClose={() => { setShowEditModal(false); setEditingMembership(null); }}
+                    />
+                )}
             </div>
         </main>
     );

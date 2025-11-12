@@ -93,20 +93,16 @@ export const useUserData = () => {
     // 🔍 Search users
     const searchUsers = async (query) => {
         try {
-            const res = await api.get("/user/search", {
-                params: { name: query },
+            const res = await api.get(`/user?name=${query}`, {
+
             });
             const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
             const normalized = payload.map((u) => ({
                 id: u.id,
                 name: u.name,
                 email: u.email,
-                role:
-                    u.role === "Administrator"
-                        ? "administrator"
-                        : u.role === "Member"
-                            ? "member"
-                            : (u.role || "").toString().toLowerCase(),
+                role: u.role
+                ,
                 avatarUrl: u.avatarUrl || u.avatar_url,
             }));
             setUsers(normalized);

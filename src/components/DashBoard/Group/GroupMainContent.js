@@ -1,3 +1,4 @@
+
 // GroupMainContent.jsx
 import React, { useState } from "react";
 import { toast } from "react-toastify";
@@ -11,7 +12,7 @@ import { PlusCircle, ArrowLeft } from "phosphor-react";
 import "./GroupMainComponent.css";
 
 const GroupMainContent = ({ currentUser }) => {
-    const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator";
+    const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator" || (currentUser?.role || "").toLowerCase() === "super_admin";
 
     const {
         groups,
@@ -120,9 +121,8 @@ const GroupMainContent = ({ currentUser }) => {
         return user?.name || `User ${adminId}`;
     };
 
-    const filteredGroups = groups.filter((g) =>
-        (g.name || g.group_name || "").toLowerCase().includes(searchQuery.toLowerCase())
-    );
+
+
 
     return (
         <main className="flex-fill">
@@ -162,7 +162,7 @@ const GroupMainContent = ({ currentUser }) => {
                             </div>
 
                             <GroupTable
-                                groups={filteredGroups}
+                                groups={groups}
                                 positions={positions}
                                 users={users}
                                 loading={loading}

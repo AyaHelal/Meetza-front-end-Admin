@@ -1,9 +1,10 @@
 import React from "react";
-import { UsersThree, Trash } from "phosphor-react";
+import { UsersThree, Trash, PencilSimpleLine } from "phosphor-react";
 
 export const GroupMembershipRow = ({
   membership,
   onDelete,
+  onEdit,
   getGroupName,
   getMemberName,
   isAdmin,
@@ -35,15 +36,26 @@ export const GroupMembershipRow = ({
       <td>
         <div className="d-flex gap-2">
           {isAdmin && (
-            <button
-              className="btn btn-sm"
-              onClick={() => onDelete(membership.id)}
-              style={{ backgroundColor: "#FF0000", borderRadius: "12px" }}
-            >
-              <span style={{ color: "white" }}>
-                <Trash size={24} />
-              </span>
-            </button>
+            <>
+              <button
+                className="btn btn-sm"
+                onClick={() => onEdit && onEdit(membership)}
+                style={{ backgroundColor: "#00DC85", borderRadius: "12px" }}
+              >
+                <span style={{ color: "white" }}>
+                  <PencilSimpleLine size={20} />
+                </span>
+              </button>
+              <button
+                className="btn btn-sm"
+                onClick={() => onDelete(membership.id)}
+                style={{ backgroundColor: "#FF0000", borderRadius: "12px" }}
+              >
+                <span style={{ color: "white" }}>
+                  <Trash size={24} />
+                </span>
+              </button>
+            </>
           )}
         </div>
       </td>

@@ -16,7 +16,7 @@ export const useGroupMembershipData = () => {
 
       const res = await api.get("/group-membership");
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
-      
+
       const normalized = payload.map((m) => ({
         id: m.id,
         group_id: m.group_id || m.groupId,
@@ -46,11 +46,11 @@ export const useGroupMembershipData = () => {
     }
   }, []);
 
-  // 🟩 Fetch members (from member endpoint or user endpoint)
+  // 🟩 Fetch members (from member endpoint or user endpoint)  
   const fetchMembers = useCallback(async () => {
     try {
       let payload = [];
-      
+
       // Try member endpoint first
       try {
         const memberRes = await api.get("/member");
@@ -60,8 +60,19 @@ export const useGroupMembershipData = () => {
         const userRes = await api.get("/user");
         payload = Array.isArray(userRes.data) ? userRes.data : userRes.data?.data || [];
       }
-      
-      setUsers(payload);
+      // i want to show the email
+
+      const normalized = payload.map((u) => ({
+
+        id: u.id ?? u.user_id ?? u.userId ?? null,
+        user_id: u.user_id ?? u.id ?? u.userId ?? null,
+        name: u.name ?? u.fullName ?? u.full_name ?? u.member_name ?? u.email?.split('@')[0] ?? "",
+        email: u.email ?? u.user_email ?? u.email_address ?? "",
+        avatarUrl: u.avatarUrl || u.avatar_url || null,
+        raw: u,
+      }));
+
+      setUsers(normalized);
     } catch (err) {
       console.error("Failed to fetch members:", err);
     }
@@ -96,10 +107,26 @@ export const useGroupMembershipData = () => {
     }
   };
 
+  // ✏️ Update membership
+  const updateMembership = async (id, group_id, member_id) => {
+    try {
+      const res = await api.patch(`/group-membership/${id}`, {
+        group_id,
+        member_id,
+      });
+      // Refresh list
+      await fetchData();
+      return res.data;
+    } catch (e) {
+      console.error("Update error:", e);
+      throw e;
+    }
+  };
+
   // 🔍 Search memberships
   const searchMemberships = async (query) => {
     try {
-      const res = await api.get("/group-membership/search", {
+      const res = await api.get(`/group?name=${query}`, {
         params: { group_id: query },
       });
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
@@ -132,6 +159,7 @@ export const useGroupMembershipData = () => {
     error,
     createMembership,
     deleteMembership,
+    updateMembership,
     searchMemberships,
     fetchData,
   };

@@ -12,7 +12,7 @@ export default function SignUpImage() {
             }
         };
 
-        updateImage(); // شغّليه أول مرة
+        updateImage();
         window.addEventListener("resize", updateImage);
 
         return () => window.removeEventListener("resize", updateImage);

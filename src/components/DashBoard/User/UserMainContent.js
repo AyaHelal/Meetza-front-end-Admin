@@ -10,7 +10,7 @@ import { PlusCircle } from "phosphor-react";
 import "./UserMainComponent.css";
 
 const UserMainContent = ({ currentUser }) => {
-    const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator";
+    const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator" || (currentUser?.role || "").toLowerCase() === "super_admin";
 
     const {
         users,
@@ -83,20 +83,18 @@ const UserMainContent = ({ currentUser }) => {
     };
 
     const handleSearchChange = (query) => {
+        console.log("query", query);
         setSearchQuery(query);
         if (query.trim() === "") {
             fetchData();
         } else {
-            searchUsers(query).catch((err) => {
-                toast.error(err?.response?.data?.message || "Failed to search users");
-            });
+            if (query.trim().length > 2)
+                searchUsers(query).catch((err) => {
+                    toast.error(err?.response?.data?.message || "Failed to search users");
+                });
         }
     };
 
-    const filteredUsers = users.filter((u) =>
-        (u.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (u.email || "").toLowerCase().includes(searchQuery.toLowerCase())
-    );
 
     return (
         <main className="flex-fill">
@@ -117,7 +115,7 @@ const UserMainContent = ({ currentUser }) => {
                     </div>
 
                     <UserTable
-                        users={filteredUsers}
+                        users={users}
                         loading={loading}
                         error={error}
                         onEdit={openEditModal}

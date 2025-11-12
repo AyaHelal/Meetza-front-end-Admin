@@ -16,7 +16,7 @@ export const useGroupData = () => {
 
       const res = await api.get("/group");
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
-      
+
       const normalized = payload.map((g) => ({
         id: g.id,
         name: g.name || g.group_name,
@@ -109,8 +109,7 @@ export const useGroupData = () => {
   // 🔍 Search groups
   const searchGroups = async (query) => {
     try {
-      const res = await api.get("/group/search", {
-        params: { name: query },
+      const res = await api.get(`/group?name=${query}`, {
       });
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
       const normalized = payload.map((g) => ({

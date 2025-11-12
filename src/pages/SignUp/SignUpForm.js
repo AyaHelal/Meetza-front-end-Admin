@@ -4,10 +4,7 @@ import { Envelope, User, Password, Eye, EyeSlash } from "phosphor-react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import "../Login/LoginForm.css";
-// Import reusable components
 import { FormInput, ToggleButton, LogoSection, SocialLoginButtons } from "../../components";
-
-// Import custom hooks and utilities
 import { useFormValidation, usePasswordVisibility } from "../../hooks";
 import { signupValidationRules } from "../../utils";
 import '../Login/LoginForm.css';

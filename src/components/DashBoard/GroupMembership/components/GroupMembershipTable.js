@@ -8,6 +8,7 @@ export const GroupMembershipTable = ({
   loading,
   error,
   onDelete,
+  onEdit,
   getGroupName,
   getMemberName,
   isAdmin,
@@ -47,6 +48,7 @@ export const GroupMembershipTable = ({
                 key={membership.id}
                 membership={membership}
                 onDelete={onDelete}
+                onEdit={onEdit}
                 getGroupName={getGroupName}
                 getMemberName={getMemberName}
                 isAdmin={isAdmin}

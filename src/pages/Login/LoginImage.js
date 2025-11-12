@@ -13,7 +13,7 @@ export default function LoginImage() {
             }
         };
 
-        updateImage(); // شغّليه أول مرة
+        updateImage();
         window.addEventListener("resize", updateImage);
 
         return () => window.removeEventListener("resize", updateImage);
