@@ -112,9 +112,146 @@ export default function ResetPassword() {
     return (
         <div className="container-fluid">
             <div className="row py-2">
+                <motion.div
+                    className="col-md-6 d-flex justify-content-center align-items-center"
+                    initial={{ opacity: 0, x: -100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 100 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                >
+                    <motion.div
+                        className="align-items-center text-center"
+                        initial={{ opacity: 0, x: 100 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -100 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                    >
+                        <LogoSection />
+
+                        <div className="justify-content-center p-8">
+                            <motion.h2
+                                className="fw-semibold"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.1 }}
+                            >
+                                Reset Password
+                            </motion.h2>
+                            <motion.span
+                                className="text-888888"
+                                style={{ fontSize: "20px" }}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.2 }}
+                            >
+                                Enter your new password
+                            </motion.span>
+
+                            <form className="form" onSubmit={handleSubmit} noValidate>
+                                {/* Success Message */}
+                                {success && (
+                                    <motion.div
+                                        className="alert alert-success mt-3"
+                                        role="alert"
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        {success}
+                                    </motion.div>
+                                )}
+
+                                {/* Error Message */}
+                                {error && (
+                                    <motion.div
+                                        className="alert alert-danger mt-3"
+                                        role="alert"
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        {error}
+                                    </motion.div>
+                                )}
+
+                                <div className="form-group mt-4">
+                                    <label htmlFor="newPassword" className="form-label text-start d-block mb-2">
+                                        New Password
+                                    </label>
+                                    <div className="position-relative">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            id="newPassword"
+                                            name="newPassword"
+                                            className="form-control"
+                                            placeholder="Enter new password"
+                                            value={formData.newPassword}
+                                            onChange={handleChange}
+                                            disabled={loading}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            className="btn btn-link position-absolute end-0 top-50 translate-middle-y"
+                                            onClick={togglePasswordVisibility}
+                                            style={{ zIndex: 10 }}
+                                        >
+                                            {showPassword ? <EyeSlash size={20} /> : <Eye size={20} />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="form-group mt-3">
+                                    <label htmlFor="confirmPassword" className="form-label text-start d-block mb-2">
+                                        Confirm Password
+                                    </label>
+                                    <div className="position-relative">
+                                        <input
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            id="confirmPassword"
+                                            name="confirmPassword"
+                                            className="form-control"
+                                            placeholder="Confirm new password"
+                                            value={formData.confirmPassword}
+                                            onChange={handleChange}
+                                            disabled={loading}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            className="btn btn-link position-absolute end-0 top-50 translate-middle-y"
+                                            onClick={toggleConfirmPasswordVisibility}
+                                            style={{ zIndex: 10 }}
+                                        >
+                                            {showConfirmPassword ? <EyeSlash size={20} /> : <Eye size={20} />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <motion.button
+                                    type="submit"
+                                    className="btn btn-primary w-100 py-3 mt-3 mb-3 rounded-4"
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    disabled={loading}
+                                >
+                                    {loading ? "Resetting..." : "Reset Password"}
+                                </motion.button>
+
+                                <div className="text-center">
+                                    <a href="/login" className="text-decoration-none text-888888">
+                                        Back to Login
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </motion.div>
+                </motion.div>
 
                 <motion.div
-                    className="col-md d-none d-md-flex justify-content-center align-items-center"
+                    className="col-md-6 d-none d-md-flex justify-content-center align-items-center"
                     initial={{ opacity: 0, x: 100 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -100 }}
