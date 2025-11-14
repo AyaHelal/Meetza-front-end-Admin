@@ -4,7 +4,7 @@ import axios from "axios";
 import useMeetingContentData from "./hooks/useMeetingContentData";
 import { MeetingContentTable } from "./components/MeetingContentTable";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
-import "../UserMainComponent.css";
+import "../User/UserMainComponent.css";
 
 export default function MeetingContent() {
     const [currentUser, setCurrentUser] = useState({});
