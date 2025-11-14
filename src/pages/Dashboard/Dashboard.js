@@ -13,17 +13,18 @@ import {
     SignOut,
 } from "phosphor-react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import UserMainContent from "../../components/DashBoard/UserMainContent";
+import UserMainContent from "../../components/DashBoard/User/UserMainContent";
 import Position from "../../components/DashBoard/Position/Position";
 import MeetingContent from "../../components/DashBoard/MeetingContent/MeetingContent.js";
 import Meeting from "../../components/DashBoard/Meeting/Meeting.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import GroupMainContent from "../../components/DashBoard/Group/GroupMainContent";
+import GroupMembershipContent from "../../components/DashBoard/GroupMembership/GroupMembershipContent";
 
 const UserDashboard = () => {
     // ---------- STATE ----------
     const [currentUser, setCurrentUser] = useState({});
-    const [users, setUsers] = useState([]);
     const [activeMenu, setActiveMenu] = useState("user");
 
     // Modals and user actions are now handled inside UserMainContent
@@ -143,7 +144,7 @@ const UserDashboard = () => {
             {/* MAIN AREA */}
             <div className="flex-fill">
                 {activeMenu === "user" && (
-                    <UserMainContent currentUser={currentUser} users={users} setUsers={setUsers} />
+                    <UserMainContent currentUser={currentUser} />
                 )}
                 {activeMenu === "position" && (
                     <Position />
@@ -154,7 +155,14 @@ const UserDashboard = () => {
                 {activeMenu === "meeting" && (
                     <Meeting />
                 )}
-                {activeMenu !== "user" && activeMenu !== "position" && activeMenu !== "content" &&activeMenu !== "meeting"&&(
+                {activeMenu === "group" && (
+                    <GroupMainContent currentUser={currentUser} />
+                )}
+                {activeMenu === "membership" && (
+                    <GroupMembershipContent currentUser={currentUser} />
+                )}
+
+                {activeMenu !== "user" && activeMenu !== "position" && activeMenu !== "content" &&activeMenu !== "meeting" && activeMenu !== "group" && activeMenu !== "membership" && (
                     <div className="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
                         <h4 className="mb-2">{getMenuLabel(activeMenu)}</h4>
                         <p className="mb-0">Main component for {getMenuLabel(activeMenu)} goes here.</p>

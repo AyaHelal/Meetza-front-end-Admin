@@ -1,0 +1,149 @@
+/* GroupMainComponent.css */
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 118, 234, 0.2);
+  border-color: #0076ea;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid #f4f4f4;
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.modal-content {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Custom scrollbar */
+.table-responsive::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f4f4f4;
+  border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: linear-gradient(to right, #0076ea, #00dc85);
+  border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to right, #0066cc, #00c775);
+}
+
+/* Badge styling */
+.badge {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Form inputs */
+.form-control:focus {
+  border-color: #b3d9ff !important;
+  box-shadow: 0 0 0 4px rgba(179, 217, 255, 0.25) !important;
+  outline: none;
+}
+
+.form-select:focus {
+  border-color: #b3d9ff !important;
+  box-shadow: 0 0 0 4px rgba(179, 217, 255, 0.25) !important;
+  outline: none;
+}
+
+.form-control::placeholder {
+  color: white;
+}
+.ff::placeholder {
+  color: #888888 !important;
+}
+
+/* Button hover effects */
+.btn-sm:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+.custom-select option:hover {
+  background-color: #e9ecef !important;
+  color: #000000 !important;
+}
+.custom-select option:checked {
+  background-color: #0d6efd !important;
+  color: white !important;
+}
+/* Modal backdrop */
+.modal {
+  backdrop-filter: blur(4px);
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 14px;
+  }
+
+  .search-input {
+    width: 100% !important;
+  }
+}
+
+/* Group icon gradient animation */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, #0076ea, #00dc85);
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}

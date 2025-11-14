@@ -1,13 +1,10 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Envelope, Password, Eye, EyeSlash } from "phosphor-react";
 import { motion } from "framer-motion";
 import axios from "axios";
-
-// Import reusable components
 import { FormInput, ToggleButton, LogoSection, SocialLoginButtons } from "../../components";
-
-// Import custom hooks and utilities
 import { useFormValidation, usePasswordVisibility } from "../../hooks";
 import { loginValidationRules } from "../../utils";
 
@@ -18,19 +15,13 @@ export default function LoginForm() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
-    // Custom hooks
     const { formData, errors, touched, handleChange: originalHandleChange, validateForm } = useFormValidation(
         { email: "", password: "" },
         loginValidationRules
     );
 
-    // API error state
     const [apiError, setApiError] = useState("");
-
-    // Remember me state
     const [rememberMe, setRememberMe] = useState(false);
-
-    // Enhanced handleChange that clears API errors
     const handleChange = (e) => {
         originalHandleChange(e);
         if (apiError) setApiError("");
@@ -38,21 +29,17 @@ export default function LoginForm() {
     };
 
     const { showPassword, togglePasswordVisibility } = usePasswordVisibility();
-
-    // Handle toggle button change
     const handleToggleChange = (value) => {
         const isLoginMode = value === 'login';
         setIsLogin(isLoginMode);
         navigate(isLoginMode ? "/login" : "/signup");
     };
 
-    // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
         handleFormSubmission();
     };
 
-    // Handle form submission logic
     const handleFormSubmission = async () => {
         if (validateForm()) {
             setApiError("");
@@ -60,8 +47,9 @@ export default function LoginForm() {
             try {
                 const response = await axios.post('https://meetza-backend.vercel.app/api/auth/login', {
                     ...formData,
-                    remember_me: rememberMe.toString(), // "true" or "false"
-                    role: 'Administrator'
+                    remember_me: rememberMe.toString(),
+                    role: 'Super_Admin',
+                    from: "dashboard"
                 });
                 console.log(response);
 
@@ -82,7 +70,6 @@ export default function LoginForm() {
                     localStorage.setItem('user', JSON.stringify(userPayload));
                     console.log("Login successful:", userName);
                 } catch (e) {
-                    // ignore storage errors
                 }
 
                 navigate('/dashboard');
@@ -122,7 +109,7 @@ export default function LoginForm() {
 
     return (
         <motion.div
-            className="align-items-center text-center"
+            className="align-items-center text-center "
             initial={{ opacity: 0, x: -100 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 100 }}
@@ -130,7 +117,7 @@ export default function LoginForm() {
         >
             <LogoSection />
 
-            <div className="justify-content-center p-8">
+            <div className="justify-content-center p-8 ff">
                 <motion.h2
                     className="fw-semibold"
                     initial={{ opacity: 0, y: 20 }}
@@ -158,7 +145,7 @@ export default function LoginForm() {
                         />
                     </div>
 
-                    <form className="form" onSubmit={handleSubmit} onKeyPress={handleKeyPress} noValidate>
+                    <form className="form " onSubmit={handleSubmit} onKeyPress={handleKeyPress} noValidate>
                         {/* API Error Display */}
                         {apiError && (
                             <motion.div

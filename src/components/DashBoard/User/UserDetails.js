@@ -23,7 +23,7 @@ const UserDetails = ({ user, onClose }) => (
             <h5 className="mt-3 mb-0">{user.name}</h5>
             <p className="text-muted small mb-1">{user.email}</p>
             <span
-                className={`badge ${user.role === "administrator" ? "bg-info text-dark" : "bg-secondary"}`}
+                className={`badge ${user.role === "Administrator" ? "bg-info text-dark" : "bg-secondary"}`}
             >
                 {user.role}
             </span>

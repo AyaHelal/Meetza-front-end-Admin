@@ -53,7 +53,7 @@ export default function VerifyResetCode() {
         try {
             setLoading(true);
             setError("");
-            await axios.post("https://meetza-backend.vercel.app/api/auth/forgot-password", {
+            await axios.post("https://meetza-backend.vercel.app/api/auth/forgot_password", {
                 email: email
             });
             alert("Verification code resent to your email.");
@@ -80,7 +80,7 @@ export default function VerifyResetCode() {
         try {
             setLoading(true);
             setError("");
-            const response = await axios.post("https://meetza-backend.vercel.app/api/auth/verify-reset-code", {
+            const response = await axios.post("https://meetza-backend.vercel.app/api/auth/verify_code", {
                 email: email,
                 code: otp
             });

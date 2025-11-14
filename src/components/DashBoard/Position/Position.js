@@ -4,6 +4,8 @@ import { usePositionData } from "./hooks/usePositionData";
 import { PositionTable } from "./components/PositionTable";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
 import "../UserMainComponent.css";
+import { SearchBar } from "./components/SearchBar";
+import "../User/UserMainComponent.css";
 
 export default function Position() {
   const [currentUser, setCurrentUser] = useState({});
@@ -38,7 +40,7 @@ useEffect(() => {
 
   useEffect(() => {
     if (userId) fetchData();
-  }, [userId,fetchData]);
+  }, [userId, fetchData]);
 
   const handleSave = async (positionId, title, adminId) => {
     if (!title.trim()) {
