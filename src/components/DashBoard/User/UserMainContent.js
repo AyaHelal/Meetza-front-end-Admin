@@ -6,7 +6,6 @@ import { UserHeader } from "./components/UserHeader";
 import { UserTable } from "./components/UserTable";
 import { SearchBar } from "../Position/components/SearchBar";
 import ModalComponent from "./ModalComponent";
-import { PlusCircle } from "phosphor-react";
 import "./UserMainComponent.css";
 
 const UserMainContent = ({ currentUser }) => {
