@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useGroupData } from "./hooks/useGroupData";
 import { GroupHeader } from "./components/GroupHeader";
 import { GroupTable } from "./components/GroupTable";
-import { SearchBar } from "../Position/components/SearchBar";
+import { SearchBar } from "../shared/SearchBar";
 import GroupModalComponent from "./GroupModalComponent";
 import GroupDetails from "./GroupDetails";
 import { PlusCircle, ArrowLeft } from "phosphor-react";

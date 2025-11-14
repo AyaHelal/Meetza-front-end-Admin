@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useGroupMembershipData } from "./hooks/useGroupMembershipData";
 import { GroupMembershipHeader } from "./components/GroupMembershipHeader";
 import { GroupMembershipTable } from "./components/GroupMembershipTable";
-import { SearchBar } from "../Position/components/SearchBar";
+import { SearchBar } from "../shared/SearchBar";
 import { PlusCircle } from "phosphor-react";
 import GroupMembershipModal from "./GroupMembershipModal";
 import "../User/UserMainComponent.css";

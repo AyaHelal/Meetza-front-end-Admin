@@ -9,6 +9,7 @@ import { UserCheck } from "lucide-react";
 import "./UserMainComponent.css";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 const UserMainContent = ({ currentUser, users, setUsers }) => {
     console.log("Current User in UserMainContent:", currentUser);
     const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator";

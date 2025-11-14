@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useUserData } from "./hooks/useUserData";
 import { UserHeader } from "./components/UserHeader";
 import { UserTable } from "./components/UserTable";
-import { SearchBar } from "../Position/components/SearchBar";
+import { SearchBar } from "../shared/SearchBar";
 import ModalComponent from "./ModalComponent";
 import "./UserMainComponent.css";
 
