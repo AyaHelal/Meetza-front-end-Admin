@@ -7,7 +7,10 @@ export const MeetingContentRow = ({
   onEdit,
   onDelete,
   isEditing,
+  currentUser,
+  isSuperAdmin,
 }) => {
+  const canEdit = isSuperAdmin || currentUser?.id === content?.user_id;
   const [contentData, setContentData] = useState({
     content_name: content?.content_name || "",
     content_description: content?.content_description || "",
@@ -91,44 +94,44 @@ export const MeetingContentRow = ({
 
       {/* Actions */}
       <td className="d-flex gap-2">
-        {showInput ? (
-          <button
+          {showInput ? (
+            <button
             className="btn btn-sm"
             style={{
               backgroundColor: "#00DC85",
               borderRadius: 12,
               color: "#fff",
             }}
-            onClick={handleSave}
-          >
-            <CheckCircle size={20} />
-          </button>
-        ) : (
-          <>
-            <button
+              onClick={handleSave}
+            >
+              <CheckCircle size={20} />
+            </button>
+          ) : (
+            <>
+              <button
               className="btn btn-sm"
               style={{
                 backgroundColor: "#00DC85",
                 borderRadius: 12,
                 color: "#fff",
               }}
-              onClick={() => onEdit(content.id)}
-            >
-              <PencilSimpleLine size={18} />
-            </button>
-            <button
+                onClick={() => onEdit(content.id)}
+              >
+                <PencilSimpleLine size={18} />
+              </button>
+              <button
               className="btn btn-sm"
               style={{
                 backgroundColor: "#FF0000",
                 borderRadius: 12,
                 color: "#fff",
               }}
-              onClick={() => onDelete(content.id)}
-            >
-              <Trash size={18} />
-            </button>
-          </>
-        )}
+                onClick={() => onDelete(content.id)}
+              >
+                <Trash size={18} />
+              </button>
+            </>
+          )}
       </td>
     </tr>
   );

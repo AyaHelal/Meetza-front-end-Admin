@@ -1,5 +1,5 @@
 import { MeetingRow } from "./MeetingRow";
-import { Plus } from "phosphor-react";
+import { PlusCircle } from "phosphor-react";
 import { SearchBar } from "../../shared/SearchBar";
 
 export const MeetingTable = ({ meetings, loading, error, onSave, onDelete, onEdit, onAdd, searchTerm, onSearchChange, addingNew, editing,contents }) => {
@@ -9,10 +9,25 @@ export const MeetingTable = ({ meetings, loading, error, onSave, onDelete, onEdi
             <div className="d-flex justify-content-between align-items-center p-4">
             <h2 className="h4 m-0 fw-semibold">Meeting Management</h2>
             <div className="d-flex gap-3 align-items-center">
+                <button
+                className="btn rounded-4 d-flex align-items-center gap-2"
+                onClick={onAdd}
+                disabled={addingNew}
+                style={{
+                    background: "linear-gradient(to right, #0076EA, #00DC85)",
+                    color: "white",
+                    fontSize: "16px",
+                    paddingTop: "0.75rem",
+                    paddingBottom: "0.75rem",
+                    paddingLeft: "1.5rem",
+                    paddingRight: "1.5rem",
+                    border: "none",
+                }}
+            >
+                <PlusCircle size={20} weight="bold" />
+                <span className="fw-semibold">Create Content</span>
+            </button>
                 <SearchBar value={searchTerm} onChange={onSearchChange} placeholder="Search meetings..." />
-                <button className="btn btn-success rounded-4 d-flex align-items-center gap-2" onClick={onAdd} disabled={addingNew} style={{ background: "linear-gradient(to right, #0076EA, #00DC85)", border: "2px solid #E9ECEF", padding: "0.75rem 1.5rem", whiteSpace: 'nowrap' }}>
-                <Plus size={20} weight="bold" /> Add Meeting
-                </button>
             </div>
             </div>
 

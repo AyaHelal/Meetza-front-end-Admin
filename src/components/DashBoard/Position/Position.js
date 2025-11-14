@@ -9,27 +9,30 @@ import "../User/UserMainComponent.css";
 export default function Position() {
   const [currentUser, setCurrentUser] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchTimeout, setSearchTimeout] = useState(null);
 
-useEffect(() => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (user) {
-    setCurrentUser({
-      id: user.id,
-      name: user.name || user.fullName || 'User',
-      role: user.role || ''
-    });
-  }
-}, []);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      setCurrentUser({
+        id: user.id,
+        name: user.name || user.fullName || 'User',
+        role: user.role || ''
+      });
+    }
+  }, []);
 
   const userId = currentUser?.id;
 
   const {
     positions,
+    users,
     loading,
     error,
     createPosition,
     updatePosition,
     deletePosition,
+    searchPositions,
     fetchData,
   } = usePositionData(userId);
 
@@ -41,41 +44,49 @@ useEffect(() => {
     if (userId) fetchData();
   }, [userId, fetchData]);
 
-  const handleSave = async (positionId, title, adminId) => {
+  const handleSave = async (positionId, title, selectedUser) => {
     if (!title.trim()) {
       toast.error("Position title is required");
       return;
     }
+    
+    // For new positions, ensure user is selected for Super Admin
+    if (!positionId && currentUser?.role === 'Super_Admin' && !selectedUser) {
+      toast.error("Please select a user for this position");
+      return;
+    }
+    
     try {
       if (positionId) {
         await updatePosition(positionId, title);
         toast.success("Position updated successfully");
       } else {
-        await createPosition(title, adminId);
+        // Always use the selected user's ID for the position
+        const administrator_id = selectedUser ? selectedUser.value : currentUser?.id;
+        console.log('Creating position with:', { title, administrator_id });
+        await createPosition(title, administrator_id);
         toast.success("Position created successfully");
       }
-      await fetchData();
+      
       setEditing((prev) => ({ ...prev, [positionId || "new"]: false }));
       setAddingNew(false);
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to save position");
+      console.error('Save error:', err);
+      toast.error(err.response?.data?.message || "Failed to save position");
     }
   };
 
-  const handleDelete = async (positionId) => {
-    if (!window.confirm("Are you sure you want to delete this position?")) return;
+  const handleDelete = async (id) => {
     try {
-      const res = await deletePosition(positionId);
-      if (res.success) {
+      const result = await deletePosition(id);
+      if (result.success) {
         toast.success("Position deleted successfully");
-        await fetchData();
       } else {
-        toast.error(res.message || "Failed to delete position");
+        toast.error(result.message || "Failed to delete position");
       }
-    } catch (err) {
-      console.error(err);
-      toast.error("Error deleting position");
+    } catch (error) {
+      console.error("Error deleting position:", error);
+      toast.error(error.response?.data?.message || "Error deleting position");
     }
   };
 
@@ -88,9 +99,29 @@ useEffect(() => {
     setEditing((prev) => ({ ...prev, "new": true }));
   };
 
-  const filteredPositions = positions.filter((p) =>
-    p.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    
+    // Clear previous timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Set a new timeout
+    const timeoutId = setTimeout(async () => {
+      if (query.trim() === "") {
+        await fetchData();
+      } else {
+        if (query.trim().length > 2){
+            await searchPositions(query).catch((err) => {
+            toast.error(err?.response?.data?.message || "Failed to search users");
+          });
+        }
+      }
+    }, 500);
+
+    setSearchTimeout(timeoutId);
+  };
 
   return (
     <main className="flex-fill">
@@ -100,7 +131,8 @@ useEffect(() => {
       />
       <PositionTable
         currentUser={currentUser}
-        positions={filteredPositions}
+        positions={positions}
+        users={users}
         loading={loading}
         error={error}
         onSave={handleSave}
@@ -108,7 +140,7 @@ useEffect(() => {
         onEdit={handleEdit}
         onAdd={handleAdd}
         searchTerm={searchQuery}
-        onSearchChange={setSearchQuery}
+        onSearchChange={handleSearch}
         editing={editing}
         addingNew={addingNew}
       />

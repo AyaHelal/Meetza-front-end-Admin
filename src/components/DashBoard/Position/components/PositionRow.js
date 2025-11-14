@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Trash, CheckCircle, PencilSimpleLine } from "phosphor-react";
+import { UserCheck } from "lucide-react";
+import Select from 'react-select';
 
 export const PositionRow = ({
   user,
@@ -8,87 +10,156 @@ export const PositionRow = ({
   onEdit,
   onDelete,
   isEditing,
+  users = [], // Add users prop for dropdown
 }) => {
   const [positionTitle, setPositionTitle] = useState(
     position?.title || ""
+  );
+  const [selectedUser, setSelectedUser] = useState(
+    position?.user ? { value: position.user.id, label: position.user.name } : null
   );
 
   useEffect(() => {
     if (position) {
       setPositionTitle(position.title);
+      if (position.user) {
+        setSelectedUser({
+          value: position.user.id,
+          label: position.user.name
+        });
+      }
     }
   }, [position]);
 
   const hasPosition = Boolean(position);
   const showInput = isEditing || !hasPosition;
+  const isSuperAdmin = user?.role === 'Super_Admin';
 
-const handleSave = () => {
-  if (positionTitle.trim()) {
-    onSave(position?.id, positionTitle.trim(), user.id);
-  } else {
-    alert("Please enter a position title");
-  }
-};
+  const handleSave = () => {
+    if (!positionTitle.trim()) {
+      alert("Please enter a position title");
+      return;
+    }
+    
+    if (isSuperAdmin && !selectedUser) {
+      alert("Please select a user");
+      return;
+    }
+    
+    const userId = isSuperAdmin ? selectedUser.value : user.id;
+    onSave(position?.id, positionTitle.trim(), userId);
+  };
+
+  const displayUser = position?.user || user;
 
   return (
     <tr className="align-middle">
-      <td className="px-4">
-        <div className="d-flex align-items-center  gap-2">
-          <div
-            className="rounded-3 d-flex align-items-center justify-content-center"
-            style={{
-              width: 40,
-              height: 40,
-              backgroundColor: "#E9ECEF",
-              color: "#6C757D",
-              fontWeight: 600,
-            }}
-          >
-            {user.name?.charAt(0)?.toUpperCase() || "U"}
-          </div>
-          <div>
-            <div className="fw-semibold" style={{ fontSize: 16}}>
-              {user.name}
-            </div>
-            <div className="text-muted" style={{ fontSize: 13 }}>
-              {user.email}
-            </div>
-          </div>
-        </div>
-      </td>
-      <td style={{ minWidth: 180 }}>
-        <div className="d-flex gap-2 align-items-center">
+      {/* User Column */}
+      {isSuperAdmin && (
+        <td className="px-4">
           {showInput ? (
-            <input
-              type="text"
-              className="form-control rounded-3"
-              placeholder="Enter position title..."
-              value={positionTitle}
-              onChange={(e) => setPositionTitle(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleSave()}
-              style={{
-                fontSize: "16px",
-                border: "2px solid #E9ECEF",
-                padding: "0.5rem",
-                width: "100%",
-              }}
-            />
-          ) : (
-            <span
-              style={{
-                fontSize: 16,
-                fontWeight: 600,
-                padding: "8px 0",
-                display: "inline-block",
-                color:"#6C757D"
-              }}
-            >
-              {positionTitle || "—"}
-            </span>
-          )}
-        </div>
+            <div className="w-100">
+              <Select
+                options={users.map(u => ({
+                  value: u.id,
+                  label: u.name,
+                }))}
+                value={selectedUser}
+                onChange={(selected) => setSelectedUser(selected)}
+                placeholder="Select user..."
+                className="basic-single"
+                classNamePrefix="select"
+                isDisabled={!isSuperAdmin}
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                menuPlacement="auto"
+                menuShouldBlockScroll={true}
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    border: '2px solid #E9ECEF',
+                    borderRadius: '12px',
+                    minHeight: '40px',
+                    boxShadow: 'none',
+                    '&:hover': {
+                      borderColor: '#0076EA',
+                    },
+                  }),
+                  menu: (base) => ({
+                    ...base,
+                    zIndex: 9999,
+                    marginTop: '5px',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  }),
+                  menuList: (base) => ({
+                    ...base,
+                    padding: '8px 0',
+                  }),
+                  option: (base, { isFocused }) => ({
+                    ...base,
+                    backgroundColor: isFocused ? '#f8f9fa' : 'white',
+                    color: '#212529',
+                    padding: '8px 16px',
+                    cursor: 'pointer',
+                    '&:active': {
+                      backgroundColor: '#e9ecef',
+                    },
+                  }),
+                  menuPortal: base => ({ ...base, zIndex: 9999 })
+                }}
+              />
+            </div>
+          ) : position?.user ? (
+            <div className="d-flex align-items-center gap-2">
+              <div
+                className="rounded-3 d-flex align-items-center justify-content-center"
+                style={{
+                  width: 56,
+                  height: 56,
+                  background: "linear-gradient(135deg, #0076EA, #00DC85)",
+                  color: "white",
+                  fontWeight: 600,
+                  objectFit: "cover"
+                }}
+              >
+                <UserCheck size={28} />
+              </div>
+              <div>
+                <div style={{ fontSize: 18 }}>
+                  {displayUser.name}
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </td>
+      )}
+
+      {/* Position Column */}
+      <td className="px-4" style={{color: "#6C757D"}}>
+        {showInput ? (
+          <input
+            type="text"
+            className="form-control rounded-3"
+            placeholder="Enter position title..."
+            value={positionTitle}
+            onChange={(e) => setPositionTitle(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleSave()}
+            style={{
+              fontSize: "16px",
+              border: "2px solid #E9ECEF",
+              padding: "0.5rem",
+              color: "#6C757D",
+              width: "100%",
+            }}
+          />
+        ) : (
+          <div className="fw-medium">{positionTitle || "—"}</div>
+        )}
       </td>
-      <td>
+
+      {/* Actions Column */}
+      <td className="px-4">
         <div className="d-flex gap-2">
           {showInput ? (
             <button

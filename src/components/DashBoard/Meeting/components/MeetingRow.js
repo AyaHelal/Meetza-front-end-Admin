@@ -143,6 +143,7 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, conte
                         className="btn btn-sm"
                         style={{ backgroundColor: "#00DC85", borderRadius: 12, color: "#fff" }}
                         onClick={handleSave}
+                        onKeyPress={(e) => e.key === "Enter" && handleSave()}
                     >
                         <CheckCircle size={20} />
                     </button>
@@ -153,6 +154,7 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, conte
                             className="btn btn-sm"
                             style={{ backgroundColor: "#00DC85", borderRadius: 12, color: "#fff" }}
                             onClick={() => onEdit(meeting.id)}
+                            onKeyPress={(e) => e.key === "Enter" && onEdit(meeting.id)}
                         >
                             <PencilSimpleLine size={18} />
                         </button>
