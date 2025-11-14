@@ -26,7 +26,7 @@ export default function MeetingContent() {
         try {
             const token = localStorage.getItem("authToken");
             const response = await axios.get(
-                "https://meetza-backend.vercel.app/api/meeting",
+                "https://meetza-backend.vercel.app/api/meeting-contents",
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
