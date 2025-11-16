@@ -1,5 +1,6 @@
 import { useState, useEffect , useCallback} from "react";
 import api from "../../../../utils/api";
+import { smartToast } from "../../../../utils/toastManager";
 
 export const usePositionData = (userId) => {
   const [positions, setPositions] = useState([]);
@@ -8,8 +9,7 @@ export const usePositionData = (userId) => {
   const [error, setError] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
-  // 🟩 Get only current user positions
-  const fetchData = useCallback(async  () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -26,46 +26,62 @@ export const usePositionData = (userId) => {
 
       if (!currentUser) {
         setError("User not found");
+        smartToast.error("User not found");
         setUsers([]);
         setPositions([]);
         return;
       }
 
-      const myPositions = allPositions.filter(
-        (pos) => pos.administrator_id === userId
-      );
+      if (currentUser.role === 'Super_Admin') {
+        const positionsWithUsers = allPositions.map(position => {
+          const user = allUsers.find(u => u.id === position.administrator_id) || {};
+          return {
+            ...position,
+            user: {
+              id: user.id,
+              name: user.name || user.fullName || 'Unknown User',
+              email: user.email,
+              role: user.role
+            }
+          };
+        });
 
-      setUsers([{ ...currentUser, positions: myPositions }]);
-      setCurrentUser(currentUser);
-      setPositions(myPositions);
+        setUsers(allUsers);
+        setCurrentUser(currentUser);
+        setPositions(positionsWithUsers);
+      } else {
+        const userPositions = allPositions.filter(pos => pos.administrator_id === userId);
+        setUsers([{ ...currentUser, positions: userPositions }]);
+        setCurrentUser(currentUser);
+        setPositions(userPositions);
+      }
     } catch (err) {
-      console.error("Fetch error:", err);
+      smartToast.error("Failed to load positions");
       setError("Failed to load data");
     } finally {
       setLoading(false);
     }
   }, [userId]);
 
-  // ➕ Create new position
   const createPosition = async (title, administrator_id) => {
     try {
+      const adminId = currentUser?.role === 'Super_Admin' ? administrator_id : userId;
+
       const res = await api.post(`/position`, {
         title,
-        administrator_id,
+        administrator_id: adminId,
       });
 
-      const newPosition = res.data;
-      setPositions((prev) => [...prev, newPosition]);
-
       await fetchData();
-      return newPosition;
+      smartToast.success("Position created successfully");
+      return res.data;
+
     } catch (e) {
-      console.error("Create error:", e);
-      return null;
+      smartToast.error(e?.response?.data?.message || "Failed to create position");
+      throw e;
     }
   };
 
-  // ✏️ Update existing position
   const updatePosition = async (id, title) => {
     try {
       const res = await api.put(`/position/${id}`, { title });
@@ -74,22 +90,37 @@ export const usePositionData = (userId) => {
       setPositions((prev) =>
         prev.map((pos) => (pos.id === id ? updatedPosition : pos))
       );
+
       await fetchData();
+      smartToast.success("Position updated successfully");
+
       return updatedPosition;
     } catch (e) {
-      console.error("Update error:", e);
+      smartToast.error("Failed to update position");
       return null;
     }
   };
 
-  // 🗑️ Delete position
   const deletePosition = async (id) => {
     try {
+      const position = positions.find(p => p.id === id);
+      if (!position) {
+        smartToast.error("Position not found");
+        return { success: false, message: 'Position not found' };
+      }
+
+      if (currentUser?.role !== 'Super_Admin' && position.administrator_id !== userId) {
+        smartToast.error("You do not have permission to delete this position");
+        return { success: false, message: 'No permission' };
+      }
+
       await api.delete(`/position/${id}`);
-      setPositions((prev) => prev.filter((pos) => pos.id !== id));
+      await fetchData();
+      smartToast.success("Position deleted successfully");
+
       return { success: true };
     } catch (e) {
-      console.error("Delete error:", e);
+      smartToast.error("Failed to delete position");
       return { success: false, message: e.message };
     }
   };
@@ -98,15 +129,45 @@ export const usePositionData = (userId) => {
     if (userId) fetchData();
   },  [userId, fetchData]);
 
+  const searchPositions = async (query) => {
+    try {
+      const res = await api.get(`/position?title=${query}`);
+      let payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+
+      if (payload.length > 0) {
+        const usersRes = await api.get('/user');
+        const allUsers = Array.isArray(usersRes.data) ? usersRes.data : usersRes.data?.data || [];
+
+        payload = payload.map(position => {
+          const user = allUsers.find(u => u.id === position.administrator_id);
+          return {
+            ...position,
+            user: user ? {
+              id: user.id,
+              name: user.name || user.fullName || 'Unknown User',
+              email: user.email,
+              role: user.role
+            } : null
+          };
+        });
+      }
+
+      setPositions(payload);
+    } catch (e) {
+      smartToast.error("Failed to search positions");
+      throw e;
+    }
+  };
+
   return {
     positions,
     users,
-    currentUser,
     loading,
     error,
-    deletePosition,
     createPosition,
     updatePosition,
+    deletePosition,
+    searchPositions,
     fetchData,
   };
 };

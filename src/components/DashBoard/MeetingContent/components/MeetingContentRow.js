@@ -7,7 +7,10 @@ export const MeetingContentRow = ({
   onEdit,
   onDelete,
   isEditing,
+  currentUser,
+  isSuperAdmin,
 }) => {
+  const canEdit = isSuperAdmin || currentUser?.id === content?.user_id;
   const [contentData, setContentData] = useState({
     content_name: content?.content_name || "",
     content_description: content?.content_description || "",
@@ -31,6 +34,21 @@ export const MeetingContentRow = ({
     } else {
       alert("Please enter both content name and description");
     }
+  };
+
+  const handleCancel = () => {
+    if (content) {
+      setContentData({
+        content_name: content.content_name || "",
+        content_description: content.content_description || "",
+      });
+    } else {
+      setContentData({
+        content_name: "",
+        content_description: "",
+      });
+    }
+    onEdit(content?.id || 'new');
   };
 
   const inputStyle = {
@@ -91,44 +109,73 @@ export const MeetingContentRow = ({
 
       {/* Actions */}
       <td className="d-flex gap-2">
-        {showInput ? (
-          <button
-            className="btn btn-sm"
-            style={{
-              backgroundColor: "#00DC85",
-              borderRadius: 12,
-              color: "#fff",
-            }}
-            onClick={handleSave}
-          >
-            <CheckCircle size={20} />
-          </button>
-        ) : (
-          <>
-            <button
+          {showInput ? (
+            <div className="d-flex gap-2">
+              <button
+                className="btn btn-sm"
+                style={{
+                  backgroundColor: "#00DC85",
+                  borderRadius: 12,
+                  minWidth: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0
+                }}
+                onClick={handleSave}
+                title="Save content"
+              >
+                <span style={{ color: "white" }}>
+                  <CheckCircle size={18} />
+                </span>
+              </button>
+              <button
+                onClick={handleCancel}
+                className="btn btn-sm"
+                style={{
+                  backgroundColor: "#6c757d",
+                  borderRadius: 12,
+                  minWidth: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0
+                }}
+                title="Cancel edit"
+              >
+                <span style={{ color: "white" }}>
+                  ×
+                </span>
+              </button>
+            </div>
+          ) : (
+            <>
+              <button
               className="btn btn-sm"
               style={{
                 backgroundColor: "#00DC85",
                 borderRadius: 12,
                 color: "#fff",
               }}
-              onClick={() => onEdit(content.id)}
-            >
-              <PencilSimpleLine size={18} />
-            </button>
-            <button
+                onClick={() => onEdit(content.id)}
+              >
+                <PencilSimpleLine size={18} />
+              </button>
+              <button
               className="btn btn-sm"
               style={{
                 backgroundColor: "#FF0000",
                 borderRadius: 12,
                 color: "#fff",
               }}
-              onClick={() => onDelete(content.id)}
-            >
-              <Trash size={18} />
-            </button>
-          </>
-        )}
+                onClick={() => onDelete(content.id)}
+              >
+                <Trash size={18} />
+              </button>
+            </>
+          )}
       </td>
     </tr>
   );

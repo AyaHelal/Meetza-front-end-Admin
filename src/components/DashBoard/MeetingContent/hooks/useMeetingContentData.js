@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { smartToast } from "../../../../utils/toastManager";
 
 const API_URL = "https://meetza-backend.vercel.app/api/meeting-contents";
 
@@ -38,64 +38,71 @@ const api = axios.create({
     const [contents, setContents] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
 
     // -------- GET ALL --------
-    const fetchContents = async () => {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-        window.location.href = "/login";
-        return;
-        }
-
+    const fetchContents = async (query = '') => {
         setLoading(true);
         setError(null);
 
         try {
-        const response = await api.get("/");
-        if (response.data.success) {
-            setContents(response.data.data || []);
-        } else {
-            toast.error("Failed to load contents");
-        }
+            const url = query ? `/?content_name=${encodeURIComponent(query)}` : '/';
+            const response = await api.get(url);
+
+            if (response.data.success) {
+                const currentUser = JSON.parse(localStorage.getItem('user'));
+                const isSuperAdmin = currentUser?.role === 'Super_Admin';
+
+                // Filter contents based on user role
+                const filteredContents = response.data.data.filter(content => {
+                    return isSuperAdmin || content.user_id === currentUser?.id;
+                });
+
+                setContents(filteredContents || []);
+            } else {
+                smartToast.error("Failed to load contents");
+                setContents([]);
+            }
         } catch (err) {
-        setError(err);
-        toast.error(err.response?.data?.message || "Error loading contents");
+            setError(err);
+            smartToast.error(err.response?.data?.message || "Error loading contents");
+            setContents([]);
         } finally {
-        setLoading(false);
+            setLoading(false);
         }
     };
 
     // -------- CREATE --------
     const addContent = async (data) => {
         try {
-        const response = await api.post("/", data);
-        if (response.data.success) {
-            toast.success("Meeting content created successfully");
-            fetchContents();
-        } else {
-            toast.error(response.data.message || "Failed to create content");
-        }
-        return response.data;
+            const response = await api.post("/", data);
+            if (response.data.success) {
+                smartToast.success("Meeting content created successfully");
+                fetchContents();
+            } else {
+                smartToast.error(response.data.message || "Failed to create content");
+            }
+            return response.data;
         } catch (err) {
-        toast.error(err.response?.data?.message || "Error creating content");
-        throw err;
+            smartToast.error(err.response?.data?.message || "Error creating content");
+            throw err;
         }
     };
 
     // -------- UPDATE --------
     const updateContent = async (id, updatedData) => {
         try {
-        const response = await api.put(`/${id}`, updatedData);
-        if (response.data.success) {
-            toast.success("Meeting content updated successfully");
-            fetchContents();
-        } else {
-            toast.error(response.data.message || "Failed to update content");
-        }
-        return response.data;
+            const response = await api.put(`/${id}`, updatedData);
+            if (response.data.success) {
+                smartToast.success("Meeting content updated successfully");
+                fetchContents();
+            } else {
+                smartToast.error(response.data.message || "Failed to update content");
+            }
+            return response.data;
         } catch (err) {
-        toast.error(err.response?.data?.message || "Error updating content");
-        throw err;
+            smartToast.error(err.response?.data?.message || "Error updating content");
+            throw err;
         }
     };
 
@@ -103,17 +110,17 @@ const api = axios.create({
     const deleteContent = async (id) => {
         if (!window.confirm("Are you sure you want to delete this content?")) return;
         try {
-        const response = await api.delete(`/${id}`);
-        if (response.data.success) {
-            setContents((prev) => prev.filter((c) => c.id !== id));
-            toast.success("Meeting content deleted successfully");
-        } else {
-            toast.error(response.data.message || "Failed to delete content");
-        }
-        return response.data;
+            const response = await api.delete(`/${id}`);
+            if (response.data.success) {
+                setContents((prev) => prev.filter((c) => c.id !== id));
+                smartToast.success("Meeting content deleted successfully");
+            } else {
+                smartToast.error(response.data.message || "Failed to delete content");
+            }
+            return response.data;
         } catch (err) {
-        toast.error(err.response?.data?.message || "Error deleting content");
-        throw err;
+            smartToast.error(err.response?.data?.message || "Error deleting content");
+            throw err;
         }
     };
 
@@ -121,5 +128,27 @@ const api = axios.create({
         fetchContents();
     }, []);
 
-    return { contents, loading, error, addContent, updateContent, deleteContent, fetchData: fetchContents };
+    const searchContents = async (query) => {
+        if (query.trim() === '') {
+            await fetchContents();
+            return;
+        }
+        if (query.trim().length > 2) {
+            await fetchContents(query).catch((err) => {
+                smartToast.error(err?.response?.data?.message || "Failed to search contents");
+            });
+        }
+    };
+
+    return {
+        contents,
+        loading,
+        error,
+        currentUser,
+        fetchContents,
+        searchContents,
+        addContent,
+        updateContent,
+        deleteContent,
+    };
 }
