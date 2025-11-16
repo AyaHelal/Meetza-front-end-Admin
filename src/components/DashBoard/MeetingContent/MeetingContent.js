@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { toast } from "react-toastify";
+import { smartToast } from "../../../utils/toastManager";
 import axios from "axios";
 import useMeetingContentData from "./hooks/useMeetingContentData";
 import { MeetingContentTable } from "./components/MeetingContentTable";
@@ -13,14 +13,14 @@ export default function MeetingContent() {
     const [editing, setEditing] = useState({});
     const [addingNew, setAddingNew] = useState(false);
 
-    const { 
-        contents, 
-        loading, 
-        error, 
+    const {
+        contents,
+        loading,
+        error,
         currentUser,
-        addContent, 
-        updateContent, 
-        deleteContent, 
+        addContent,
+        updateContent,
+        deleteContent,
         fetchContents,
         searchContents
     } = useMeetingContentData();
@@ -61,7 +61,7 @@ export default function MeetingContent() {
             await fetchMeetings();
         } catch(error) {
             console.error("Failed to save content", error);
-            toast.error(error.response?.data?.message || "Failed to save content");
+            smartToast.error(error.response?.data?.message || "Failed to save content");
         }
     };
 
@@ -72,7 +72,7 @@ export default function MeetingContent() {
             await fetchMeetings();
         } catch (error) {
             console.error("Failed to delete content:", error);
-            toast.error(error.response?.data?.message || "Failed to delete content");
+            smartToast.error(error.response?.data?.message || "Failed to delete content");
         }
     };
 
@@ -101,7 +101,7 @@ export default function MeetingContent() {
         };
     }, [searchTimeout]);
 
-    const handleEdit = (id) => setEditing((prev) => ({ ...prev, [id]: true }));
+    const handleEdit = (id) => setEditing((prev) => (id === 'new' ? { new: true } : { ...prev, [id]: !prev[id] }));
     const handleAdd = () => {
         setAddingNew(true);
         setEditing({ new: true });
@@ -112,7 +112,7 @@ export default function MeetingContent() {
             <UserWelcomeHeader
                 userName={currentUser?.name || currentUser?.username || "User"}
                 description={
-                    currentUser?.role === 'Super_Admin' 
+                    currentUser?.role === 'Super_Admin'
                         ? "Welcome back! Manage all meeting contents."
                         : "Welcome back! Manage your meeting contents."
                 }

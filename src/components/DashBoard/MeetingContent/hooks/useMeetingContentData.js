@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { smartToast } from "../../../../utils/toastManager";
 
 const API_URL = "https://meetza-backend.vercel.app/api/meeting-contents";
 
@@ -44,28 +44,28 @@ const api = axios.create({
     const fetchContents = async (query = '') => {
         setLoading(true);
         setError(null);
-        
+
         try {
             const url = query ? `/?content_name=${encodeURIComponent(query)}` : '/';
             const response = await api.get(url);
-            
+
             if (response.data.success) {
                 const currentUser = JSON.parse(localStorage.getItem('user'));
                 const isSuperAdmin = currentUser?.role === 'Super_Admin';
-                
+
                 // Filter contents based on user role
                 const filteredContents = response.data.data.filter(content => {
                     return isSuperAdmin || content.user_id === currentUser?.id;
                 });
-                
+
                 setContents(filteredContents || []);
             } else {
-                toast.error("Failed to load contents");
+                smartToast.error("Failed to load contents");
                 setContents([]);
             }
         } catch (err) {
             setError(err);
-            toast.error(err.response?.data?.message || "Error loading contents");
+            smartToast.error(err.response?.data?.message || "Error loading contents");
             setContents([]);
         } finally {
             setLoading(false);
@@ -77,14 +77,14 @@ const api = axios.create({
         try {
             const response = await api.post("/", data);
             if (response.data.success) {
-                toast.success("Meeting content created successfully");
+                smartToast.success("Meeting content created successfully");
                 fetchContents();
             } else {
-                toast.error(response.data.message || "Failed to create content");
+                smartToast.error(response.data.message || "Failed to create content");
             }
             return response.data;
         } catch (err) {
-            toast.error(err.response?.data?.message || "Error creating content");
+            smartToast.error(err.response?.data?.message || "Error creating content");
             throw err;
         }
     };
@@ -94,14 +94,14 @@ const api = axios.create({
         try {
             const response = await api.put(`/${id}`, updatedData);
             if (response.data.success) {
-                toast.success("Meeting content updated successfully");
+                smartToast.success("Meeting content updated successfully");
                 fetchContents();
             } else {
-                toast.error(response.data.message || "Failed to update content");
+                smartToast.error(response.data.message || "Failed to update content");
             }
             return response.data;
         } catch (err) {
-            toast.error(err.response?.data?.message || "Error updating content");
+            smartToast.error(err.response?.data?.message || "Error updating content");
             throw err;
         }
     };
@@ -113,13 +113,13 @@ const api = axios.create({
             const response = await api.delete(`/${id}`);
             if (response.data.success) {
                 setContents((prev) => prev.filter((c) => c.id !== id));
-                toast.success("Meeting content deleted successfully");
+                smartToast.success("Meeting content deleted successfully");
             } else {
-                toast.error(response.data.message || "Failed to delete content");
+                smartToast.error(response.data.message || "Failed to delete content");
             }
             return response.data;
         } catch (err) {
-            toast.error(err.response?.data?.message || "Error deleting content");
+            smartToast.error(err.response?.data?.message || "Error deleting content");
             throw err;
         }
     };
@@ -135,7 +135,7 @@ const api = axios.create({
         }
         if (query.trim().length > 2) {
             await fetchContents(query).catch((err) => {
-                toast.error(err?.response?.data?.message || "Failed to search contents");
+                smartToast.error(err?.response?.data?.message || "Failed to search contents");
             });
         }
     };

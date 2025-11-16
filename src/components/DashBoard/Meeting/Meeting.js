@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import { smartToast } from "../../../utils/toastManager";
 import useMeetingData from "./hooks/useMeetingData";
 import { MeetingTable } from "./components/MeetingTable";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
@@ -20,55 +20,65 @@ export default function Meeting() {
         updateMeeting,
         deleteMeeting,
         fetchMeetings,
-        searchMeetings
+        searchMeetings,
     } = useMeetingData();
-    const { contents, fetchData: fetchContents } = useMeetingContentData();
+
+    // get contents + fetch function from hook
+    const { contents, fetchContents } = useMeetingContentData();
+
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"));
         if (user) setCurrentUser({ name: user.name || "User" });
         fetchMeetings();
         fetchContents();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSave = async (id, data) => {
         try {
-            if (id) {
-                await updateMeeting(id, data);
-            } else {
-                await addMeeting(data);
-            }
-            setEditing({});
-            setAddingNew(false);
-            // Refresh the meetings list after saving
-            await fetchMeetings();
+        if (id) {
+            await updateMeeting(id, data);
+        } else {
+            await addMeeting(data);
+        }
+        setEditing({});
+        setAddingNew(false);
+        // Refresh the meetings list after saving
+        await fetchMeetings();
         } catch (err) {
-            console.error('Save error:', err);
-            toast.error(err.response?.data?.message || "Failed to save meeting");
+        console.error("Save error:", err);
+        smartToast.error(err.response?.data?.message || "Failed to save meeting");
         }
     };
 
     const handleDelete = async (id) => await deleteMeeting(id);
-    const handleEdit = (id) => setEditing((prev) => ({ ...prev, [id]: true }));
-    const handleAdd = () => { setAddingNew(true); setEditing({ new: true }); };
+
+    // <-- changed to TOGGLE editing state (so cancel can toggle off)
+    const handleEdit = (id) => setEditing((prev) => (id === "new" ? { new: true } : { ...prev, [id]: !prev[id] }));
+
+    const handleAdd = () => {
+        setAddingNew(true);
+        setEditing({ new: true });
+    };
 
     const handleSearch = async (query) => {
         setSearchTerm(query);
 
         // Clear previous timeout
         if (searchTimeout) {
-            clearTimeout(searchTimeout);
+        clearTimeout(searchTimeout);
         }
 
         // Set a new timeout
         const timeoutId = setTimeout(async () => {
-            if (query.trim() === "") {
-                await fetchMeetings();
-            } else {
-                if (query.trim().length > 2)
-                await searchMeetings(query).catch((err) => {
-                    toast.error(err?.response?.data?.message || "Failed to search meetings");
-                });
-            }
+        if (query.trim() === "") {
+            await fetchMeetings();
+        } else {
+            if (query.trim().length > 2)
+            await searchMeetings(query).catch((err) => {
+                smartToast.error(err?.response?.data?.message || "Failed to search meetings");
+            });
+        }
         }, 500);
 
         setSearchTimeout(timeoutId);

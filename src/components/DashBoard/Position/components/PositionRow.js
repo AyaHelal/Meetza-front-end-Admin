@@ -50,6 +50,22 @@ export const PositionRow = ({
     onSave(position?.id, positionTitle.trim(), userId);
   };
 
+  const handleCancel = () => {
+    // Reset form fields
+    if (position) {
+      setPositionTitle(position.title || '');
+      setSelectedUser(position.user ? { 
+        value: position.user.id, 
+        label: position.user.name 
+      } : null);
+    } else {
+      setPositionTitle('');
+      setSelectedUser(null);
+    }
+    // Toggle edit mode off by calling onEdit with the position ID
+    onEdit(position?.id || 'new');
+  };
+
   const displayUser = position?.user || user;
 
   return (
@@ -73,7 +89,7 @@ export const PositionRow = ({
                 menuPortalTarget={document.body}
                 menuPosition="fixed"
                 menuPlacement="auto"
-                menuShouldBlockScroll={true}
+                menuShouldBlockScroll
                 styles={{
                   control: (base) => ({
                     ...base,
@@ -106,7 +122,7 @@ export const PositionRow = ({
                       backgroundColor: '#e9ecef',
                     },
                   }),
-                  menuPortal: base => ({ ...base, zIndex: 9999 })
+                  menuPortal: base => ({ ...base, zIndex: '9999' })
                 }}
               />
             </div>
@@ -162,19 +178,46 @@ export const PositionRow = ({
       <td className="px-4">
         <div className="d-flex gap-2">
           {showInput ? (
-            <button
-              className="btn btn-sm"
-              style={{
-                backgroundColor: "#00DC85",
-                borderRadius: 12,
-              }}
-              onClick={handleSave}
-              title="Save position"
-            >
-              <span style={{ color: "white" }}>
-                <CheckCircle size={18} />
-              </span>
-            </button>
+            <div className="d-flex gap-2">
+              <button
+                className="btn btn-sm"
+                style={{
+                  backgroundColor: "#00DC85",
+                  borderRadius: 12,
+                  minWidth: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0
+                }}
+                onClick={handleSave}
+                title="Save position"
+              >
+                <span style={{ color: "white" }}>
+                  <CheckCircle size={18} />
+                </span>
+              </button>
+              <button
+                className="btn btn-sm"
+                style={{
+                  backgroundColor: "#6c757d",
+                  borderRadius: 12,
+                  minWidth: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0
+                }}
+                onClick={handleCancel}
+                title="Cancel edit"
+              >
+                <span style={{ color: "white" }}>
+                  ×
+                </span>
+              </button>
+            </div>
           ) : hasPosition ? (
             <>
               <button

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { smartToast } from "../../../../utils/toastManager";
+
 
 const API_URL = "https://meetza-backend.vercel.app/api/meeting";
 
@@ -57,7 +59,7 @@ const api = axios.create({
 
                 setMeetings(filteredMeetings || []);
             } else {
-                toast.error("Failed to load meetings");
+                smartToast.error("Failed to load meetings");
                 setMeetings([]);
             }
         } catch (err) {
@@ -76,7 +78,7 @@ const api = axios.create({
         }
         if (query.trim().length > 2) {
             await fetchMeetings(query).catch((err) => {
-                toast.error(err?.response?.data?.message || "Failed to search users");
+                smartToast.error(err?.response?.data?.message || "Failed to search users");
             });
         }
     };
@@ -89,12 +91,12 @@ const api = axios.create({
         };
         const res = await api.post("/", payload);
         if (res.data.success) {
-            toast.success("Meeting created successfully");
+            smartToast.success("Meeting created successfully");
             setMeetings((prev) => [...prev, res.data.data]);
             return res.data.data;
-        } else toast.error(res.data.message || "Failed to create meeting");
+        } else smartToast.error(res.data.message || "Failed to create meeting");
         } catch (err) {
-        toast.error(err.response?.data?.message || "Error creating meeting");
+        smartToast.error(err.response?.data?.message || "Error creating meeting");
         throw err;
         }
     };
@@ -107,14 +109,14 @@ const api = axios.create({
         };
         const res = await api.put(`/${id}`, payload);
         if (res.data.success) {
-            toast.success("Meeting updated successfully");
+            smartToast.success("Meeting updated successfully");
             setMeetings((prev) =>
             prev.map((m) => (m.id === id ? { ...m, ...data } : m))
             );
             return res.data;
-        } else toast.error(res.data.message || "Failed to update meeting");
+        } else smartToast.error(res.data.message || "Failed to update meeting");
         } catch (err) {
-        toast.error(err.response?.data?.message || "Error updating meeting");
+        smartToast.error(err.response?.data?.message || "Error updating meeting");
         throw err;
         }
     };
@@ -125,11 +127,11 @@ const api = axios.create({
         const res = await api.delete(`/${id}`);
         if (res.data.success) {
             setMeetings((prev) => prev.filter((m) => m.id !== id));
-            toast.success("Meeting deleted successfully");
+            smartToast.success("Meeting deleted successfully");
             return res.data;
-        } else toast.error(res.data.message || "Failed to delete meeting");
+        } else smartToast.error(res.data.message || "Failed to delete meeting");
         } catch (err) {
-        toast.error(err.response?.data?.message || "Error deleting meeting");
+        smartToast.error(err.response?.data?.message || "Error deleting meeting");
         throw err;
         }
     };

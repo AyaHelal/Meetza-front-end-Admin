@@ -36,6 +36,21 @@ export const MeetingContentRow = ({
     }
   };
 
+  const handleCancel = () => {
+    if (content) {
+      setContentData({
+        content_name: content.content_name || "",
+        content_description: content.content_description || "",
+      });
+    } else {
+      setContentData({
+        content_name: "",
+        content_description: "",
+      });
+    }
+    onEdit(content?.id || 'new');
+  };
+
   const inputStyle = {
     fontSize: "16px",
     border: "2px solid #E9ECEF",
@@ -95,17 +110,46 @@ export const MeetingContentRow = ({
       {/* Actions */}
       <td className="d-flex gap-2">
           {showInput ? (
-            <button
-            className="btn btn-sm"
-            style={{
-              backgroundColor: "#00DC85",
-              borderRadius: 12,
-              color: "#fff",
-            }}
-              onClick={handleSave}
-            >
-              <CheckCircle size={20} />
-            </button>
+            <div className="d-flex gap-2">
+              <button
+                className="btn btn-sm"
+                style={{
+                  backgroundColor: "#00DC85",
+                  borderRadius: 12,
+                  minWidth: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0
+                }}
+                onClick={handleSave}
+                title="Save content"
+              >
+                <span style={{ color: "white" }}>
+                  <CheckCircle size={18} />
+                </span>
+              </button>
+              <button
+                onClick={handleCancel}
+                className="btn btn-sm"
+                style={{
+                  backgroundColor: "#6c757d",
+                  borderRadius: 12,
+                  minWidth: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0
+                }}
+                title="Cancel edit"
+              >
+                <span style={{ color: "white" }}>
+                  ×
+                </span>
+              </button>
+            </div>
           ) : (
             <>
               <button
