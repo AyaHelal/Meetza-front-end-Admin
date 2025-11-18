@@ -40,29 +40,26 @@ export const PositionRow = ({
       alert("Please enter a position title");
       return;
     }
-    
     if (isSuperAdmin && !selectedUser) {
       alert("Please select a user");
       return;
     }
-    
+
     const userId = isSuperAdmin ? selectedUser.value : user.id;
     onSave(position?.id, positionTitle.trim(), userId);
   };
 
   const handleCancel = () => {
-    // Reset form fields
     if (position) {
       setPositionTitle(position.title || '');
-      setSelectedUser(position.user ? { 
-        value: position.user.id, 
-        label: position.user.name 
+      setSelectedUser(position.user ? {
+        value: position.user.id,
+        label: position.user.name
       } : null);
     } else {
       setPositionTitle('');
       setSelectedUser(null);
     }
-    // Toggle edit mode off by calling onEdit with the position ID
     onEdit(position?.id || 'new');
   };
 
@@ -71,61 +68,48 @@ export const PositionRow = ({
   return (
     <tr className="align-middle">
       {/* User Column */}
-      {isSuperAdmin && (
+      {isSuperAdmin ? (
         <td className="px-4">
           {showInput ? (
-            <div className="w-100">
-              <Select
-                options={users.map(u => ({
-                  value: u.id,
-                  label: u.name,
-                }))}
-                value={selectedUser}
-                onChange={(selected) => setSelectedUser(selected)}
-                placeholder="Select user..."
-                className="basic-single"
-                classNamePrefix="select"
-                isDisabled={!isSuperAdmin}
-                menuPortalTarget={document.body}
-                menuPosition="fixed"
-                menuPlacement="auto"
-                menuShouldBlockScroll
-                styles={{
-                  control: (base) => ({
-                    ...base,
-                    border: '2px solid #E9ECEF',
-                    borderRadius: '12px',
-                    minHeight: '40px',
-                    boxShadow: 'none',
-                    '&:hover': {
-                      borderColor: '#0076EA',
-                    },
-                  }),
-                  menu: (base) => ({
-                    ...base,
-                    zIndex: 9999,
-                    marginTop: '5px',
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                  }),
-                  menuList: (base) => ({
-                    ...base,
-                    padding: '8px 0',
-                  }),
-                  option: (base, { isFocused }) => ({
-                    ...base,
-                    backgroundColor: isFocused ? '#f8f9fa' : 'white',
-                    color: '#212529',
-                    padding: '8px 16px',
-                    cursor: 'pointer',
-                    '&:active': {
-                      backgroundColor: '#e9ecef',
-                    },
-                  }),
-                  menuPortal: base => ({ ...base, zIndex: '9999' })
-                }}
-              />
-            </div>
+            <Select
+              options={users.map(u => ({ value: u.id, label: u.name }))}
+              value={selectedUser}
+              onChange={(selected) => setSelectedUser(selected)}
+              placeholder="Select user..."
+              className="basic-single"
+              classNamePrefix="select"
+              menuPortalTarget={document.body}
+              menuPosition="fixed"
+              menuPlacement="auto"
+              menuShouldBlockScroll
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  border: '2px solid #E9ECEF',
+                  borderRadius: '12px',
+                  minHeight: '40px',
+                  boxShadow: 'none',
+                  '&:hover': { borderColor: '#0076EA' },
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 9999,
+                  marginTop: '5px',
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                }),
+                menuList: (base) => ({ ...base, padding: '8px 0' }),
+                option: (base, { isFocused }) => ({
+                  ...base,
+                  backgroundColor: isFocused ? '#f8f9fa' : 'white',
+                  color: '#212529',
+                  padding: '8px 16px',
+                  cursor: 'pointer',
+                  '&:active': { backgroundColor: '#e9ecef' },
+                }),
+                menuPortal: base => ({ ...base, zIndex: '9999' })
+              }}
+            />
           ) : position?.user ? (
             <div className="d-flex align-items-center gap-2">
               <div
@@ -148,6 +132,10 @@ export const PositionRow = ({
               </div>
             </div>
           ) : null}
+        </td>
+      ) : (
+        <td className="px-4">
+          <div className="fw-medium">{displayUser.name}</div>
         </td>
       )}
 

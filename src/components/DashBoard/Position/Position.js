@@ -4,6 +4,7 @@ import { usePositionData } from "./hooks/usePositionData";
 import { PositionTable } from "./components/PositionTable";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
 import "../User/UserMainComponent.css";
+import api from "../../../utils/api";
 
 export default function Position() {
   const [currentUser, setCurrentUser] = useState({});
@@ -28,8 +29,6 @@ export default function Position() {
     users,
     loading,
     error,
-    createPosition,
-    updatePosition,
     deletePosition,
     searchPositions,
     fetchData,
@@ -42,32 +41,50 @@ export default function Position() {
     if (userId) fetchData();
   }, [userId, fetchData]);
 
-  const handleSave = async (positionId, title, selectedUser) => {
-    if (!title.trim()) {
-      smartToast.error("Position title is required");
-      return;
-    }
+const handleSave = async (positionId, title, selectedUserId) => {
+  if (!title.trim()) {
+    smartToast.error("Position title is required");
+    return;
+  }
 
-    if (!positionId && currentUser?.role === 'Super_Admin' && !selectedUser) {
+  let payload = { title };
+
+  if (currentUser?.role === 'Super_Admin') {
+    if (!selectedUserId) {
       smartToast.error("Please select a user for this position");
       return;
     }
+    payload = {
+      ...payload,
+      role: "Super_Admin",
+      administrator_id: selectedUserId
+    };
+  } else {
+    payload = {
+      ...payload,
+      administrator_id: currentUser.id
+    };
+  }
 
-    try {
-      if (positionId) {
-        await updatePosition(positionId, title);
-      } else {
-        const administrator_id = selectedUser ? selectedUser.value : currentUser?.id;
-        await createPosition(title, administrator_id);
-      }
-
-      setEditing((prev) => ({ ...prev, [positionId || "new"]: false }));
-      setAddingNew(false);
-
-    } catch (err) {
-      smartToast.error(err.response?.data?.message || "Failed to save position");
+  try {
+    if (positionId) {
+      await api.put(`/position/${positionId}`, payload);
+      smartToast.success("Position updated successfully");
+    } else {
+      await api.post(`/position`, payload);
+      smartToast.success("Position created successfully");
     }
-  };
+
+    setEditing((prev) => ({ ...prev, [positionId || "new"]: false }));
+    setAddingNew(false);
+    fetchData();
+  } catch (err) {
+    smartToast.error(err.response?.data?.message || "Failed to save position");
+  }
+};
+
+
+
 
   const handleDelete = async (id) => {
     const result = await deletePosition(id);
