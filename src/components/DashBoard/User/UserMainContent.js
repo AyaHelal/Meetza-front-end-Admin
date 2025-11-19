@@ -99,8 +99,8 @@ const UserMainContent = ({ currentUser }) => {
         <main className="flex-fill">
             <UserHeader currentUser={currentUser} />
 
-            <div className="m-4 rounded-3" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)", height: "804px" }}>
-                <div className="card shadow-sm rounded-3 border-0" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+            <div className=" rounded-3" >
+                <div className="card m-4 shadow-sm rounded-3 border-0" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
                     <div className="card-body p-3 mb-4 d-flex justify-content-between align-items-center">
                         <div className="d-flex gap-3 align-items-center">
                             <h2 className="h5 mb-0 fw-semibold" style={{ fontSize: "24px" }}>User Management</h2>

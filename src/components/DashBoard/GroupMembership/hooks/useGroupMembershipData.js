@@ -46,37 +46,16 @@ export const useGroupMembershipData = () => {
     }
   }, []);
 
-  // 🟩 Fetch members (from member endpoint or user endpoint)  
-  const fetchMembers = useCallback(async () => {
+  const fetchUsers = useCallback(async () => {
     try {
-      let payload = [];
-
-      // Try member endpoint first
-      try {
-        const memberRes = await api.get("/member");
-        payload = Array.isArray(memberRes.data) ? memberRes.data : memberRes.data?.data || [];
-      } catch (memberError) {
-        // Fallback to user endpoint
-        const userRes = await api.get("/user");
-        payload = Array.isArray(userRes.data) ? userRes.data : userRes.data?.data || [];
-      }
-      // i want to show the email
-
-      const normalized = payload.map((u) => ({
-
-        id: u.id ?? u.user_id ?? u.userId ?? null,
-        user_id: u.user_id ?? u.id ?? u.userId ?? null,
-        name: u.name ?? u.fullName ?? u.full_name ?? u.member_name ?? u.email?.split('@')[0] ?? "",
-        email: u.email ?? u.user_email ?? u.email_address ?? "",
-        avatarUrl: u.avatarUrl || u.avatar_url || null,
-        raw: u,
-      }));
-
-      setUsers(normalized);
+      const res = await api.get("/user");
+      const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      setUsers(payload);
     } catch (err) {
-      console.error("Failed to fetch members:", err);
+      console.error("Failed to fetch users:", err);
     }
   }, []);
+
 
   // ➕ Create new membership
   const createMembership = async (group_id, member_id) => {
@@ -148,8 +127,8 @@ export const useGroupMembershipData = () => {
   useEffect(() => {
     fetchData();
     fetchGroups();
-    fetchMembers();
-  }, [fetchData, fetchGroups, fetchMembers]);
+    fetchUsers();
+  }, [fetchData, fetchGroups, fetchUsers]);
 
   return {
     memberships,

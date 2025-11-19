@@ -1,0 +1,44 @@
+.user-table-container {
+  max-height: 700px;
+}
+
+@media (max-height: 900px) {
+  .user-table-container {
+    max-height: 415px !important;
+  }
+}
+
+.user-table-container::-webkit-scrollbar-button {
+  display: none;
+}
+
+.user-table-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.user-table-container::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+.user-table-container::-webkit-scrollbar-thumb {
+  background: #c5c6c6;
+
+  border-radius: 10px;
+}
+
+.user-table-container::-webkit-scrollbar-thumb:hover {
+  background: #c5c6c6;
+}
+
+.table-header-sticky th {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+  border-bottom: 2px solid #f4f4f4;
+}
+
+tbody tr,
+tbody td {
+  border-bottom: none !important;
+}

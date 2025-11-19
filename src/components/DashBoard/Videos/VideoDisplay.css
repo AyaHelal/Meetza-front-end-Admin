@@ -1,0 +1,35 @@
+@media (max-width: 1550px) and (min-width: 1441px) {
+  .width-850 {
+    width: 900px;
+    margin-left: 5%;
+  }
+}
+@media (max-height: 900px) {
+  .comment_scrollbar_height {
+    max-height: 170px !important;
+  }
+  .input-custom-width {
+    width: 590px !important;
+  }
+}
+.comment_scrollbar_height::-webkit-scrollbar-button {
+  display: none; /* ده بيشيل الأسهم فوق وتحت */
+}
+
+.comment_scrollbar_height::-webkit-scrollbar {
+  width: 10px; /* عرض scrollbar */
+}
+
+.comment_scrollbar_height::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+.comment_scrollbar_height::-webkit-scrollbar-thumb {
+  background: #c5c6c6; /* لون المقبض عند hover */
+
+  border-radius: 10px;
+}
+
+.comment_scrollbar_height::-webkit-scrollbar-thumb:hover {
+  background: #c5c6c6; /* لون المقبض عند hover */
+}

@@ -121,18 +121,12 @@ const GroupMembershipContent = ({ currentUser }) => {
     };
 
     // Helper function to get member name by ID
-    const getMemberName = (memberId, memberName = null) => {
-        if (memberName) return memberName;
-        if (!memberId) return "N/A";
-        const user = users.find((u) =>
-            u.user_id === memberId ||
-            String(u.user_id) === String(memberId) ||
-            u.id === memberId ||
-            u.id === Number(memberId) ||
-            String(u.id) === String(memberId)
-        );
-        return user?.name || `User ${memberId}`;
+    const getMemberName = (memberId) => {
+        const user = users.find(u => u.user_id === memberId || u.id === memberId);
+        return user?.name || user?.email || `User ${memberId}`;
     };
+
+
 
     // Helper function to get group name by ID
     const getGroupName = (groupId, groupName = null) => {
@@ -148,8 +142,8 @@ const GroupMembershipContent = ({ currentUser }) => {
         <main className="flex-fill">
             <GroupMembershipHeader currentUser={currentUser} />
 
-            <div className="m-4 rounded-3" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)", height: "804px" }}>
-                <div className="card shadow-sm rounded-3 border-0" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+            <div className=" rounded-3" >
+                <div className="card shadow-sm m-4 rounded-3 border-0" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
                     {!showForm ? (
                         <>
                             <div className="card-body p-3 mb-4 d-flex justify-content-between align-items-center">
@@ -190,6 +184,7 @@ const GroupMembershipContent = ({ currentUser }) => {
                                 onEdit={openEditForm}
                                 getGroupName={getGroupName}
                                 getMemberName={getMemberName}
+                                getMemberEmail={getMemberEmail}
                                 isAdmin={isAdmin}
                             />
                         </>

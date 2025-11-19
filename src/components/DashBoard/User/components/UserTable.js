@@ -1,5 +1,7 @@
 import React from "react";
 import { UserRow } from "./UserRow";
+import '../../CSS/Table.css';
+
 
 export const UserTable = ({
   users,
@@ -10,10 +12,10 @@ export const UserTable = ({
   isAdmin,
 }) => {
   return (
-    <div className="table-responsive overflow-hidden">
-      <table className="table table-borderless px-5">
-        <thead className="" style={{ borderBottom: "5px solid #F4F4F4" }}>
-          <tr className="mx-5">
+    <div className="table-responsive user-table-container rounded-3">
+      <table className="table table-borderless">
+        <thead className="table-header-sticky">
+          <tr>
             <th style={{ color: "#888888" }} className="fw-semibold px-4">Name</th>
             <th style={{ color: "#888888" }} className="fw-semibold">Email</th>
             <th style={{ color: "#888888" }} className="fw-semibold">Role</th>
@@ -52,15 +54,22 @@ export const UserTable = ({
           )}
         </tbody>
       </table>
-      <style jsx>{`
-        tbody tr {
-          border-bottom: none !important;
-        }
-        tbody td {
-          border-bottom: none !important;
-        }
-      `}</style>
-    </div>
-  );
-};
 
+      <style jsx>{`
+  
+    .table-header-sticky th {
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 10;
+      border-bottom: 2px solid #F4F4F4;
+    }
+
+    tbody tr, tbody td {
+      border-bottom: none !important;
+    }
+  `}</style>
+    </div>
+
+  );
+}
