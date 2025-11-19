@@ -79,9 +79,10 @@ export const useGroupMembershipData = () => {
 
       setUsers(normalized);
     } catch (err) {
-      console.error("Failed to fetch members:", err);
+      console.error("Failed to fetch users:", err);
     }
   }, []);
+
 
   // ➕ Create new membership
   const createMembership = async (group_id, member_id) => {
@@ -154,8 +155,8 @@ export const useGroupMembershipData = () => {
   useEffect(() => {
     fetchData();
     fetchGroups();
-    fetchMembers();
-  }, [fetchData, fetchGroups, fetchMembers]);
+    fetchUsers();
+  }, [fetchData, fetchGroups, fetchUsers]);
 
   return {
     memberships,

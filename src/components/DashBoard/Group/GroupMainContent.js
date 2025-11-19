@@ -154,8 +154,8 @@ const GroupMainContent = ({ currentUser }) => {
         <main className="flex-fill">
             <GroupHeader currentUser={currentUser} />
 
-            <div className="m-4 rounded-3" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)", height: "804px" }}>
-                <div className="card shadow-sm rounded-3 border-0" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+            <div className="rounded-3" >
+                <div className="card shadow-sm m-4  rounded-3 border-0" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
                     {!showForm ? (
                         <>
                             <div className="card-body p-3 mb-4 d-flex justify-content-between align-items-center">

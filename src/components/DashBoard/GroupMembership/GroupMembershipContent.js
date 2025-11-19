@@ -134,6 +134,8 @@ const GroupMembershipContent = ({ currentUser }) => {
         return user?.name || `User ${memberId}`;
     };
 
+
+
     // Helper function to get group name by ID
     const getGroupName = (groupId, groupName = null) => {
         if (groupName) return groupName;
@@ -148,8 +150,8 @@ const GroupMembershipContent = ({ currentUser }) => {
         <main className="flex-fill">
             <GroupMembershipHeader currentUser={currentUser} />
 
-            <div className="m-4 rounded-3" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)", height: "804px" }}>
-                <div className="card shadow-sm rounded-3 border-0" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+            <div className=" rounded-3" >
+                <div className="card shadow-sm m-4 rounded-3 border-0" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
                     {!showForm ? (
                         <>
                             <div className="card-body p-3 mb-4 d-flex justify-content-between align-items-center">

@@ -65,7 +65,7 @@
 }
 
 .table-responsive::-webkit-scrollbar-thumb {
-  background: linear-gradient(to right, #0076ea, #00dc85);
+  background: #c5c6c6; /* لون المقبض عند hover */
   border-radius: 10px;
 }
 

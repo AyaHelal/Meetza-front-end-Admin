@@ -1,6 +1,6 @@
 import React from "react";
 import { GroupMembershipRow } from "./GroupMembershipRow";
-
+import '../../CSS/Table.css';
 export const GroupMembershipTable = ({
   memberships,
   groups,
@@ -15,12 +15,13 @@ export const GroupMembershipTable = ({
   isAdmin,
 }) => {
   return (
-    <div className="table-responsive overflow-hidden">
-      <table className="table table-borderless px-5">
-        <thead className="" style={{ borderBottom: "5px solid #F4F4F4" }}>
+    <div className="table-responsive overflow-hidden user-table-container rounded-3">
+      <table className="table table-borderless">
+        <thead className="table-header-sticky">
           <tr className="mx-5">
             <th style={{ color: "#888888" }} className="fw-semibold px-4">Group</th>
-            <th style={{ color: "#888888" }} className="fw-semibold">Member</th>
+            <th style={{ color: "#888888" }} className="fw-semibold">Member Name</th>
+            <th style={{ color: "#888888" }} className="fw-semibold">Member Email</th>
             <th style={{ color: "#888888" }} className="fw-semibold">Actions</th>
           </tr>
         </thead>

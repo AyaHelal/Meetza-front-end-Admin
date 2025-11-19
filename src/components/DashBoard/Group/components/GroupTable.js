@@ -1,7 +1,6 @@
 import React from "react";
-import { UsersThree, PencilSimpleLine, Trash } from "phosphor-react";
 import { GroupRow } from "./GroupRow";
-
+import '../../CSS/Table.css';
 export const GroupTable = ({
   groups,
   positions,
@@ -15,9 +14,9 @@ export const GroupTable = ({
   isAdmin,
 }) => {
   return (
-    <div className="table-responsive overflow-hidden">
-      <table className="table table-borderless px-5">
-        <thead className="" style={{ borderBottom: "5px solid #F4F4F4" }}>
+    <div className="table-responsive  user-table-container rounded-3">
+      <table className="table table-borderless">
+        <thead className="table-header-sticky">
           <tr className="mx-5">
             <th style={{ color: "#888888" }} className="fw-semibold px-4">Name</th>
             <th style={{ color: "#888888" }} className="fw-semibold">Position</th>

@@ -19,6 +19,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GroupMainContent from "../../components/DashBoard/Group/GroupMainContent";
 import GroupMembershipContent from "../../components/DashBoard/GroupMembership/GroupMembershipContent";
+import VideoDisplay from "../../components/DashBoard/Videos/VideoDisplay";
 
 const UserDashboard = () => {
     // ---------- STATE ----------
@@ -46,8 +47,6 @@ const UserDashboard = () => {
         } catch (e) {
             // ignore parsing errors
         }
-
-
     }, []);
 
     // ---------- MENU ----------
@@ -58,9 +57,10 @@ const UserDashboard = () => {
         { id: "membership", icon: IdentificationCard, label: "Group Membership" },
         { id: "meeting", icon: VideoCamera, label: "Meeting" },
         { id: "content", icon: File, label: "Meeting Content" },
-        { id: "videos", icon: VideoCamera, label: "Videos" }
+        { id: "videos", icon: VideoCamera, label: "Videos" },
+        // { id: "likes", icon: Heart, label: "Likes" },
+        // { id: "comments", icon: ChatCircleDots, label: "Comments" },
     ];
-
 
     const handleMenuClick = (id) => {
         setActiveMenu(id);
@@ -88,16 +88,26 @@ const UserDashboard = () => {
 
     return (
         <div className="d-flex min-vh-100 bg-light">
+            <style>{`
+                .responsive-aside {
+                    height: 936px;
+                }
+                @media (max-height: 1024px) {
+                    .responsive-aside {
+                        height: calc(100vh - 80px);
+                    }
+                }
+            `}</style>
             {/* SIDEBAR */}
             <aside
-                className="bg-white rounded-3 p-2 m-4 mt-5"
-                style={{ width: 230, boxShadow: "0 4px 12px rgba(0,0,0,0.1)", height: "936px" }}
+                className="bg-white rounded-3 p-2 m-4 mt-5 responsive-aside d-flex flex-column"
+                style={{ width: 230, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
             >
                 <div className="px-2 pb-5">
                     <img src="/assets/MeetzaLogo.png" alt="Meetza Logo" />
                 </div>
 
-                <nav className="px-2 ">
+                <nav className="px-2 flex-grow-1">
                     {menuItems.map((item) => {
                         const Icon = item.icon;
                         return (
@@ -120,7 +130,7 @@ const UserDashboard = () => {
                     })}
                 </nav>
 
-                <div className="d-flex flex-column gap-2" style={{ marginTop: "100%" }}>
+                <div className="d-flex flex-column gap-2 px-2 pb-md-4 pb-lg-2">
                     <button className="btn btn-light d-flex align-items-center rounded-5"
                         style={{ width: "fit-content", backgroundColor: "#F4F6F8" }}>
                         <Bell size={24} />
@@ -157,21 +167,24 @@ const UserDashboard = () => {
                 {activeMenu === "membership" && (
                     <GroupMembershipContent currentUser={currentUser} />
                 )}
+                {activeMenu === "videos" && (
+                    <VideoDisplay currentUser={currentUser} />
+                )}
 
-                {activeMenu !== "user" && activeMenu !== "position" && activeMenu !== "content" &&activeMenu !== "meeting" && activeMenu !== "group" && activeMenu !== "membership" && (
+                {activeMenu !== "user" && activeMenu !== "position" && activeMenu !== "content" && activeMenu !== "meeting" && activeMenu !== "group" && activeMenu !== "membership" && activeMenu !== "videos" && (
                     <div className="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
                         <h4 className="mb-2">{getMenuLabel(activeMenu)}</h4>
                         <p className="mb-0">Main component for {getMenuLabel(activeMenu)} goes here.</p>
                     </div>
                 )}
-                    <ToastContainer
-                        position="top-right"
-                        autoClose={3000}
-                        hideProgressBar={false}
-                        newestOnTop
-                        closeOnClick
-                        pauseOnHover
-                    />
+                <ToastContainer
+                    position="top-right"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    newestOnTop
+                    closeOnClick
+                    pauseOnHover
+                />
             </div>
         </div>
     );
