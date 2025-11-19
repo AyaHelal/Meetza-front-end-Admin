@@ -3,7 +3,6 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { smartToast } from "../../../../utils/toastManager";
 
-
 const API_URL = "https://meetza-backend.vercel.app/api/meeting";
 
 // Axios instance
@@ -32,7 +31,9 @@ const api = axios.create({
     const formatForAPI = (inputValue) => {
     const d = new Date(inputValue);
     const pad = (n) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(
+        d.getHours()
+    )}:${pad(d.getMinutes())}:00`;
     };
 
     export default function useMeetingData() {
@@ -44,51 +45,65 @@ const api = axios.create({
         setLoading(true);
         setError(null);
         try {
-            const url = query ? `/?title=${encodeURIComponent(query)}` : '/';
-            const res = await api.get(url);
+        const url = query ? `/?title=${encodeURIComponent(query)}` : '/';
+        const res = await api.get(url);
 
-            if (res.data.success) {
-                const currentUser = JSON.parse(localStorage.getItem('user'));
-                const isSuperAdmin = currentUser?.role === 'Super_Admin';
+        if (res.data.success) {
+            const currentUser = JSON.parse(localStorage.getItem('user'));
+            const isSuperAdmin = currentUser?.role === 'Super_Admin';
 
-                // Filter meetings based on user role
-                const filteredMeetings = res.data.data.filter(meeting => {
-                    if (isSuperAdmin) return true; // Super Admin sees all
-                    return meeting.user_id === currentUser?.id; // Regular users see only their meetings
-                });
+            const filteredMeetings = res.data.data.filter(meeting => {
+            if (isSuperAdmin) return true;
+            return meeting.administrator_id === currentUser?.id;
+            });
 
-                setMeetings(filteredMeetings || []);
-            } else {
-                smartToast.error("Failed to load meetings");
-                setMeetings([]);
-            }
-        } catch (err) {
-            setError(err);
-            toast.error(err.response?.data?.message || "Error loading meetings");
+            setMeetings(filteredMeetings || []);
+        } else {
+            smartToast.error("Failed to load meetings");
             setMeetings([]);
+        }
+        } catch (err) {
+        setError(err);
+        toast.error(err.response?.data?.message || "Error loading meetings");
+        setMeetings([]);
         } finally {
-            setLoading(false);
+        setLoading(false);
         }
     };
 
     const searchMeetings = async (query) => {
         if (query.trim() === '') {
-            await fetchMeetings();
-            return;
+        await fetchMeetings();
+        return;
         }
         if (query.trim().length > 2) {
-            await fetchMeetings(query).catch((err) => {
-                smartToast.error(err?.response?.data?.message || "Failed to search users");
-            });
+        await fetchMeetings(query).catch((err) => {
+            smartToast.error(err?.response?.data?.message || "Failed to search meetings");
+        });
         }
     };
 
     const addMeeting = async (data) => {
         try {
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+
+        // استخدم group_id من payload لو موجود أو خذ أول group_id من meetings
+        const groupId =
+            data.group_id ||
+            (meetings.length > 0 ? meetings[0].group_id : null);
+
+        if (!groupId) {
+            smartToast.error("Cannot create meeting: no group_id available");
+            return;
+        }
+
         const payload = {
             ...data,
             datetime: formatForAPI(data.datetime),
+            group_id: groupId,
+            administrator_id: currentUser.id,
         };
+
         const res = await api.post("/", payload);
         if (res.data.success) {
             smartToast.success("Meeting created successfully");
@@ -102,24 +117,33 @@ const api = axios.create({
     };
 
     const updateMeeting = async (id, data) => {
-        try {
+    try {
+        const originalMeeting = meetings.find(m => m.id === id);
+
         const payload = {
-            ...data,
+            title: data.title,
             datetime: formatForAPI(data.datetime),
+            status: data.status,
+            meeting_content_id: data.meeting_content_id,
+            group_id: data.group_id || originalMeeting?.group_id,
         };
+
         const res = await api.put(`/${id}`, payload);
         if (res.data.success) {
             smartToast.success("Meeting updated successfully");
-            setMeetings((prev) =>
-            prev.map((m) => (m.id === id ? { ...m, ...data } : m))
+            setMeetings(prev =>
+                prev.map(m => (m.id === id ? { ...m, ...data } : m))
             );
             return res.data;
-        } else smartToast.error(res.data.message || "Failed to update meeting");
-        } catch (err) {
+        } else {
+            smartToast.error(res.data.message || "Failed to update meeting");
+        }
+    } catch (err) {
         smartToast.error(err.response?.data?.message || "Error updating meeting");
         throw err;
-        }
-    };
+    }
+};
+
 
     const deleteMeeting = async (id) => {
         if (!window.confirm("Are you sure you want to delete this meeting?")) return;
@@ -150,4 +174,4 @@ const api = axios.create({
         deleteMeeting,
         searchMeetings
     };
-};
+}

@@ -7,6 +7,7 @@ export const GroupMembershipRow = ({
   onEdit,
   getGroupName,
   getMemberName,
+  getMemberEmail,
   isAdmin,
 }) => {
   return (
@@ -31,7 +32,10 @@ export const GroupMembershipRow = ({
         </div>
       </td>
       <td className="fw-semibold" style={{ color: "#888888", fontSize: "16px" }}>
-        {getMemberName(membership.member_id, membership.member_name)}
+        {getMemberName(membership.member_id)}
+        <div style={{ fontSize: "14px", color: "#888" }}>
+          {getMemberEmail(membership.member_id)}
+        </div>
       </td>
       <td>
         <div className="d-flex gap-2">

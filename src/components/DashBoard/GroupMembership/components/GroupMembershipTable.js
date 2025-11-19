@@ -11,6 +11,7 @@ export const GroupMembershipTable = ({
   onEdit,
   getGroupName,
   getMemberName,
+  getMemberEmail,
   isAdmin,
 }) => {
   return (
@@ -51,6 +52,7 @@ export const GroupMembershipTable = ({
                 onEdit={onEdit}
                 getGroupName={getGroupName}
                 getMemberName={getMemberName}
+                getMemberEmail={getMemberEmail}
                 isAdmin={isAdmin}
               />
             ))

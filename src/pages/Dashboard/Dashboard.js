@@ -6,8 +6,6 @@ import {
     IdentificationCard,
     VideoCamera,
     File,
-    Heart,
-    ChatCircleDots,
     Bell,
     Gear,
     SignOut,
@@ -60,9 +58,7 @@ const UserDashboard = () => {
         { id: "membership", icon: IdentificationCard, label: "Group Membership" },
         { id: "meeting", icon: VideoCamera, label: "Meeting" },
         { id: "content", icon: File, label: "Meeting Content" },
-        { id: "videos", icon: VideoCamera, label: "Videos" },
-        { id: "likes", icon: Heart, label: "Likes" },
-        { id: "comments", icon: ChatCircleDots, label: "Comments" },
+        { id: "videos", icon: VideoCamera, label: "Videos" }
     ];
 
 

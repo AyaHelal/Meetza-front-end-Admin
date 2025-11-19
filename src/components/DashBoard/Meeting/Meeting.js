@@ -4,6 +4,9 @@ import useMeetingData from "./hooks/useMeetingData";
 import { MeetingTable } from "./components/MeetingTable";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
 import useMeetingContentData from "../MeetingContent/hooks/useMeetingContentData";
+import { useGroupData } from "../Group/hooks/useGroupData";
+import MeetingModal from "./components/MeetingModal";
+import axios from "axios";
 
 export default function Meeting() {
     const [currentUser, setCurrentUser] = useState({});
@@ -11,96 +14,79 @@ export default function Meeting() {
     const [searchTimeout, setSearchTimeout] = useState(null);
     const [editing, setEditing] = useState({});
     const [addingNew, setAddingNew] = useState(false);
+    // use normalized group hook (handles fetching + normalization)
+    const { groups } = useGroupData();
 
-    const {
-        meetings,
-        loading,
-        error,
-        addMeeting,
-        updateMeeting,
-        deleteMeeting,
-        fetchMeetings,
-        searchMeetings,
-    } = useMeetingData();
+    // modal state
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState('create');
+    const [modalData, setModalData] = useState({ title: '', datetime: '', status: 'Scheduled', meeting_content_id: '', group_id: '', id: null });
 
-    // get contents + fetch function from hook
+    const { meetings, loading, error, addMeeting, updateMeeting, deleteMeeting, fetchMeetings, searchMeetings } = useMeetingData();
     const { contents, fetchContents } = useMeetingContentData();
+
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"));
-        if (user) setCurrentUser({ name: user.name || "User" });
+        if (user) setCurrentUser(user);
         fetchMeetings();
         fetchContents();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSave = async (id, data) => {
         try {
-        if (id) {
-            await updateMeeting(id, data);
-        } else {
-            await addMeeting(data);
-        }
-        setEditing({});
-        setAddingNew(false);
-        // Refresh the meetings list after saving
+        if (id) await updateMeeting(id, data);
+        else await addMeeting(data);
+        setEditing({}); setAddingNew(false);
         await fetchMeetings();
-        } catch (err) {
-        console.error("Save error:", err);
-        smartToast.error(err.response?.data?.message || "Failed to save meeting");
-        }
+        } catch (err) { smartToast.error(err.response?.data?.message || "Failed to save meeting"); }
     };
 
     const handleDelete = async (id) => await deleteMeeting(id);
 
-    // <-- changed to TOGGLE editing state (so cancel can toggle off)
-    const handleEdit = (id) => setEditing((prev) => (id === "new" ? { new: true } : { ...prev, [id]: !prev[id] }));
+    const handleEdit = (id) => {
+        const m = meetings.find(x => String(x.id) === String(id));
+        setModalMode('edit');
+        setModalData({
+            id: m?.id || null,
+            title: m?.title || '',
+            datetime: m?.datetime || '',
+            status: m?.status || 'Scheduled',
+            meeting_content_id: m?.meeting_content_id || '',
+            group_id: m?.group_id || ''
+        });
+        setModalOpen(true);
+    };
 
     const handleAdd = () => {
-        setAddingNew(true);
-        setEditing({ new: true });
+        setModalMode('create');
+        // Derive a group_id silently: prefer the first existing meeting's group_id, then the first fetched group
+        const derivedGroupId = meetings && meetings.length > 0 ? meetings[0].group_id : (groups && groups.length > 0 ? (groups[0].id || groups[0].group_id) : '');
+        setModalData({ title: '', datetime: '', status: 'Scheduled', meeting_content_id: '', group_id: derivedGroupId || '', id: null });
+        setModalOpen(true);
+    };
+
+    const closeModal = () => setModalOpen(false);
+
+    const handleModalSubmit = async (data) => {
+        await handleSave(data.id, data);
+        closeModal();
     };
 
     const handleSearch = async (query) => {
         setSearchTerm(query);
-
-        // Clear previous timeout
-        if (searchTimeout) {
-        clearTimeout(searchTimeout);
-        }
-
-        // Set a new timeout
-        const timeoutId = setTimeout(async () => {
-        if (query.trim() === "") {
-            await fetchMeetings();
-        } else {
-            if (query.trim().length > 2)
-            await searchMeetings(query).catch((err) => {
-                smartToast.error(err?.response?.data?.message || "Failed to search meetings");
-            });
-        }
-        }, 500);
-
+        if (searchTimeout) clearTimeout(searchTimeout);
+        const timeoutId = setTimeout(() => searchMeetings(query).catch(err => smartToast.error(err?.response?.data?.message || "Failed to search meetings")), 500);
         setSearchTimeout(timeoutId);
     };
 
     return (
         <main className="flex-fill">
         <UserWelcomeHeader userName={currentUser?.name || "User"} description="Welcome back! Manage your meetings efficiently." />
-        <MeetingTable
-            meetings={meetings}
-            loading={loading}
-            error={error?.message}
-            onSave={handleSave}
-            onDelete={handleDelete}
-            onEdit={handleEdit}
-            onAdd={handleAdd}
-            searchTerm={searchTerm}
-            onSearchChange={handleSearch}
-            addingNew={addingNew}
-            editing={editing}
-            contents={contents}
-        />
+        <MeetingTable meetings={meetings} loading={loading} error={error?.message} onSave={handleSave} onDelete={handleDelete} onEdit={handleEdit} onAdd={handleAdd} searchTerm={searchTerm} onSearchChange={handleSearch} addingNew={addingNew} editing={editing} contents={contents} currentUser={currentUser} />
+        {modalOpen && (
+            <MeetingModal mode={modalMode} data={modalData} contents={contents} groups={groups} onChange={setModalData} onClose={closeModal} onSubmit={handleModalSubmit} />
+        )}
         </main>
     );
 }

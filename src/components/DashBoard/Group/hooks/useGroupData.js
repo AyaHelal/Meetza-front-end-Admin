@@ -77,22 +77,24 @@ export const useGroupData = () => {
     }
   };
 
-  // ✏️ Update existing group
-  const updateGroup = async (id, name, description) => {
-    try {
-      const res = await api.patch(`/group/${id}`, {
-        name,
-        description: description || "",
-      });
+  // ✏️ Update existing group (UI updates name only)
+  const updateGroup = async (id, name, position_id = undefined) => {
+  try {
+    const payload = { group_name: name };
+    if (position_id !== undefined && position_id !== null && position_id !== "") payload.position_id = position_id;
+    console.log(`[updateGroup] ID: ${id}, Payload:`, payload);
+    const res = await api.put(`/group/${id}`, payload);
+    console.log(`[updateGroup] Success response:`, res.data);
+    const updatedGroup = res.data;
+    await fetchData();
+    return updatedGroup;
+  } catch (e) {
+    console.error("Update error:", e.response?.data || e.message);
+    console.error("Full error:", e);
+    throw e;
+  }
+};
 
-      const updatedGroup = res.data;
-      await fetchData();
-      return updatedGroup;
-    } catch (e) {
-      console.error("Update error:", e);
-      throw e;
-    }
-  };
 
   // 🗑️ Delete group
   const deleteGroup = async (id) => {

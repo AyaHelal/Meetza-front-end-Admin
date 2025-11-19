@@ -63,18 +63,16 @@ const GroupMembershipModal = ({ mode, formData, setFormData, groups, onSave, onC
                         <button
                             type="button"
                             className="btn rounded-3 px-4 py-2"
-                            onClick={onClose}
-                            style={{ backgroundColor: "#F4F4F4", color: "#888888", border: "none", fontSize: "16px", fontWeight: "600" }}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="button"
-                            className="btn rounded-3 px-4 py-2"
                             onClick={onSave}
-                            style={{ background: "linear-gradient(to right, #0076EA, #00DC85)", color: "white", border: "none", fontSize: "16px", fontWeight: "600" }}
+                            style={{ flex: 1,
+                                    background: '#007bff',
+                                    color: 'white',
+                                    borderRadius: 8,
+                                    padding: '10px 12px',
+                                    fontWeight: 600
+                                }}
                         >
-                            {mode === "create" ? "Create Membership" : "Update Membership"}
+                            {mode === "create" ? "Create" : "Save"}
                         </button>
                     </div>
                 </div>
