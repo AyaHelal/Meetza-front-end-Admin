@@ -117,24 +117,33 @@ const api = axios.create({
     };
 
     const updateMeeting = async (id, data) => {
-        try {
+    try {
+        const originalMeeting = meetings.find(m => m.id === id);
+
         const payload = {
-            ...data,
+            title: data.title,
             datetime: formatForAPI(data.datetime),
+            status: data.status,
+            meeting_content_id: data.meeting_content_id,
+            group_id: data.group_id || originalMeeting?.group_id,
         };
+
         const res = await api.put(`/${id}`, payload);
         if (res.data.success) {
             smartToast.success("Meeting updated successfully");
-            setMeetings((prev) =>
-            prev.map((m) => (m.id === id ? { ...m, ...data } : m))
+            setMeetings(prev =>
+                prev.map(m => (m.id === id ? { ...m, ...data } : m))
             );
             return res.data;
-        } else smartToast.error(res.data.message || "Failed to update meeting");
-        } catch (err) {
+        } else {
+            smartToast.error(res.data.message || "Failed to update meeting");
+        }
+    } catch (err) {
         smartToast.error(err.response?.data?.message || "Error updating meeting");
         throw err;
-        }
-    };
+    }
+};
+
 
     const deleteMeeting = async (id) => {
         if (!window.confirm("Are you sure you want to delete this meeting?")) return;

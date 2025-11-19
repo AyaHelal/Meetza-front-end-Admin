@@ -108,6 +108,8 @@ const createPosition = async (title, selectedUser) => {
   };
 
   const deletePosition = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this position?")) return;
+
     try {
       const position = positions.find(p => p.id === id);
       if (!position) {

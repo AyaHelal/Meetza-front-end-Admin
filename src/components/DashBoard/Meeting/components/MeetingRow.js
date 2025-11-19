@@ -58,7 +58,7 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, curre
     };
 
     const showInput = isEditing || !meeting;
-    const canEdit = currentUser?.role === "Super_Admin" || meeting?.user_id === currentUser?.id;
+    const canEdit = currentUser?.role === "Super_Admin" || currentUser?.role === "Administrator";
     const inputStyle = { fontSize: "16px", fontWeight: 500, border: "2px solid #E9ECEF", borderRadius: "8px", padding: "0.5rem", width: "100%" };
     const textStyle = { fontSize: "16px", fontWeight: 600, padding: "8px 20px", color: "#6C757D" };
 

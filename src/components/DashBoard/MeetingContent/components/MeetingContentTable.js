@@ -64,7 +64,7 @@ export const MeetingContentTable = ({
                 <tr><td colSpan="3" className="text-center py-4">Loading...</td></tr>
               ) : error ? (
                 <tr><td colSpan="3" className="text-center py-4 text-danger">{error}</td></tr>
-              ) : contents.length === 0 && !addingNew ? (
+              ) : contents.length === 0 ? (
                 <tr><td colSpan="3" className="text-center py-4">No contents found</td></tr>
               ) : (
                 <>
@@ -72,24 +72,12 @@ export const MeetingContentTable = ({
                     <MeetingContentRow
                       key={content.id}
                       content={content}
-                      isEditing={editing[content.id]}
-                      onSave={onSave}
                       onDelete={onDelete}
                       onEdit={onEdit}
                       currentUser={currentUser}
                       isSuperAdmin={isSuperAdmin}
                     />
                   ))}
-                  {addingNew && (
-                    <MeetingContentRow
-                      key="new"
-                      content={null}
-                      onSave={onSave}
-                      isEditing={true}
-                      currentUser={currentUser}
-                      isSuperAdmin={isSuperAdmin}
-                    />
-                  )}
                 </>
               )}
             </tbody>

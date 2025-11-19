@@ -49,10 +49,12 @@ const api = axios.create({
         if (response.data.success) {
             const user = JSON.parse(localStorage.getItem("user"));
             setCurrentUser(user);
+            // Show all contents for both Super_Admin and Administrator roles
             const isSuperAdmin = user?.role === "Super_Admin";
+            const isAdmin = user?.role === "Administrator";
 
             const filteredContents = response.data.data.filter(
-            (c) => isSuperAdmin || c.user_id === user?.id
+            (c) => isSuperAdmin || isAdmin || c.user_id === user?.id
             );
 
             setContents(filteredContents || []);

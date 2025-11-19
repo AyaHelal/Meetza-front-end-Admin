@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { smartToast } from "../../../utils/toastManager";
 import useMeetingContentData from "./hooks/useMeetingContentData";
 import { MeetingContentTable } from "./components/MeetingContentTable";
+import MeetingContentModal from "./components/MeetingContentModal";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
 import "../User/UserMainComponent.css";
 
@@ -72,10 +73,29 @@ export default function MeetingContent() {
         };
     }, [searchTimeout]);
 
-    const handleEdit = (id) => setEditing((prev) => (id === 'new' ? { new: true } : { ...prev, [id]: !prev[id] }));
+    // modal state for create/edit
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState('create');
+    const [modalData, setModalData] = useState({ content_name: '', content_description: '', id: null });
+
+    const handleEdit = (id) => {
+        const item = contents.find((c) => c.id === id);
+        setModalMode('edit');
+        setModalData({ id: item?.id || null, content_name: item?.content_name || '', content_description: item?.content_description || '' });
+        setModalOpen(true);
+    };
+
     const handleAdd = () => {
-        setAddingNew(true);
-        setEditing({ new: true });
+        setModalMode('create');
+        setModalData({ content_name: '', content_description: '', id: null });
+        setModalOpen(true);
+    };
+
+    const closeModal = () => setModalOpen(false);
+
+    const handleModalSubmit = async (data) => {
+        await handleSave(data.id, data);
+        closeModal();
     };
 
     return (
@@ -103,6 +123,9 @@ export default function MeetingContent() {
                 addingNew={addingNew}
                 currentUser={currentUser}
             />
+            {modalOpen && (
+                <MeetingContentModal mode={modalMode} data={modalData} onChange={setModalData} onClose={closeModal} onSubmit={handleModalSubmit} />
+            )}
         </main>
     );
 }
