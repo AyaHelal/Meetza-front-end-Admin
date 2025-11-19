@@ -13,6 +13,7 @@ import PasswordStrengthIndicator from "../../components/common/StrongPassword";
 export default function SignUpForm() {
     const [isSignUp, setIsSignUp] = useState(true);
     const navigate = useNavigate();
+    // Role is fixed to Administrator for signup flow (only admins create signups)
 
     // Custom hooks
     const { formData, errors, touched, handleChange: originalHandleChange, validateForm } = useFormValidation(
@@ -216,6 +217,8 @@ export default function SignUpForm() {
                                 showPassword={showConfirmPassword}
                             />
                         )}
+
+                        {/* Role is fixed to Administrator; no selection shown here */}
 
                         <motion.button
                             type="submit"

@@ -18,13 +18,14 @@ export const useGroupMembershipData = () => {
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
 
       const normalized = payload.map((m) => ({
-        id: m.id,
-        group_id: m.group_id || m.groupId,
-        member_id: m.member_id || m.memberId || m.user_id || m.userId || null,
-        member_name: m.member?.name || m.user?.name || m.member_name || null,
-        group_name: m.group?.name || m.group?.group_name || m.group_name || null,
-        createdAt: m.createdAt || m.created_at,
-      }));
+      id: m.id,
+      group_id: m.group_id || m.groupId,
+      member_id: String(m.member_id || m.memberId || m.user_id || m.userId || ""),
+      member_name: m.member?.name || m.user?.name || m.member_name || null,
+      group_name: m.group?.name || m.group?.group_name || m.group_name || null,
+      createdAt: m.createdAt || m.created_at,
+    }));
+
 
       setMemberships(normalized);
     } catch (err) {
@@ -46,11 +47,37 @@ export const useGroupMembershipData = () => {
     }
   }, []);
 
-  const fetchUsers = useCallback(async () => {
+  // 🟩 Fetch members (from member endpoint or user endpoint)
+  const fetchMembers = useCallback(async () => {
     try {
-      const res = await api.get("/user");
-      const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
-      setUsers(payload);
+      let payload = [];
+
+      // Try member endpoint first
+      try {
+        const memberRes = await api.get("/member");
+        payload = Array.isArray(memberRes.data) ? memberRes.data : memberRes.data?.data || [];
+      } catch (memberError) {
+        // Fallback to user endpoint
+        const userRes = await api.get("/user");
+        payload = Array.isArray(userRes.data) ? userRes.data : userRes.data?.data || [];
+      }
+      // i want to show the email
+
+      const normalized = payload.map((u) => {
+      const uid = u.user_id ?? u.id ?? u.userId ?? null;
+
+      return {
+        id: uid,
+        user_id: String(uid),
+        name: u.name ?? u.fullName ?? u.full_name ?? u.member_name ?? u.email?.split('@')[0] ?? "",
+        email: u.email ?? u.user_email ?? u.email_address ?? "",
+        avatarUrl: u.avatarUrl || u.avatar_url || null,
+        raw: u,
+      };
+    });
+
+
+      setUsers(normalized);
     } catch (err) {
       console.error("Failed to fetch users:", err);
     }
@@ -76,6 +103,7 @@ export const useGroupMembershipData = () => {
 
   // 🗑️ Delete membership
   const deleteMembership = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this member from group?")) return;
     try {
       await api.delete(`/group-membership/${id}`);
       setMemberships((prev) => prev.filter((m) => m.id !== id));

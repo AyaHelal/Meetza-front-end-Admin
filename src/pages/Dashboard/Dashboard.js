@@ -6,8 +6,6 @@ import {
     IdentificationCard,
     VideoCamera,
     File,
-    Heart,
-    ChatCircleDots,
     Bell,
     Gear,
     SignOut,

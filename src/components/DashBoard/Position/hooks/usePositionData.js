@@ -63,24 +63,30 @@ export const usePositionData = (userId) => {
     }
   }, [userId]);
 
-  const createPosition = async (title, administrator_id) => {
-    try {
-      const adminId = currentUser?.role === 'Super_Admin' ? administrator_id : userId;
+const createPosition = async (title, selectedUser) => {
+  try {
+    let payload = { title };
 
-      const res = await api.post(`/position`, {
-        title,
-        administrator_id: adminId,
-      });
-
-      await fetchData();
-      smartToast.success("Position created successfully");
-      return res.data;
-
-    } catch (e) {
-      smartToast.error(e?.response?.data?.message || "Failed to create position");
-      throw e;
+    if (currentUser?.role === 'Super_Admin') {
+      payload.role = 'Super_Admin';
+      payload.administrator_id = selectedUser?.value;
     }
-  };
+
+    const res = await api.post('/position', payload);
+
+    await fetchData();
+    smartToast.success("Position created successfully");
+    return res.data;
+
+  } catch (e) {
+    smartToast.error(e?.response?.data?.message || "Failed to create position");
+    throw e;
+  }
+};
+
+
+
+
 
   const updatePosition = async (id, title) => {
     try {
@@ -102,6 +108,8 @@ export const usePositionData = (userId) => {
   };
 
   const deletePosition = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this position?")) return;
+
     try {
       const position = positions.find(p => p.id === id);
       if (!position) {

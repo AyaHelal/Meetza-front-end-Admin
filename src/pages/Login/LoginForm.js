@@ -14,6 +14,7 @@ export default function LoginForm() {
     const [isLogin, setIsLogin] = useState(true);
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedRole, setSelectedRole] = useState('Super_Admin');
 
     const { formData, errors, touched, handleChange: originalHandleChange, validateForm } = useFormValidation(
         { email: "", password: "" },
@@ -48,13 +49,19 @@ export default function LoginForm() {
                 const response = await axios.post('https://meetza-backend.vercel.app/api/auth/login', {
                     ...formData,
                     remember_me: rememberMe.toString(),
-                    role: 'Super_Admin',
+                    role: selectedRole,
                     from: "dashboard"
                 });
                 console.log(response);
 
                 if (response?.data?.data?.token) {
                     localStorage.setItem('authToken', response?.data?.data?.token);
+                    // Save remember_me flag so we know to auto-login on next page load
+                    if (rememberMe) {
+                        localStorage.setItem('rememberMe', 'true');
+                    } else {
+                        localStorage.removeItem('rememberMe');
+                    }
                     console.log("authToken", response?.data?.data?.token);
                 }
                 try {
@@ -62,6 +69,7 @@ export default function LoginForm() {
                     if (userName) {
                         localStorage.setItem('userName', userName);
                     }
+                    // Get role from backend response, don't hardcode it
                     const userRole = response?.data?.data?.user?.role || response?.data?.role;
                     if (userRole) {
                         localStorage.setItem('userRole', userRole);
@@ -189,6 +197,42 @@ export default function LoginForm() {
                             onTogglePassword={togglePasswordVisibility}
                             showPassword={showPassword}
                         />
+
+                        {/* Role Selection Radio Buttons */}
+                        <div className="mt-4 mb-3">
+                            <div className="d-flex gap-5 mt-2">
+                                <div className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="radio"
+                                        name="role"
+                                        id="superAdminRole"
+                                        value="Super_Admin"
+                                        checked={selectedRole === 'Super_Admin'}
+                                        onChange={(e) => setSelectedRole(e.target.value)}
+                                        style={{ cursor: "pointer" }}
+                                    />
+                                    <label className="form-check-label" htmlFor="superAdminRole" style={{ cursor: "pointer", fontSize: "12px" }}>
+                                        Super Admin
+                                    </label>
+                                </div>
+                                <div className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="radio"
+                                        name="role"
+                                        id="administratorRole"
+                                        value="Administrator"
+                                        checked={selectedRole === 'Administrator'}
+                                        onChange={(e) => setSelectedRole(e.target.value)}
+                                        style={{ cursor: "pointer" }}
+                                    />
+                                    <label className="form-check-label" htmlFor="administratorRole" style={{ cursor: "pointer", fontSize: "12px" }}>
+                                        Administrator
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
 
                         <div className="d-flex justify-content-between align-items-center mt-2">
                             <div className="form-check">

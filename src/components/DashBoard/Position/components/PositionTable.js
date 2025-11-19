@@ -68,19 +68,19 @@ export const PositionTable = ({
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="3" className="text-center py-4 text-muted">
+                  <td colSpan={currentUser?.role === 'Super_Admin' ? 3 : 2} className="text-center py-4 text-muted">
                     Loading...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan="3" className="text-center py-4 text-danger">
+                  <td colSpan={currentUser?.role === 'Super_Admin' ? 3 : 2} className="text-center py-4 text-danger">
                     {error}
                   </td>
                 </tr>
               ) : positions.length === 0 && !addingNew ? (
                 <tr>
-                  <td colSpan="3" className="text-center py-4 text-muted">
+                  <td colSpan={currentUser?.role === 'Super_Admin' ? 3 : 2} className="text-center py-4 text-muted">
                     No positions found
                   </td>
                 </tr>
@@ -94,22 +94,11 @@ export const PositionTable = ({
                       onSave={onSave}
                       onEdit={onEdit}
                       onDelete={onDelete}
-                      isEditing={editing[pos.id]}
+                      isEditing={false}
                       users={users}
                     />
                   ))}
-                  {addingNew && (
-                    <PositionRow
-                      key="new"
-                      user={currentUser}
-                      position={null}
-                      onSave={onSave}
-                      onEdit={onAdd}
-                      onDelete={onAdd}
-                      isEditing={true}
-                      users={users}
-                    />
-                  )}
+                
                 </>
               )}
             </tbody>

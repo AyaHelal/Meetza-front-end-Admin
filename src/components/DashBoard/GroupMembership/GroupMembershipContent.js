@@ -47,11 +47,6 @@ const GroupMembershipContent = ({ currentUser }) => {
         setShowEditModal(true);
     };
 
-    const getMemberEmail = (memberId) => {
-        const u = users.find((x) => x.user_id === memberId || x.id === memberId || String(x.id) === String(memberId));
-        return u?.email || "";
-    };
-
     // form changes are handled directly by modal via setFormData
     const handleFormChange = (e) => {
         const { name, value } = e.target;
@@ -120,10 +115,23 @@ const GroupMembershipContent = ({ currentUser }) => {
         }
     };
 
+    const getMemberEmail = (memberId) => {
+        const u = users.find((x) => x.user_id === String(memberId) || x.id === String(memberId) || String(x.id) === String(memberId));
+        return u?.email || "";
+    };
+
     // Helper function to get member name by ID
-    const getMemberName = (memberId) => {
-        const user = users.find(u => u.user_id === memberId || u.id === memberId);
-        return user?.name || user?.email || `User ${memberId}`;
+    const getMemberName = (memberId, memberName = null) => {
+        if (memberName) return memberName;
+        if (!memberId) return "N/A";
+        const user = users.find((u) =>
+            u.user_id === String(memberId) ||
+            String(u.user_id) === String(memberId) ||
+            u.id === memberId ||
+            u.id === Number(memberId) ||
+            String(u.id) === String(memberId)
+        );
+        return user?.name || `User ${memberId}`;
     };
 
 
@@ -260,30 +268,17 @@ const GroupMembershipContent = ({ currentUser }) => {
                                                 <button
                                                     type="button"
                                                     className="btn rounded-3 px-4 py-2"
-                                                    onClick={() => setShowForm(false)}
-                                                    style={{
-                                                        backgroundColor: "#F4F4F4",
-                                                        color: "#888888",
-                                                        border: "none",
-                                                        fontSize: "16px",
-                                                        fontWeight: "600",
-                                                    }}
-                                                >
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="btn rounded-3 px-4 py-2"
                                                     onClick={handleCreateMembership}
                                                     style={{
-                                                        background: "linear-gradient(to right, #0076EA, #00DC85)",
-                                                        color: "white",
-                                                        border: "none",
-                                                        fontSize: "16px",
-                                                        fontWeight: "600",
+                                                        flex: 1,
+                                                        background: '#007bff',
+                                                        color: 'white',
+                                                        borderRadius: 8,
+                                                        padding: '10px 12px',
+                                                        fontWeight: 600
                                                     }}
                                                 >
-                                                    Create Membership
+                                                    Create
                                                 </button>
                                             </div>
                                         </div>
