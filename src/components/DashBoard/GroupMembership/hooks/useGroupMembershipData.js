@@ -155,8 +155,8 @@ export const useGroupMembershipData = () => {
   useEffect(() => {
     fetchData();
     fetchGroups();
-    fetchUsers();
-  }, [fetchData, fetchGroups, fetchUsers]);
+    fetchMembers();
+  }, [fetchData, fetchGroups, fetchMembers]);
 
   return {
     memberships,
