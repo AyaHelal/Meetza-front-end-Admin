@@ -4,11 +4,10 @@ import api from "../../../../utils/api";
 export const useGroupMembershipData = () => {
   const [memberships, setMemberships] = useState([]);
   const [groups, setGroups] = useState([]);
-  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 🟩 Fetch all memberships
+  // 🟩 Fetch memberships
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
@@ -16,16 +15,13 @@ export const useGroupMembershipData = () => {
 
       const res = await api.get("/group-membership");
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
-
+      console.log("Fetched memberships:", payload);
       const normalized = payload.map((m) => ({
-      id: m.id,
-      group_id: m.group_id || m.groupId,
-      member_id: String(m.member_id || m.memberId || m.user_id || m.userId || ""),
-      member_name: m.member?.name || m.user?.name || m.member_name || null,
-      group_name: m.group?.name || m.group?.group_name || m.group_name || null,
-      createdAt: m.createdAt || m.created_at,
-    }));
-
+        id: m.id || `${m.group_id}-${m.email}`,
+        group_id: m.group_id,
+        name: m.name || m.member_name || "N/A",
+        email: m.email || m.member_email || "N/A",
+      }));
 
       setMemberships(normalized);
     } catch (err) {
@@ -47,128 +43,74 @@ export const useGroupMembershipData = () => {
     }
   }, []);
 
-  // 🟩 Fetch members (from member endpoint or user endpoint)
-  const fetchMembers = useCallback(async () => {
+  // ➕ Create membership
+  const createMembership = async (group_id, member_email) => {
     try {
-      let payload = [];
-
-      // Try member endpoint first
-      try {
-        const memberRes = await api.get("/member");
-        payload = Array.isArray(memberRes.data) ? memberRes.data : memberRes.data?.data || [];
-      } catch (memberError) {
-        // Fallback to user endpoint
-        const userRes = await api.get("/user");
-        payload = Array.isArray(userRes.data) ? userRes.data : userRes.data?.data || [];
-      }
-      // i want to show the email
-
-      const normalized = payload.map((u) => {
-      const uid = u.user_id ?? u.id ?? u.userId ?? null;
-
-      return {
-        id: uid,
-        user_id: String(uid),
-        name: u.name ?? u.fullName ?? u.full_name ?? u.member_name ?? u.email?.split('@')[0] ?? "",
-        email: u.email ?? u.user_email ?? u.email_address ?? "",
-        avatarUrl: u.avatarUrl || u.avatar_url || null,
-        raw: u,
-      };
-    });
-
-
-      setUsers(normalized);
-    } catch (err) {
-      console.error("Failed to fetch users:", err);
-    }
-  }, []);
-
-
-  // ➕ Create new membership
-  const createMembership = async (group_id, member_id) => {
-    try {
-      const res = await api.post("/group-membership", {
-        group_id,
-        member_id,
-      });
-
-      const newMembership = res.data;
+      const res = await api.post("/group-membership", { group_id, email: member_email });
       await fetchData();
-      return newMembership;
-    } catch (e) {
-      console.error("Create error:", e);
-      throw e;
+      return res.data;
+    } catch (err) {
+      console.error("Create error:", err);
+      throw err;
+    }
+  };
+
+  // ✏️ Update membership
+  const updateMembership = async (id, group_id, member_email) => {
+    try {
+      const res = await api.put(`/group-membership/${id}`, { group_id, email: member_email });
+      await fetchData();
+      return res.data;
+    } catch (err) {
+      console.error("Update error:", err);
+      throw err;
     }
   };
 
   // 🗑️ Delete membership
   const deleteMembership = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this member from group?")) return;
     try {
       await api.delete(`/group-membership/${id}`);
       setMemberships((prev) => prev.filter((m) => m.id !== id));
       return { success: true };
-    } catch (e) {
-      console.error("Delete error:", e);
-      return { success: false, message: e.message };
-    }
-  };
-
-  // ✏️ Update membership
-  const updateMembership = async (id, group_id, member_id) => {
-    try {
-      const res = await api.patch(`/group-membership/${id}`, {
-        group_id,
-        member_id,
-      });
-      // Refresh list
-      await fetchData();
-      return res.data;
-    } catch (e) {
-      console.error("Update error:", e);
-      throw e;
+    } catch (err) {
+      console.error("Delete error:", err);
+      return { success: false, message: err.message };
     }
   };
 
   // 🔍 Search memberships
   const searchMemberships = async (query) => {
     try {
-      const res = await api.get(`/group?name=${query}`, {
-        params: { group_id: query },
-      });
+      const res = await api.get(`/group-membership?search=${query}`);
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
       const normalized = payload.map((m) => ({
-        id: m.id,
-        group_id: m.group_id || m.groupId,
-        member_id: m.member_id || m.memberId || m.user_id || m.userId || null,
-        member_name: m.member?.name || m.user?.name || m.member_name || null,
-        group_name: m.group?.name || m.group?.group_name || m.group_name || null,
-        createdAt: m.createdAt || m.created_at,
+        id: m.id || `${m.group_id}-${m.email}`,
+        group_id: m.group_id,
+        member_name: m.name || m.member_name || "N/A",
+        member_email: m.email || m.member_email || "N/A",
       }));
       setMemberships(normalized);
-    } catch (e) {
-      console.error("Search error:", e);
-      throw e;
+    } catch (err) {
+      console.error("Search error:", err);
+      throw err;
     }
   };
 
   useEffect(() => {
     fetchData();
     fetchGroups();
-    fetchMembers();
-  }, [fetchData, fetchGroups, fetchMembers]);
+  }, [fetchData, fetchGroups]);
 
   return {
     memberships,
     groups,
-    users,
     loading,
     error,
     createMembership,
-    deleteMembership,
     updateMembership,
+    deleteMembership,
     searchMemberships,
     fetchData,
   };
 };
-
