@@ -30,7 +30,6 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
                             aria-label="Close"
                             style={{ fontSize: "14px" }}
                         >
-                            <X size={24} weight="bold" />
                         </button>
                     </div>
 
