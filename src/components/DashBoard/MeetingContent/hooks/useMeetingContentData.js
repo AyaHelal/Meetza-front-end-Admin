@@ -1,37 +1,8 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { smartToast } from "../../../../utils/toastManager";
+import apiCommon from "../../../../utils/api";
 
-const API_URL = "https://meetza-backend.vercel.app/api/meeting-contents";
-
-// Axios instance
-const api = axios.create({
-    baseURL: API_URL,
-    headers: { "Content-Type": "application/json" },
-    });
-
-    // Interceptors
-    api.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem("authToken");
-        if (token) config.headers.Authorization = `Bearer ${token}`;
-        return config;
-    },
-    (error) => Promise.reject(error)
-    );
-
-    api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-        localStorage.removeItem("authToken");
-        window.location.href = "/login";
-        }
-        return Promise.reject(error);
-    }
-    );
-
-    export default function useMeetingContentData() {
+export default function useMeetingContentData() {
     const [contents, setContents] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -43,8 +14,8 @@ const api = axios.create({
         setError(null);
 
         try {
-        const url = query ? `/?name=${encodeURIComponent(query)}` : "/";
-        const response = await api.get(url);
+        const urlSuffix = query ? `?name=${encodeURIComponent(query)}` : '';
+        const response = await apiCommon.get(`/meeting-contents${urlSuffix}`);
 
         if (response.data.success) {
             const user = JSON.parse(localStorage.getItem("user"));
@@ -73,7 +44,7 @@ const api = axios.create({
     // -------- CREATE --------
     const addContent = async (data) => {
         try {
-        const response = await api.post("/", data);
+        const response = await apiCommon.post(`/meeting-contents`, data);
         if (response.data.success) {
             smartToast.success("Meeting content created successfully");
             fetchContents();
@@ -90,7 +61,7 @@ const api = axios.create({
     // -------- UPDATE --------
     const updateContent = async (id, updatedData) => {
         try {
-        const response = await api.put(`/${id}`, updatedData);
+        const response = await apiCommon.put(`/meeting-contents/${id}`, updatedData);
         if (response.data.success) {
             smartToast.success("Meeting content updated successfully");
             fetchContents();
@@ -108,7 +79,7 @@ const api = axios.create({
     const deleteContent = async (id) => {
         if (!window.confirm("Are you sure you want to delete this content?")) return;
         try {
-        const response = await api.delete(`/${id}`);
+        const response = await apiCommon.delete(`/meeting-contents/${id}`);
         if (response.data.success) {
             setContents((prev) => prev.filter((c) => c.id !== id));
             smartToast.success("Meeting content deleted successfully");

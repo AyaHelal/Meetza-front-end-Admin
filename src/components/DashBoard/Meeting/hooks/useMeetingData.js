@@ -1,33 +1,7 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { smartToast } from "../../../../utils/toastManager";
 import apiCommon from "../../../../utils/api";
-
-const API_URL = "https://meetza-backend.vercel.app/api/meeting";
-
-// Axios instance
-const api = axios.create({
-    baseURL: API_URL,
-    headers: { "Content-Type": "application/json" },
-    });
-
-    api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("authToken");
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-    return config;
-    });
-
-    api.interceptors.response.use(
-    (res) => res,
-    (error) => {
-        if (error.response?.status === 401) {
-        localStorage.removeItem("authToken");
-        window.location.href = "/login";
-        }
-        return Promise.reject(error);
-    }
-    );
 
     const formatForAPI = (inputValue) => {
     const d = new Date(inputValue);
@@ -46,8 +20,8 @@ const api = axios.create({
         setLoading(true);
         setError(null);
         try {
-        const url = query ? `/?title=${encodeURIComponent(query)}` : '/';
-        const res = await api.get(url);
+        const urlSuffix = query ? `?title=${encodeURIComponent(query)}` : '';
+        const res = await apiCommon.get(`/meeting${urlSuffix}`);
 
         if (res.data.success) {
             const currentUser = JSON.parse(localStorage.getItem('user'));
@@ -93,7 +67,7 @@ const api = axios.create({
 
         if (!groupId) {
             try {
-                const groupsRes = await apiCommon.get('/group');
+                    const groupsRes = await apiCommon.get('/group');
                 const allGroups = Array.isArray(groupsRes.data) ? groupsRes.data : groupsRes.data?.data || [];
                 groupId = allGroups[0]?.id || null;
             } catch (e) {
@@ -113,7 +87,7 @@ const api = axios.create({
             administrator_id: currentUser.id,
         };
 
-        const res = await api.post("/", payload);
+        const res = await apiCommon.post("/meeting", payload);
         if (res.data.success) {
             smartToast.success("Meeting created successfully");
             setMeetings((prev) => [...prev, res.data.data]);
@@ -137,7 +111,7 @@ const api = axios.create({
             group_id: data.group_id || originalMeeting?.group_id,
         };
 
-        const res = await api.put(`/${id}`, payload);
+        const res = await apiCommon.put(`/meeting/${id}`, payload);
         if (res.data.success) {
             smartToast.success("Meeting updated successfully");
             setMeetings(prev =>
@@ -157,7 +131,7 @@ const api = axios.create({
     const deleteMeeting = async (id) => {
         if (!window.confirm("Are you sure you want to delete this meeting?")) return;
         try {
-        const res = await api.delete(`/${id}`);
+        const res = await apiCommon.delete(`/meeting/${id}`);
         if (res.data.success) {
             setMeetings((prev) => prev.filter((m) => m.id !== id));
             smartToast.success("Meeting deleted successfully");
