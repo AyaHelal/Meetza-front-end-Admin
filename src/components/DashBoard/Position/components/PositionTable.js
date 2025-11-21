@@ -1,7 +1,7 @@
 import { PositionRow } from "./PositionRow";
 import { SearchBar } from "../../shared/SearchBar";
 import { PlusCircle } from "phosphor-react";
-
+import '../../CSS/Table.css';
 export const PositionTable = ({
   currentUser,
   positions,
@@ -24,22 +24,22 @@ export const PositionTable = ({
           <h2 className="h4 m-0 fw-semibold" style={{ color: "#010101" }}>Position Management</h2>
           <div className="d-flex gap-3 align-items-center">
             <button
-                className="btn rounded-4 d-flex align-items-center gap-2"
-                onClick={onAdd}
-                disabled={addingNew}
-                style={{
-                    background: "linear-gradient(to right, #0076EA, #00DC85)",
-                    color: "white",
-                    fontSize: "16px",
-                    paddingTop: "0.75rem",
-                    paddingBottom: "0.75rem",
-                    paddingLeft: "1.5rem",
-                    paddingRight: "1.5rem",
-                    border: "none",
-                }}
+              className="btn rounded-4 d-flex align-items-center gap-2"
+              onClick={onAdd}
+              disabled={addingNew}
+              style={{
+                background: "linear-gradient(to right, #0076EA, #00DC85)",
+                color: "white",
+                fontSize: "16px",
+                paddingTop: "0.75rem",
+                paddingBottom: "0.75rem",
+                paddingLeft: "1.5rem",
+                paddingRight: "1.5rem",
+                border: "none",
+              }}
             >
-                <PlusCircle size={20} weight="bold" />
-                <span className="fw-semibold">Create Position</span>
+              <PlusCircle size={20} weight="bold" />
+              <span className="fw-semibold">Create Position</span>
             </button>
             <SearchBar
               value={searchTerm}
@@ -48,7 +48,7 @@ export const PositionTable = ({
             />
           </div>
         </div>
-        <div className="table-responsive overflow-hidden">
+        <div className="table-responsive user-table-container overflow-hidden">
           <table className="table table-borderless">
             <thead style={{ borderBottom: "5px solid #F4F4F4" }}>
               <tr>
@@ -98,7 +98,7 @@ export const PositionTable = ({
                       users={users}
                     />
                   ))}
-                
+
                 </>
               )}
             </tbody>

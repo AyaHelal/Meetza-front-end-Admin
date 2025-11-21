@@ -16,7 +16,6 @@ const GroupMembershipModal = ({ mode, formData, setFormData, groups, onSave, onC
                             {mode === "create" ? "Create New Membership" : "Edit Membership"}
                         </h5>
                         <button type="button" className="btn-close" onClick={onClose} aria-label="Close" style={{ fontSize: "14px" }}>
-                            <X size={24} weight="bold" />
                         </button>
                     </div>
 
@@ -64,13 +63,14 @@ const GroupMembershipModal = ({ mode, formData, setFormData, groups, onSave, onC
                             type="button"
                             className="btn rounded-3 px-4 py-2"
                             onClick={onSave}
-                            style={{ flex: 1,
-                                    background: '#007bff',
-                                    color: 'white',
-                                    borderRadius: 8,
-                                    padding: '10px 12px',
-                                    fontWeight: 600
-                                }}
+                            style={{
+                                flex: 1,
+                                background: '#007bff',
+                                color: 'white',
+                                borderRadius: 8,
+                                padding: '10px 12px',
+                                fontWeight: 600
+                            }}
                         >
                             {mode === "create" ? "Create" : "Save"}
                         </button>

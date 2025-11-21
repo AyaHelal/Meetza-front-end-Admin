@@ -44,14 +44,14 @@ const GroupMainContent = ({ currentUser }) => {
     };
 
     const openEditModal = (group) => {
-    setModalMode("edit");
-    setFormData({ name: group.name });
-    setSelectedGroup({
-        ...group,
-        position_id: group.position_id || group.positionId
-    });
-    setShowEditModal(true);
-};
+        setModalMode("edit");
+        setFormData({ name: group.name });
+        setSelectedGroup({
+            ...group,
+            position_id: group.position_id || group.positionId
+        });
+        setShowEditModal(true);
+    };
 
 
     const handleFormChange = (e) => {
@@ -77,31 +77,31 @@ const GroupMainContent = ({ currentUser }) => {
     };
 
     const handleUpdateGroup = async () => {
-    if (!selectedGroup) {
-        console.error("No group selected for update");
-        return;
-    }
+        if (!selectedGroup) {
+            console.error("No group selected for update");
+            return;
+        }
 
-    const groupId = selectedGroup.id;
-    console.log("Selected Group ID:", groupId);
-    const payload = {
-        group_name: formData.name,
-        position_id: selectedGroup.position_id
+        const groupId = selectedGroup.id;
+        console.log("Selected Group ID:", groupId);
+        const payload = {
+            group_name: formData.name,
+            position_id: selectedGroup.position_id
+        };
+        console.log("Payload sent:", payload);
+
+        try {
+            const res = await updateGroup(groupId, formData.name, selectedGroup.position_id);
+            console.log("Response from backend:", res);
+            setShowEditModal(false);
+            toast.success("Group updated successfully");
+            fetchData();
+        } catch (error) {
+            console.error("Update error:", error);
+            const msg = error?.response?.data?.message || error.message || "Failed to update group";
+            toast.error(msg);
+        }
     };
-    console.log("Payload sent:", payload);
-
-    try {
-        const res = await updateGroup(groupId, formData.name, selectedGroup.position_id);
-        console.log("Response from backend:", res);
-        setShowEditModal(false);
-        toast.success("Group updated successfully");
-        fetchData();
-    } catch (error) {
-        console.error("Update error:", error);
-        const msg = error?.response?.data?.message || error.message || "Failed to update group";
-        toast.error(msg);
-    }
-};
 
 
 
@@ -208,15 +208,13 @@ const GroupMainContent = ({ currentUser }) => {
                                         className="btn btn-sm d-flex align-items-center gap-2"
                                         onClick={() => setShowForm(false)}
                                         style={{
-                                            backgroundColor: "#F4F4F4",
-                                            color: "#888888",
+                                            backgroundColor: "#0076EA",
+                                            color: "#ffffff",
                                             border: "none",
-                                            padding: "0.5rem 1rem",
                                             borderRadius: "12px",
                                         }}
                                     >
-                                        <ArrowLeft size={20} />
-                                        Back
+                                        <ArrowLeft size={24} />
                                     </button>
                                     <h2 className="h5 mb-0 fw-semibold" style={{ fontSize: "24px" }}>
                                         Create New Group
@@ -224,8 +222,8 @@ const GroupMainContent = ({ currentUser }) => {
                                 </div>
 
                                 <div className="row justify-content-center">
-                                    <div className="col-lg-8">
-                                        <div className="bg-white rounded-3 p-4" style={{ border: "2px solid #E9ECEF" }}>
+                                    <div className="col-lg-7">
+                                        <div className="bg-white ps-5 border-0 p-4 align-items-center justify-content-center" style={{ border: "2px solid #E9ECEF" }}>
                                             <div className="mb-4">
                                                 <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
                                                     Group Name <span style={{ color: "#FF0000" }}>*</span>
@@ -239,8 +237,8 @@ const GroupMainContent = ({ currentUser }) => {
                                                     placeholder="Enter group name"
                                                     style={{
                                                         border: "2px solid #E9ECEF",
-                                                        padding: "0.75rem",
                                                         fontSize: "16px",
+                                                        width: "70%",
                                                     }}
                                                 />
                                             </div>
@@ -256,8 +254,8 @@ const GroupMainContent = ({ currentUser }) => {
                                                     onChange={handleFormChange}
                                                     style={{
                                                         border: "2px solid #E9ECEF",
-                                                        padding: "0.75rem",
                                                         fontSize: "16px",
+                                                        width: "70%",
                                                     }}
                                                 >
                                                     <option value="">Select a position</option>
@@ -269,21 +267,22 @@ const GroupMainContent = ({ currentUser }) => {
                                                 </select>
                                             </div>
 
-                                            <div className="d-flex gap-3 justify-content-end">
+                                            <div className="align-items-center
+                                            justify-content-center">
                                                 <button
                                                     type="button"
-                                                    className="btn rounded-3 px-4 py-2"
+                                                    className="btn rounded-3 px-5 py-2"
                                                     onClick={handleCreateGroup}
                                                     style={{
-                                                        flex: 1,
-                                                        background: '#007bff',
-                                                        color: 'white',
-                                                        borderRadius: 8,
-                                                        padding: '10px 12px',
-                                                        fontWeight: 600
+                                                        background: " #0076EA",
+                                                        marginLeft: "6rem",
+                                                        color: "white",
+                                                        border: "none",
+                                                        fontSize: "16px",
+                                                        fontWeight: "600",
                                                     }}
                                                 >
-                                                    Create
+                                                    Create Group
                                                 </button>
                                             </div>
                                         </div>

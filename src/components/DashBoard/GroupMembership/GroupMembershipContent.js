@@ -9,7 +9,7 @@ import { SearchBar } from "../shared/SearchBar";
 import { PlusCircle } from "phosphor-react";
 import GroupMembershipModal from "./GroupMembershipModal";
 import "../User/UserMainComponent.css";
-
+import { ArrowLeft } from "phosphor-react";
 const GroupMembershipContent = ({ currentUser }) => {
     const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator" || (currentUser?.role || "").toLowerCase() === "super_admin";
 
@@ -114,26 +114,13 @@ const GroupMembershipContent = ({ currentUser }) => {
             });
         }
     };
-
-    const getMemberEmail = (memberId) => {
-        const u = users.find((x) => x.user_id === String(memberId) || x.id === String(memberId) || String(x.id) === String(memberId));
-        return u?.email || "";
+    const getMemberName = (memberId) => {
+        const user = users.find(u => u.user_id === memberId || u.id === memberId);
+        return user?.name || user?.email || `User ${memberId}`;
+    }; const getMemberEmail = (memberId) => {
+        const user = users.find(u => u.user_id === memberId || u.id === memberId);
+        return user?.email || "N/A";
     };
-
-    // Helper function to get member name by ID
-    const getMemberName = (memberId, memberName = null) => {
-        if (memberName) return memberName;
-        if (!memberId) return "N/A";
-        const user = users.find((u) =>
-            u.user_id === String(memberId) ||
-            String(u.user_id) === String(memberId) ||
-            u.id === memberId ||
-            u.id === Number(memberId) ||
-            String(u.id) === String(memberId)
-        );
-        return user?.name || `User ${memberId}`;
-    };
-
 
 
     // Helper function to get group name by ID
@@ -201,17 +188,17 @@ const GroupMembershipContent = ({ currentUser }) => {
                             <div className="card-body p-4">
                                 <div className="d-flex align-items-center gap-3 mb-4">
                                     <button
-                                        className="btn btn-sm d-flex align-items-center gap-2"
+                                        className="btn btn-sm d-flex align-items-center gap-2 p-2"
                                         onClick={() => setShowForm(false)}
                                         style={{
-                                            backgroundColor: "#F4F4F4",
-                                            color: "#888888",
+                                            backgroundColor: "#0076EA",
+                                            color: "#ffffff",
                                             border: "none",
-                                            padding: "0.5rem 1rem",
                                             borderRadius: "12px",
                                         }}
                                     >
-                                        Back
+                                        <ArrowLeft size={24} />
+
                                     </button>
                                     <h2 className="h5 mb-0 fw-semibold" style={{ fontSize: "24px" }}>
                                         Create New Group Membership
@@ -219,8 +206,9 @@ const GroupMembershipContent = ({ currentUser }) => {
                                 </div>
 
                                 <div className="row justify-content-center">
-                                    <div className="col-lg-8">
-                                        <div className="bg-white rounded-3 p-4" style={{ border: "2px solid #E9ECEF" }}>
+                                    <div className="col-lg-7">
+                                        <div className="bg-white ps-5 border-0 p-4 align-items-center justify-content-center" style={{ border: "2px solid #E9ECEF", paddingLeft: "3.7rem !important" }}>
+
                                             <div className="mb-4">
                                                 <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
                                                     Group <span style={{ color: "#FF0000" }}>*</span>
@@ -232,8 +220,8 @@ const GroupMembershipContent = ({ currentUser }) => {
                                                     onChange={handleFormChange}
                                                     style={{
                                                         border: "2px solid #E9ECEF",
-                                                        padding: "0.75rem",
                                                         fontSize: "16px",
+                                                        width: "70%",
                                                     }}
                                                 >
                                                     <option value="">Select a group</option>
@@ -258,27 +246,29 @@ const GroupMembershipContent = ({ currentUser }) => {
                                                     placeholder="Enter member email address"
                                                     style={{
                                                         border: "2px solid #E9ECEF",
-                                                        padding: "0.75rem",
                                                         fontSize: "16px",
+                                                        width: "70%",
                                                     }}
                                                 />
                                             </div>
 
-                                            <div className="d-flex gap-3 justify-content-end">
+                                            <div className=" align-items-center
+                                            justify-content-center">
+
                                                 <button
                                                     type="button"
-                                                    className="btn rounded-3 px-4 py-2"
+                                                    className="btn rounded-3  px-4 py-2"
                                                     onClick={handleCreateMembership}
                                                     style={{
-                                                        flex: 1,
-                                                        background: '#007bff',
-                                                        color: 'white',
-                                                        borderRadius: 8,
-                                                        padding: '10px 12px',
-                                                        fontWeight: 600
+                                                        background: " #0076EA",
+                                                        marginLeft: "6rem",
+                                                        color: "white",
+                                                        border: "none",
+                                                        fontSize: "16px",
+                                                        fontWeight: "600",
                                                     }}
                                                 >
-                                                    Create
+                                                    Create Membership
                                                 </button>
                                             </div>
                                         </div>

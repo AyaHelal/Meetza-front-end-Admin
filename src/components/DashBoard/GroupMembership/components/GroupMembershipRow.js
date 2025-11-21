@@ -32,10 +32,7 @@ export const GroupMembershipRow = ({
         </div>
       </td>
       <td className="fw-semibold" style={{ color: "#888888", fontSize: "16px" }}>
-        {getMemberName(membership.member_id)}
-        <div style={{ fontSize: "14px", color: "#888" }}>
-          {getMemberEmail(membership.member_id)}
-        </div>
+        {getMemberName(membership.member_id, membership.member_name)}
       </td>
       <td className="fw-semibold" style={{ color: "#888888", fontSize: "16px" }}>
         {getMemberEmail(membership.member_id, membership.member_email)}
