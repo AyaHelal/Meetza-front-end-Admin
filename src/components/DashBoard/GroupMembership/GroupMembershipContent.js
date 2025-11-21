@@ -114,8 +114,13 @@ const GroupMembershipContent = ({ currentUser }) => {
             });
         }
     };
-    const getMemberName = (membership) => membership?.name || "N/A";
-    const getMemberEmail = (membership) => membership?.email || "N/A";
+    const getMemberName = (memberId) => {
+        const user = users.find(u => u.user_id === memberId || u.id === memberId);
+        return user?.name || user?.email || `User ${memberId}`;
+    }; const getMemberEmail = (memberId) => {
+        const user = users.find(u => u.user_id === memberId || u.id === memberId);
+        return user?.email || "N/A";
+    };
 
 
     // Helper function to get group name by ID
