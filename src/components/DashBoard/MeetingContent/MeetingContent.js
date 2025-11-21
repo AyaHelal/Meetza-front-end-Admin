@@ -103,7 +103,7 @@ export default function MeetingContent() {
             <UserWelcomeHeader
                 userName={currentUser?.name || currentUser?.username || "User"}
                 description={
-                    currentUser?.role === 'Super_Admin'
+                    (currentUser?.role === 'Super_Admin' || currentUser?.role === 'Administrator')
                         ? "Welcome back! Manage all meeting contents."
                         : "Welcome back! Manage your meeting contents."
                 }
