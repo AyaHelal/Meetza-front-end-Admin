@@ -28,6 +28,43 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+// Response interceptor for error handling
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        // Handle 401 Unauthorized - token expired or invalid
+        if (error.response?.status === 401) {
+            console.error("Authentication error:", error.response);
+            // Optionally clear token and redirect to login
+            try {
+                localStorage.removeItem("authToken");
+                localStorage.removeItem("user");
+                localStorage.removeItem("userRole");
+            } catch (_) {
+                // ignore
+            }
+        }
+        // Handle 403 Forbidden - insufficient permissions
+        if (error.response?.status === 403) {
+            console.error("Permission denied:", error.response);
+        }
+        // Log other errors for debugging
+        if (error.response) {
+            console.error("API Error:", {
+                status: error.response.status,
+                statusText: error.response.statusText,
+                data: error.response.data,
+                url: error.config?.url,
+            });
+        } else if (error.request) {
+            console.error("Network Error:", error.request);
+        } else {
+            console.error("Error:", error.message);
+        }
+        return Promise.reject(error);
+    }
+);
+
 export default api;
 
 

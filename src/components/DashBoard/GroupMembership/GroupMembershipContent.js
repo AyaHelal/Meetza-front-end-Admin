@@ -114,10 +114,20 @@ const GroupMembershipContent = ({ currentUser }) => {
             });
         }
     };
-    const getMemberName = (memberId) => {
+    const getMemberName = (memberId, memberName = null) => {
+        // If member_name is already provided from the API response, use it
+        if (memberName) return memberName;
+
+        // Otherwise, try to find in users array
         const user = users.find(u => u.user_id === memberId || u.id === memberId);
         return user?.name || user?.email || `User ${memberId}`;
-    }; const getMemberEmail = (memberId) => {
+    };
+
+    const getMemberEmail = (memberId, memberEmail = null) => {
+        // If member_email is already provided from the API response, use it
+        if (memberEmail) return memberEmail;
+
+        // Otherwise, try to find in users array
         const user = users.find(u => u.user_id === memberId || u.id === memberId);
         return user?.email || "N/A";
     };
