@@ -21,6 +21,35 @@
   }
 }
 
+/* ===== FORM CONTAINER RESPONSIVE STYLES ===== */
+.form-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Large screens - make forms smaller and centered */
+@media (min-width: 992px) {
+  .form-container {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1200px) {
+  .form-container {
+    max-width: 450px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1441px) {
+  .form-container {
+    max-width: 350px;
+    margin: 0 auto;
+  }
+}
+
 /* ===== FORM INPUT STYLES ===== */
 input::placeholder {
   color: #888888 !important;
