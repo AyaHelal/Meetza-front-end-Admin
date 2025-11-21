@@ -60,11 +60,20 @@ const VideoDisplay = ({ currentUser }) => {
             setError(null);
             const response = await api.get('/video');
             console.log('API /video response:', response.data);
-            console.log('First video structure:', response.data?.data?.[0]);
-            if (response.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
-                setVideos(response.data.data);
-                setCurrentVideo(response.data.data[0]);
+            
+            // Handle both response structures: array directly or nested in data property
+            const videosArray = Array.isArray(response.data) 
+                ? response.data 
+                : (Array.isArray(response.data?.data) ? response.data.data : []);
+            
+            console.log('Parsed videos array:', videosArray);
+            console.log('First video structure:', videosArray[0]);
+            
+            if (videosArray && videosArray.length > 0) {
+                setVideos(videosArray);
+                setCurrentVideo(videosArray[0]);
             } else {
+                console.warn('No videos found in response');
                 setVideos([]);
                 setCurrentVideo(null);
             }
@@ -161,8 +170,6 @@ const VideoDisplay = ({ currentUser }) => {
                     const baseUrl = `${url.protocol}//${url.host}`;
                     const encodedPath = encodeURIComponent(idParam);
 
-                    // Use thumbnail API for images - this works without authentication for shared files
-                    // Format: https://domain/_layouts/15/getpreview.ashx?path=<encoded_path>
                     return `${baseUrl}/_layouts/15/getpreview.ashx?path=${encodedPath}&resolution=6`;
                 }
 
@@ -195,17 +202,7 @@ const VideoDisplay = ({ currentUser }) => {
         console.log('CurrentVideo poster full URL:', posterFull);
         console.log('CurrentVideo video full URL:', videoFull);
     }, [currentVideo]);
-    useEffect(() => {
-        const fetchMembers = async () => {
-            try {
-                const res = await api.get('/member/');
-                setMembers(res.data);
-            } catch (err) {
-                console.error('Error fetching members:', err);
-            }
-        };
-        fetchMembers();
-    }, []);
+
     // Fetch comments for a specific video
     const fetchCommentsByVideoId = async (videoId) => {
         try {
