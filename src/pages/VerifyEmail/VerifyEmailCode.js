@@ -119,7 +119,7 @@ export default function VerifyEmailCode() {
         >
             <LogoSection />
 
-            <div className="w-100 d-flex flex-column align-items-center text-center justify-content-center p-8">
+            <div className="w-100 d-flex flex-column align-items-center text-center justify-content-center p-8 form-container">
                 <motion.h2
                     className="fw-semibold mb-3"
                     initial={{ opacity: 0, y: 20 }}

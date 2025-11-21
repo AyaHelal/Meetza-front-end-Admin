@@ -33,3 +33,27 @@
 .comment_scrollbar_height::-webkit-scrollbar-thumb:hover {
   background: #c5c6c6; /* لون المقبض عند hover */
 }
+
+/* Search animation styles */
+.search-container {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.search-input-expanded::placeholder {
+  color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.search-close-btn {
+  animation: fadeIn 0.3s ease 0.2s both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

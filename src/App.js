@@ -27,7 +27,7 @@ function AnimatedRoutes() {
     // Check for remember me token on app load
     const rememberMe = localStorage.getItem('rememberMe') === 'true';
     const token = localStorage.getItem('authToken');
-    
+
     if (rememberMe && token && location.pathname === '/login') {
       // Auto-redirect to dashboard if remember me is enabled and token exists
       // Delay slightly to allow state to settle
@@ -35,7 +35,7 @@ function AnimatedRoutes() {
         window.location.href = '/dashboard';
       }, 100);
     }
-    
+
     setAutoLoginAttempted(true);
     const t = setTimeout(() => setLoading(false), 1000);
     return () => clearTimeout(t);

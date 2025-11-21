@@ -71,18 +71,20 @@ export default function ForgotPasswordForm() {
         >
             <LogoSection />
 
-            <div className="justify-content-center p-8">
+            <div className="justify-content-center p-8 form-container">
                 <motion.h2
                     className="fw-semibold"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
+                    style={{ fontSize: "24px" }}
+
                 >
                     Forgot Password
                 </motion.h2>
                 <motion.span
                     className="text-888888"
-                    style={{ fontSize: "20px" }}
+                    style={{ fontSize: "18px" }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
@@ -136,7 +138,7 @@ export default function ForgotPasswordForm() {
 
                     <motion.button
                         type="submit"
-                        className="btn btn-primary w-100 py-3 mt-3 mb-3 rounded-4"
+                        className="btn btn-primary w-100 py-2 mt-3 mb-3 rounded-4"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         disabled={loading}
