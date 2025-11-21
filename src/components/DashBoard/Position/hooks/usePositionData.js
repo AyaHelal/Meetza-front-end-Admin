@@ -1,6 +1,31 @@
-import { useState, useEffect , useCallback} from "react";
-import api from "../../../../utils/api";
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 import { smartToast } from "../../../../utils/toastManager";
+import apiCommon from "../../../../utils/api";
+
+const API_URL = "https://meetza-backend.vercel.app/api";
+
+const api = axios.create({
+  baseURL: API_URL,
+  headers: { "Content-Type": "application/json" },
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("authToken");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+api.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("authToken");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const usePositionData = (userId) => {
   const [positions, setPositions] = useState([]);
@@ -15,7 +40,7 @@ export const usePositionData = (userId) => {
       setError(null);
 
       const [userRes, posRes] = await Promise.all([
-        api.get(`/user`),
+        apiCommon.get(`/user`),
         api.get(`/position`),
       ]);
 
@@ -33,17 +58,18 @@ export const usePositionData = (userId) => {
         return;
       }
 
-      if (currentUser.role === 'Super_Admin') {
-        const positionsWithUsers = allPositions.map(position => {
-          const user = allUsers.find(u => u.id === position.administrator_id) || {};
+      // لو Super Admin يشوف كل الـ positions
+      if (currentUser.role === "Super_Admin") {
+        const positionsWithUsers = allPositions.map((position) => {
+          const user = allUsers.find((u) => u.id === position.administrator_id) || {};
           return {
             ...position,
             user: {
               id: user.id,
-              name: user.name || user.fullName || 'Unknown User',
+              name: user.name || user.fullName || "Unknown User",
               email: user.email,
-              role: user.role
-            }
+              role: user.role,
+            },
           };
         });
 
@@ -51,7 +77,9 @@ export const usePositionData = (userId) => {
         setCurrentUser(currentUser);
         setPositions(positionsWithUsers);
       } else {
-        const userPositions = allPositions.filter(pos => pos.administrator_id === userId);
+        const userPositions = allPositions.filter(
+          (pos) => pos.administrator_id === userId
+        );
         setUsers([{ ...currentUser, positions: userPositions }]);
         setCurrentUser(currentUser);
         setPositions(userPositions);
@@ -64,30 +92,29 @@ export const usePositionData = (userId) => {
     }
   }, [userId]);
 
-const createPosition = async (title, selectedUser) => {
-  try {
-    let payload = { title };
+  const createPosition = async (title, selectedUser) => {
+    try {
+      let payload = { title };
 
-    if (currentUser?.role === 'Super_Admin') {
-      payload.role = 'Super_Admin';
-      payload.administrator_id = selectedUser;
+      const curr = JSON.parse(localStorage.getItem("user")) || {};
+      if (curr.role === "Super_Admin") {
+        payload.role = "Super_Admin";
+        payload.administrator_id = selectedUser;
+      } else {
+        payload.role = "Administrator";
+        payload.administrator_id = curr.id;
+      }
+
+      const res = await api.post("/position", payload);
+
+      await fetchData();
+      smartToast.success("Position created successfully");
+      return res.data;
+    } catch (e) {
+      smartToast.error(e?.response?.data?.message || "Failed to create position");
+      throw e;
     }
-
-    const res = await api.post('/position', payload);
-
-    await fetchData();
-    smartToast.success("Position created successfully");
-    return res.data;
-
-  } catch (e) {
-    smartToast.error(e?.response?.data?.message || "Failed to create position");
-    throw e;
-  }
-};
-
-
-
-
+  };
 
   const updatePosition = async (id, title) => {
     try {
@@ -112,15 +139,15 @@ const createPosition = async (title, selectedUser) => {
     if (!window.confirm("Are you sure you want to delete this position?")) return;
 
     try {
-      const position = positions.find(p => p.id === id);
+      const position = positions.find((p) => p.id === id);
       if (!position) {
         smartToast.error("Position not found");
-        return { success: false, message: 'Position not found' };
+        return { success: false, message: "Position not found" };
       }
 
-      if (currentUser?.role !== 'Super_Admin' && position.administrator_id !== userId) {
+      if (currentUser?.role !== "Super_Admin" && position.administrator_id !== userId) {
         smartToast.error("You do not have permission to delete this position");
-        return { success: false, message: 'No permission' };
+        return { success: false, message: "No permission" };
       }
 
       await api.delete(`/position/${id}`);
@@ -134,29 +161,27 @@ const createPosition = async (title, selectedUser) => {
     }
   };
 
-  useEffect(() => {
-    if (userId) fetchData();
-  },  [userId, fetchData]);
-
   const searchPositions = async (query) => {
     try {
       const res = await api.get(`/position?title=${query}`);
       let payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
 
       if (payload.length > 0) {
-        const usersRes = await api.get('/user');
+        const usersRes = await apiCommon.get("/user");
         const allUsers = Array.isArray(usersRes.data) ? usersRes.data : usersRes.data?.data || [];
 
-        payload = payload.map(position => {
-          const user = allUsers.find(u => u.id === position.administrator_id);
+        payload = payload.map((position) => {
+          const user = allUsers.find((u) => u.id === position.administrator_id);
           return {
             ...position,
-            user: user ? {
-              id: user.id,
-              name: user.name || user.fullName || 'Unknown User',
-              email: user.email,
-              role: user.role
-            } : null
+            user: user
+              ? {
+                  id: user.id,
+                  name: user.name || user.fullName || "Unknown User",
+                  email: user.email,
+                  role: user.role,
+                }
+              : null,
           };
         });
       }
@@ -167,6 +192,10 @@ const createPosition = async (title, selectedUser) => {
       throw e;
     }
   };
+
+  useEffect(() => {
+    if (userId) fetchData();
+  }, [userId, fetchData]);
 
   return {
     positions,

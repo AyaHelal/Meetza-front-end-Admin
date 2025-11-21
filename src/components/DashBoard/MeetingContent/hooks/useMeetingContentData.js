@@ -49,8 +49,8 @@ const api = axios.create({
         if (response.data.success) {
             const user = JSON.parse(localStorage.getItem("user"));
             setCurrentUser(user);
-            // Show all contents only for Super_Admin role; others see only their own
-            const isSuperAdmin = user?.role === "Super_Admin";
+            // Show all contents for Super_Admin or Administrator; others see only their own
+            const isSuperAdmin = user?.role === "Super_Admin" || user?.role === "Administrator";
 
             const filteredContents = response.data.data.filter(
             (c) => isSuperAdmin || c.user_id === user?.id

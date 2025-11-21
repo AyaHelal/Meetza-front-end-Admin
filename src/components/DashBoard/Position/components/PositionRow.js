@@ -16,7 +16,7 @@ export const PositionRow = ({
 
   return (
     <tr className="align-middle">
-      {/* User Column: only render for Super_Admin */}
+      {/* User Column: render for Super_Admin or Administrator */}
       {isSuperAdmin && (
         <td className="px-4">
           {position?.user ? (
