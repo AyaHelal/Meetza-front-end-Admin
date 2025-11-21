@@ -130,15 +130,15 @@ const UserDashboard = () => {
                     })}
                 </nav>
 
-                <div className="d-flex flex-column gap-2 px-2 pb-md-4 pb-lg-2">
-                    <button className="btn btn-light d-flex align-items-center rounded-5"
+                <div className="d-flex flex-row gap-2 px-1 pb-md-4 pb-lg-2">
+                    {/* <button className="btn btn-light d-flex align-items-center rounded-5"
                         style={{ width: "fit-content", backgroundColor: "#F4F6F8" }}>
                         <Bell size={24} />
                     </button>
                     <button className="btn btn-light d-flex align-items-center rounded-5"
                         style={{ width: "fit-content", backgroundColor: "#F4F6F8" }}>
                         <Gear size={24} />
-                    </button>
+                    </button> */}
                     <button className="btn btn-light d-flex align-items-center rounded-5"
                         style={{ width: "fit-content", backgroundColor: "#F4F6F8" }}
                         onClick={handleLogout}>

@@ -1,6 +1,7 @@
 import { MeetingRow } from "./MeetingRow";
 import { PlusCircle } from "phosphor-react";
 import { SearchBar } from "../../shared/SearchBar";
+import '../../CSS/Table.css';
 
 export const MeetingTable = ({ meetings, loading, error, onSave, onDelete, onEdit, onAdd, searchTerm, onSearchChange, addingNew, editing, contents, currentUser }) => {
     return (
@@ -17,9 +18,9 @@ export const MeetingTable = ({ meetings, loading, error, onSave, onDelete, onEdi
             </div>
             </div>
 
-            <div className="table-responsive overflow-hidden">
-            <table className="table table-borderless">
-                <thead style={{ borderBottom: "5px solid #F4F4F4" }}>
+                <div className="table-responsive user-table-container rounded-3">
+                    <table className="table table-borderless">
+                        <thead className="table-header-sticky">
                 <tr>
                     <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Title</th>
                     <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Datetime</th>
@@ -27,15 +28,15 @@ export const MeetingTable = ({ meetings, loading, error, onSave, onDelete, onEdi
                     <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '200px' }}>Content Name</th>
                     <th className="fw-semibold" style={{ color: "#888888" }}>Actions</th>
                 </tr>
-                </thead>
-                <tbody>
-                {loading ? (
-                    <tr><td colSpan="5" className="text-center py-4">Loading...</td></tr>
-                ) : error ? (
-                    <tr><td colSpan="5" className="text-center py-4 text-danger">{error}</td></tr>
-                ) : meetings.length === 0 && !addingNew ? (
-                    <tr><td colSpan="5" className="text-center py-4">No meetings found</td></tr>
-                ) : (
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr><td colSpan="5" className="text-center py-4">Loading...</td></tr>
+                            ) : error ? (
+                                <tr><td colSpan="5" className="text-center py-4 text-danger">{error}</td></tr>
+                            ) : meetings.length === 0 && !addingNew ? (
+                                <tr><td colSpan="5" className="text-center py-4">No meetings found</td></tr>
+                            ) : (
                     <>
                     {meetings.map((m) => (
                         <MeetingRow key={m.id} meeting={m} isEditing={editing[m.id]} onSave={onSave} onEdit={onEdit} onDelete={onDelete} contents={contents} currentUser={currentUser} />
@@ -43,8 +44,8 @@ export const MeetingTable = ({ meetings, loading, error, onSave, onDelete, onEdi
                     {addingNew && <MeetingRow key="new" meeting={null} isEditing={true} onSave={onSave} contents={contents} currentUser={currentUser} />}
                     </>
                 )}
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
             </div>
         </div>
         </div>

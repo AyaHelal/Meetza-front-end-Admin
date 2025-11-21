@@ -28,8 +28,8 @@ export default function Position() {
   const handleModalSubmit = async (data) => {
   const payload = {
   title: data.title,
-  administrator_id: data.showUserSelect ? data.selectedUser : currentUser.id,
-  role: data.showUserSelect ? 'Super_Admin' : 'Administrator',
+  administrator_id: data.selectedUser ,
+  role: 'Super_Admin',
 };
 
   try {
@@ -50,7 +50,7 @@ export default function Position() {
 
   const handleAdd = () => {
     setModalMode('create');
-    setModalData({ id: null, title: '', selectedUser: null, showUserSelect: currentUser?.role === 'Super_Admin' });
+    setModalData({ id: null, title: '', selectedUser: null, showUserSelect: true });
     setModalOpen(true);
   };
 
@@ -61,7 +61,7 @@ export default function Position() {
       id: pos?.id || null,
       title: pos?.title || '',
       selectedUser: pos?.user?.id || null,
-      showUserSelect: currentUser?.role === 'Super_Admin'
+      showUserSelect: true
     });
     setModalOpen(true);
   };

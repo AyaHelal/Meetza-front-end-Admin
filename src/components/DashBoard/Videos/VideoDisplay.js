@@ -15,11 +15,31 @@ const VideoDisplay = ({ currentUser }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [members, setMembers] = useState([]);
+    const [likeCounts, setLikeCounts] = useState({});
 
     // Fetch videos from API
     useEffect(() => {
         fetchVideos();
     }, []);
+
+    const fetchLikeCounts = async (videoId) => {
+    try {
+        const res = await api.get(`/like/video/${videoId}`);
+        const countsArray = res.data.likeCounts || [];
+        const counts = { like: 0, dislike: 0 };
+
+        countsArray.forEach(item => {
+            const type = Number(item.like_type);
+            if (type === 1) counts.like = item.count;
+            else if (type === 0) counts.dislike = item.count;
+        });
+
+        setLikeCounts(prev => ({ ...prev, [videoId]: counts }));
+    } catch (err) {
+        console.error(`Error fetching like counts for video ${videoId}:`, err);
+    }
+};
+
 
     const fetchVideos = async () => {
         try {
@@ -111,67 +131,73 @@ const VideoDisplay = ({ currentUser }) => {
     }, []);
     // Fetch comments for a specific video
     const fetchCommentsByVideoId = async (videoId) => {
-        try {
-            const response = await api.get(`/comment/video/${videoId}`);
-            console.log(`Full API response for video ${videoId}:`, response);
-            console.log(`Response data:`, response.data);
-            console.log(`Response status:`, response.status);
+    try {
+        const response = await api.get(`/comment/video/${videoId}`);
+        console.log(`Full API response for video ${videoId}:`, response);
+        console.log(`Response data:`, response.data);
+        console.log(`Response status:`, response.status);
 
-            // Try different possible response structures
-            let commentsList = [];
-            if (Array.isArray(response.data)) {
-                commentsList = response.data;
-                console.log('Comments is direct array');
-            } else if (response.data?.data && Array.isArray(response.data.data)) {
-                commentsList = response.data.data;
-                console.log('Comments in response.data.data');
-            } else if (response.data?.comments && Array.isArray(response.data.comments)) {
-                commentsList = response.data.comments;
-                console.log('Comments in response.data.comments');
-            }
-
-            console.log('Final commentsList:', commentsList);
-            // Only update if this is still the current video
-            setCurrentVideo(prev => {
-                if (!prev || (prev._id !== videoId && prev.id !== videoId)) {
-                    return prev;
-                }
-                // Only update if comments actually changed
-                if (JSON.stringify(prev.comments) === JSON.stringify(commentsList)) {
-                    return prev;
-                }
-                return { ...prev, comments: commentsList };
-            });
-        } catch (err) {
-            // Handle 404 as no comments found (not an error)
-            if (err.response?.status === 404) {
-                console.log(`No comments found for video ${videoId}`);
-                setCurrentVideo(prev => {
-                    if (!prev || (prev._id !== videoId && prev.id !== videoId)) {
-                        return prev;
-                    }
-                    if (JSON.stringify(prev.comments) === JSON.stringify([])) {
-                        return prev;
-                    }
-                    return { ...prev, comments: [] };
-                });
-            } else {
-                console.error(`Error fetching comments for video ${videoId}:`, err);
-                setCurrentVideo(prev => {
-                    if (!prev || (prev._id !== videoId && prev.id !== videoId)) {
-                        return prev;
-                    }
-                    if (JSON.stringify(prev.comments) === JSON.stringify([])) {
-                        return prev;
-                    }
-                    return { ...prev, comments: [] };
-                });
-            }
+        // Try different possible response structures
+        let commentsList = [];
+        if (Array.isArray(response.data)) {
+            commentsList = response.data;
+            console.log('Comments is direct array');
+        } else if (response.data?.data && Array.isArray(response.data.data)) {
+            commentsList = response.data.data;
+            console.log('Comments in response.data.data');
+        } else if (response.data?.comments && Array.isArray(response.data.comments)) {
+            commentsList = response.data.comments;
+            console.log('Comments in response.data.comments');
         }
-    };    // Fetch comments when currentVideo changes
+
+        // Get comment count from API or fallback to length
+        let commentCount = 0;
+        if (typeof response.data.commentCount === 'number') {
+            commentCount = response.data.commentCount;
+        } else {
+            commentCount = commentsList.length;
+        }
+
+        console.log('Final commentsList:', commentsList);
+        console.log('Comment count:', commentCount);
+
+        // Only update if this is still the current video
+        setCurrentVideo(prev => {
+            if (!prev || (prev._id !== videoId && prev.id !== videoId)) {
+                return prev;
+            }
+
+            // Only update if comments or count actually changed
+            if (JSON.stringify(prev.comments) === JSON.stringify(commentsList) && prev.commentCount === commentCount) {
+                return prev;
+            }
+
+            return { ...prev, comments: commentsList, commentCount };
+        });
+    } catch (err) {
+        // Handle 404 as no comments found (not an error)
+        if (err.response?.status === 404) {
+            console.log(`No comments found for video ${videoId}`);
+            setCurrentVideo(prev => {
+                if (!prev || (prev._id !== videoId && prev.id !== videoId)) return prev;
+                if (JSON.stringify(prev.comments) === JSON.stringify([]) && prev.commentCount === 0) return prev;
+                return { ...prev, comments: [], commentCount: 0 };
+            });
+        } else {
+            console.error(`Error fetching comments for video ${videoId}:`, err);
+            setCurrentVideo(prev => {
+                if (!prev || (prev._id !== videoId && prev.id !== videoId)) return prev;
+                if (JSON.stringify(prev.comments) === JSON.stringify([]) && prev.commentCount === 0) return prev;
+                return { ...prev, comments: [], commentCount: 0 };
+            });
+        }
+    }
+};
+   // Fetch comments when currentVideo changes
     useEffect(() => {
         if (!currentVideo) return;
         const videoId = currentVideo._id || currentVideo.id;
+        fetchLikeCounts(videoId);
         if (!videoId) return;
 
         // Fetch comments for this video
@@ -184,6 +210,7 @@ const VideoDisplay = ({ currentUser }) => {
 
         try {
             await api.delete(`/video/${videoId}`);
+
             toast.success("Video deleted successfully");
             // Remove video from list
             const updatedVideos = videos.filter(v => v._id !== videoId && v.id !== videoId);
@@ -204,7 +231,7 @@ const VideoDisplay = ({ currentUser }) => {
         if (!window.confirm("Are you sure you want to delete this comment?")) return;
 
         try {
-            await api.delete(`/video/${videoId}/comment/${commentId}`);
+            await api.delete(`comment/${commentId}`);
             toast.success("Comment deleted successfully");
             // Refresh comments for this video
             fetchCommentsByVideoId(videoId);
@@ -262,10 +289,10 @@ const VideoDisplay = ({ currentUser }) => {
     return (
         <div className="flex-fill" style={{ backgroundColor: '#f5f5f5', minHeight: '100vh', padding: '20px' }}>
             <style>{`
-               .video-main-col { 
-    width: 100%; 
-    max-width: 100%; 
-    margin: 0 auto; 
+               .video-main-col {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
 }
 
 /* شاشات كبيرة جدًا 1900px أو أكتر */
@@ -278,9 +305,9 @@ const VideoDisplay = ({ currentUser }) => {
 
 /* لو العرض أقل من 1800px */
 @media (max-width: 1500px) {
-    .video-main-col { 
-        width: 746px; 
-        max-width: 100%; 
+    .video-main-col {
+        width: 746px;
+        max-width: 100%;
     }
 }
             `}</style>
@@ -330,7 +357,7 @@ const VideoDisplay = ({ currentUser }) => {
                     </div>
                     {/* Video Info */}
                     <div className="card-body my-3">
-                        <div className="d-flex align-items-center mb-3 p-2  bg-light  shadow-sm width-850 
+                        <div className="d-flex align-items-center mb-3 p-2  bg-light  shadow-sm width-850
                         " style={{
                                 fontSize: "14px",
                                 borderRadius: "24px"
@@ -351,20 +378,20 @@ const VideoDisplay = ({ currentUser }) => {
                                 onClick={() => navigator.clipboard.writeText(buildFileUrl
                                     (currentVideo.video_url) || '')}>Copy</button>
                             <button className='btn rounded-5 p-1 btn-sm' style={{ backgroundColor: "#E6E0E0", color: "#000000" }}>
-                                <span className='m-1'>10</span>
+                                <span className='m-1'>{likeCounts[currentVideo._id || currentVideo.id]?.dislike || 0}</span>
                                 <ThumbsDown size={24} />
 
 
                             </button>
                             <button className='btn rounded-5 p-1 btn-sm mx-2' style={{ backgroundColor: "#E6E0E0", color: "#000000" }}>
-                                <span className='m-1'>10</span>
+                                <span className='m-1'>{likeCounts[currentVideo._id || currentVideo.id]?.like || 0}</span>
                                 <HeartStraight size={24} />
 
 
 
                             </button>
                             <button className='btn rounded-5 p-1 btn-sm' style={{ backgroundColor: "#E6E0E0", color: "#000000" }}>
-                                <span className='m-1'>10</span>
+                                <span className='m-1'>{currentVideo.commentCount || 0}</span>
                                 <ChatTeardropDots size={24} />
 
 

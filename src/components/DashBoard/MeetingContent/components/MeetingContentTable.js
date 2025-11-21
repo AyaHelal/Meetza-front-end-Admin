@@ -1,6 +1,7 @@
 import { MeetingContentRow } from "./MeetingContentRow";
 import { PlusCircle } from "phosphor-react";
 import { SearchBar } from "../../shared/SearchBar";
+import '../../CSS/Table.css';
 
 export const MeetingContentTable = ({
   contents,
@@ -23,9 +24,8 @@ export const MeetingContentTable = ({
       <div className="card shadow-sm rounded-3 border-0">
         <div className="d-flex justify-content-between align-items-center p-4">
           <h2 className="h4 m-0 fw-semibold">Meeting Content Management</h2>
-          <div className="d-flex gap-3 align-items-center">
-            {/* زر Create يظهر إذا currentUser موجود */}
-            {currentUser && (
+            <div className="d-flex gap-3 align-items-center">
+            {isSuperAdmin && (
               <button
                 className="btn rounded-4 d-flex align-items-center gap-2"
                 onClick={onAdd}
@@ -50,9 +50,9 @@ export const MeetingContentTable = ({
           </div>
         </div>
 
-        <div className="table-responsive overflow-hidden">
+        <div className="table-responsive user-table-container rounded-3">
           <table className="table table-borderless">
-            <thead style={{ borderBottom: "5px solid #F4F4F4" }}>
+            <thead className="table-header-sticky">
               <tr>
                 <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Content Name</th>
                 <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '200px' }}>Content Description</th>

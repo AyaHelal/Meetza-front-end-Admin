@@ -60,7 +60,7 @@ export default function SignUpForm() {
                     name: formData.name,
                     password: formData.password,
                     email: formData.email,
-                    role: 'Administrator'
+                    role: 'Super_Admin'
                 });
                 console.log(response);
                 // Save email to localStorage for verification
