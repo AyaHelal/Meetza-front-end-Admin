@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { smartToast } from "../../../../utils/toastManager";
+import apiCommon from "../../../../utils/api";
 
 const API_URL = "https://meetza-backend.vercel.app/api/meeting";
 
@@ -50,7 +51,7 @@ const api = axios.create({
 
         if (res.data.success) {
             const currentUser = JSON.parse(localStorage.getItem('user'));
-            const isSuperAdmin = currentUser?.role === 'Super_Admin';
+            const isSuperAdmin = currentUser?.role === 'Super_Admin' || currentUser?.role === 'Administrator';
 
             const filteredMeetings = res.data.data.filter(meeting => {
             if (isSuperAdmin) return true;
@@ -87,10 +88,18 @@ const api = axios.create({
         try {
         const currentUser = JSON.parse(localStorage.getItem('user'));
 
-        // استخدم group_id من payload لو موجود أو خذ أول group_id من meetings
-        const groupId =
-            data.group_id ||
-            (meetings.length > 0 ? meetings[0].group_id : null);
+        // استخدم group_id من payload لو موجود أو خذ أول group_id من groups (fetch all groups)
+        let groupId = data.group_id || (meetings.length > 0 ? meetings[0].group_id : null);
+
+        if (!groupId) {
+            try {
+                const groupsRes = await apiCommon.get('/group');
+                const allGroups = Array.isArray(groupsRes.data) ? groupsRes.data : groupsRes.data?.data || [];
+                groupId = allGroups[0]?.id || null;
+            } catch (e) {
+                // ignore, will handle below
+            }
+        }
 
         if (!groupId) {
             smartToast.error("Cannot create meeting: no group_id available");

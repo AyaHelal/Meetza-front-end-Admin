@@ -6,6 +6,7 @@ import { PositionTable } from "./components/PositionTable";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
 import "../User/UserMainComponent.css";
 import api from "../../../utils/api";
+import apiCommon from "../../../utils/api";
 import PositionModal from "./components/PositionModal";
 
 export default function Position() {
@@ -26,31 +27,38 @@ export default function Position() {
   useEffect(() => { if (userId) fetchData(); }, [userId, fetchData]);
 
   const handleModalSubmit = async (data) => {
-  const payload = {
-  title: data.title,
-  administrator_id: data.selectedUser ,
-  role: 'Super_Admin',
-};
+    try {
+      const current = JSON.parse(localStorage.getItem('user')) || {};
+      let payload = { title: data.title };
 
-  try {
-    if (modalMode === 'edit' && data.id) {
-      await api.put(`/position/${data.id}`, payload);
-      smartToast.success("Position updated successfully");
-    } else {
-      await api.post(`/position`, payload);
-      smartToast.success("Position created successfully");
+      // If Super_Admin creating/updating, allow selecting administrator
+      if (current.role === 'Super_Admin') {
+        payload.administrator_id = data.selectedUser || null;
+        payload.role = 'Super_Admin';
+      } else {
+        // Administrator: only set title, assign administrator_id to current user
+        payload.administrator_id = current.id;
+        payload.role = 'Administrator';
+      }
+
+      if (modalMode === 'edit' && data.id) {
+        await api.put(`/position/${data.id}`, payload);
+        smartToast.success("Position updated successfully");
+      } else {
+        await api.post(`/position`, payload);
+        smartToast.success("Position created successfully");
+      }
+      fetchData();
+      setModalOpen(false);
+    } catch (err) {
+      smartToast.error(err.response?.data?.message || "Failed to save position");
     }
-    fetchData();
-    setModalOpen(false);
-  } catch (err) {
-    smartToast.error(err.response?.data?.message || "Failed to save position");
-  }
 };
 
 
   const handleAdd = () => {
     setModalMode('create');
-    setModalData({ id: null, title: '', selectedUser: null, showUserSelect: true });
+    setModalData({ id: null, title: '', selectedUser: null, showUserSelect: currentUser?.role === 'Super_Admin' });
     setModalOpen(true);
   };
 
@@ -61,7 +69,7 @@ export default function Position() {
       id: pos?.id || null,
       title: pos?.title || '',
       selectedUser: pos?.user?.id || null,
-      showUserSelect: true
+      showUserSelect: currentUser?.role === 'Super_Admin'
     });
     setModalOpen(true);
   };

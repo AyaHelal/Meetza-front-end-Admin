@@ -17,7 +17,7 @@ export const MeetingContentTable = ({
   editing,
   currentUser,
 }) => {
-  const isSuperAdmin = currentUser?.role === 'Super_Admin';
+  const isSuperAdmin = currentUser?.role === 'Super_Admin' || currentUser?.role === 'Administrator';
 
   return (
     <div className="m-4 rounded-3" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>

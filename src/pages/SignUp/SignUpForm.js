@@ -46,12 +46,12 @@ export default function SignUpForm() {
         setApiError("");
         setIsLoading(true);
         try {
-            const response = await axios.post('https://meetza-backend.vercel.app/api/auth/register', {
-                name: formData.name,
-                password: formData.password,
-                email: formData.email,
-                role: 'Super_Admin'
-            });
+                const response = await axios.post('https://meetza-backend.vercel.app/api/auth/register', {
+                    name: formData.name,
+                    password: formData.password,
+                    email: formData.email,
+                    role: 'Administrator'
+                });
             console.log(response);
             localStorage.setItem("userEmail", formData.email);
             navigate('/verify-email');
