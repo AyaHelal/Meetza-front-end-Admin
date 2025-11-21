@@ -4,97 +4,75 @@ import { Envelope, User, Password, Eye, EyeSlash } from "phosphor-react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import "../Login/LoginForm.css";
-import { FormInput, ToggleButton, LogoSection, SocialLoginButtons } from "../../components";
+import { FormInput, ToggleButton, LogoSection } from "../../components";
 import { useFormValidation, usePasswordVisibility } from "../../hooks";
 import { signupValidationRules } from "../../utils";
-import '../Login/LoginForm.css';
 import PasswordStrengthIndicator from "../../components/common/StrongPassword";
+import SocialLoginButtons from "../../components/common/SocialLoginButtons";
 
 export default function SignUpForm() {
     const [isSignUp, setIsSignUp] = useState(true);
     const navigate = useNavigate();
-    // Role is fixed to Administrator for signup flow (only admins create signups)
 
-    // Custom hooks
     const { formData, errors, touched, handleChange: originalHandleChange, validateForm } = useFormValidation(
         { name: "", email: "", password: "", confirmPassword: "" },
         signupValidationRules
     );
 
-    // Enhanced handleChange that clears API errors
+    const [apiError, setApiError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
     const handleChange = (e) => {
         originalHandleChange(e);
-        // Clear API error when user starts typing
-        if (apiError) {
-            setApiError("");
-        }
+        if (apiError) setApiError("");
     };
 
     const { showPassword, togglePasswordVisibility } = usePasswordVisibility();
     const { showPassword: showConfirmPassword, togglePasswordVisibility: toggleConfirmPasswordVisibility } = usePasswordVisibility();
 
-    // Handle toggle button change
     const handleToggleChange = (value) => {
         const isSignUpMode = value === 'signup';
         setIsSignUp(isSignUpMode);
         navigate(isSignUpMode ? "/signup" : "/login");
     };
 
-    // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
         handleFormSubmission();
     };
 
-    // API error state
-    const [apiError, setApiError] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-
-    // Handle form submission logic
     const handleFormSubmission = async () => {
-        if (validateForm()) {
-            setApiError(""); // Clear previous errors
-            setIsLoading(true);
-            try {
-                const response = await axios.post('https://meetza-backend.vercel.app/api/auth/register', {
-                    name: formData.name,
-                    password: formData.password,
-                    email: formData.email,
-                    role: 'Super_Admin'
-                });
-                console.log(response);
-                // Save email to localStorage for verification
-                localStorage.setItem("userEmail", formData.email);
-                // Navigate to verify email page after successful registration
-                navigate('/verify-email');
-            } catch (error) {
-                console.log(error);
-                // Display API error message to user
-                if (error.response?.data?.message) {
-                    setApiError(error.response.data.message);
-                } else if (error.message) {
-                    setApiError(error.message);
-                } else {
-                    setApiError("Registration failed. Please try again.");
-                }
-            } finally {
-                setIsLoading(false);
+        if (!validateForm()) return;
+        setApiError("");
+        setIsLoading(true);
+        try {
+            const response = await axios.post('https://meetza-backend.vercel.app/api/auth/register', {
+                name: formData.name,
+                password: formData.password,
+                email: formData.email,
+                role: 'Super_Admin'
+            });
+            console.log(response);
+            localStorage.setItem("userEmail", formData.email);
+            navigate('/verify-email');
+        } catch (error) {
+            if (error.response?.data?.message) {
+                setApiError(error.response.data.message);
+            } else if (error.message) {
+                setApiError(error.message);
+            } else {
+                setApiError("Registration failed. Please try again.");
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    // Handle Enter key press
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
             handleFormSubmission();
         }
-    };
-
-    // Handle social login
-    const handleSocialLogin = (provider) => {
-        console.log(`Sign up with ${provider}`);
-        // Add social signup logic here
     };
 
     const toggleOptions = [
@@ -131,125 +109,116 @@ export default function SignUpForm() {
                     Please enter your Details as administrator
                 </motion.span>
 
-                <div className="justify-content-center">
-                    <div className="mt-4 d-flex justify-content-center">
-                        <ToggleButton
-                            options={toggleOptions}
-                            activeOption={isSignUp ? 'signup' : 'login'}
-                            onOptionChange={handleToggleChange}
-                        />
-                    </div>
+                <div className="mt-4 d-flex justify-content-center">
+                    <ToggleButton
+                        options={toggleOptions}
+                        activeOption={isSignUp ? 'signup' : 'login'}
+                        onOptionChange={handleToggleChange}
+                    />
+                </div>
 
-                    <form className="form" onSubmit={handleSubmit} onKeyPress={handleKeyPress} noValidate>
-                        {/* API Error Display */}
-                        {apiError && (
-                            <motion.div
-                                className="alert alert-danger mt-3"
-                                role="alert"
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                {apiError}
-                            </motion.div>
-                        )}
-                        <FormInput
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            onKeyPress={handleKeyPress}
-                            placeholder="Farida Emad"
-                            type="text"
-                            label="Name"
-                            error={errors.name}
-                            touched={touched.name}
-                            icon={User}
-                        />
+                <form className="form" onSubmit={handleSubmit} onKeyPress={handleKeyPress} noValidate>
+                    {apiError && (
+                        <motion.div
+                            className="alert alert-danger mt-3"
+                            role="alert"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            {apiError}
+                        </motion.div>
+                    )}
 
-                        <FormInput
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            onKeyPress={handleKeyPress}
-                            placeholder="johndoe@email.com"
-                            type="email"
-                            label="your Email"
-                            error={errors.email}
-                            touched={touched.email}
-                            icon={Envelope}
-                        />
+                    <FormInput
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Farida Emad"
+                        type="text"
+                        label="Name"
+                        error={errors.name}
+                        touched={touched.name}
+                        icon={User}
+                    />
 
+                    <FormInput
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        onKeyPress={handleKeyPress}
+                        placeholder="johndoe@email.com"
+                        type="email"
+                        label="Your Email"
+                        error={errors.email}
+                        touched={touched.email}
+                        icon={Envelope}
+                    />
+
+                    <FormInput
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        onKeyPress={handleKeyPress}
+                        placeholder="●●●●●●●●"
+                        type={showPassword ? "text" : "password"}
+                        label="Password"
+                        error={errors.password}
+                        touched={touched.password}
+                        icon={Password}
+                        toggleIcon={showPassword ? EyeSlash : Eye}
+                        showPasswordToggle
+                        onTogglePassword={togglePasswordVisibility}
+                    />
+                    <PasswordStrengthIndicator password={formData.password} />
+
+                    {formData.password.length > 0 && (
                         <FormInput
-                            name="password"
-                            value={formData.password}
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
                             onChange={handleChange}
                             onKeyPress={handleKeyPress}
                             placeholder="●●●●●●●●"
-                            type={showPassword ? "text" : "password"}
-                            label="Password"
-                            error={errors.password}
-                            touched={touched.password}
+                            type={showConfirmPassword ? "text" : "password"}
+                            label="Confirm Password"
+                            error={errors.confirmPassword}
+                            touched={touched.confirmPassword}
                             icon={Password}
-                            toggleIcon={showPassword ? EyeSlash : Eye}
-                            showPasswordToggle={true}
-                            onTogglePassword={togglePasswordVisibility}
-                            showPassword={showPassword}
+                            toggleIcon={showConfirmPassword ? EyeSlash : Eye}
+                            showPasswordToggle
+                            onTogglePassword={toggleConfirmPasswordVisibility}
                         />
-                        <PasswordStrengthIndicator password={formData.password} />
+                    )}
 
-                        {/* Confirm Password Field - Only shows when password field has content */}
-                        {formData.password.length > 0 && (
-                            <FormInput
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                onKeyPress={handleKeyPress}
-                                placeholder="●●●●●●●●"
-                                type={showConfirmPassword ? "text" : "password"}
-                                label="Confirm Password"
-                                error={errors.confirmPassword}
-                                touched={touched.confirmPassword}
-                                icon={Password}
-                                toggleIcon={showConfirmPassword ? EyeSlash : Eye}
-                                showPasswordToggle={true}
-                                onTogglePassword={toggleConfirmPasswordVisibility}
-                                showPassword={showConfirmPassword}
-                            />
-                        )}
+                    <motion.button
+                        type="submit"
+                        className="btn btn-primary w-100 py-3 mt-3 mb-3 rounded-4 d-inline-flex align-items-center justify-content-center"
+                        whileHover={!isLoading ? { scale: 1.02 } : {}}
+                        whileTap={!isLoading ? { scale: 0.98 } : {}}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <>
+                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Creating account...
+                            </>
+                        ) : 'Creat Account'}
+                    </motion.button>
 
-                        {/* Role is fixed to Administrator; no selection shown here */}
-
-                        <motion.button
-                            type="submit"
-                            className="btn btn-primary w-100 py-3 mt-3 mb-3 rounded-4 d-inline-flex align-items-center justify-content-center"
-                            whileHover={!isLoading ? { scale: 1.02 } : {}}
-                            whileTap={!isLoading ? { scale: 0.98 } : {}}
-                            disabled={isLoading}
-                        >
-                            {isLoading ? (
-                                <>
-                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                    Creating account...
-                                </>
-                            ) : (
-                                'continue'
-                            )}
-                        </motion.button>
-
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.5, delay: 0.4 }}
-                        >
-                            <span className="text-888888">
-                                or continue with
-                            </span>
-                        </motion.div>
-
-                        <SocialLoginButtons onProviderClick={handleSocialLogin} />
-                    </form>
-                </div>
+                     <motion.div
+                        className="mt-4"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.3 }}
+                    >
+                        <div className="text-center mb-3">
+                            <span className="text-muted">Or sign up with</span>
+                        </div>
+                        <SocialLoginButtons />
+                    </motion.div>
+                </form>
             </div>
         </motion.div>
     );
