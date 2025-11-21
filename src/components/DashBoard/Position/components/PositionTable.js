@@ -48,9 +48,9 @@ export const PositionTable = ({
             />
           </div>
         </div>
-        <div className="table-responsive user-table-container overflow-hidden">
+        <div className="table-responsive user-table-container rounded-3">
           <table className="table table-borderless">
-            <thead style={{ borderBottom: "5px solid #F4F4F4" }}>
+            <thead className="table-header-sticky">
               <tr>
                 {currentUser?.role === 'Super_Admin' && (
                   <th className="fw-semibold px-4" style={{ color: "#888888" }}>

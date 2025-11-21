@@ -198,41 +198,7 @@ export default function LoginForm() {
                             showPassword={showPassword}
                         />
 
-                        {/* Role Selection Radio Buttons */}
-                        <div className="mt-4 mb-3">
-                            <div className="d-flex gap-5 mt-2">
-                                <div className="form-check">
-                                    <input
-                                        className="form-check-input"
-                                        type="radio"
-                                        name="role"
-                                        id="superAdminRole"
-                                        value="Super_Admin"
-                                        checked={selectedRole === 'Super_Admin'}
-                                        onChange={(e) => setSelectedRole(e.target.value)}
-                                        style={{ cursor: "pointer" }}
-                                    />
-                                    <label className="form-check-label" htmlFor="superAdminRole" style={{ cursor: "pointer", fontSize: "12px" }}>
-                                        Super Admin
-                                    </label>
-                                </div>
-                                <div className="form-check">
-                                    <input
-                                        className="form-check-input"
-                                        type="radio"
-                                        name="role"
-                                        id="administratorRole"
-                                        value="Administrator"
-                                        checked={selectedRole === 'Administrator'}
-                                        onChange={(e) => setSelectedRole(e.target.value)}
-                                        style={{ cursor: "pointer" }}
-                                    />
-                                    <label className="form-check-label" htmlFor="administratorRole" style={{ cursor: "pointer", fontSize: "12px" }}>
-                                        Administrator
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
+                        {/* Role is fixed to Super_Admin; selection removed */}
 
                         <div className="d-flex justify-content-between align-items-center mt-2">
                             <div className="form-check">

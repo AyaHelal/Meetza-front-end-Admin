@@ -69,7 +69,7 @@ const createPosition = async (title, selectedUser) => {
 
     if (currentUser?.role === 'Super_Admin') {
       payload.role = 'Super_Admin';
-      payload.administrator_id = selectedUser?.value;
+      payload.administrator_id = selectedUser;
     }
 
     const res = await api.post('/position', payload);

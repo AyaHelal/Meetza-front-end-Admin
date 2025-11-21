@@ -4,9 +4,8 @@ import { Trash, PencilSimpleLine } from "phosphor-react";
 export const MeetingContentRow = ({ content, onEdit, onDelete, currentUser, isSuperAdmin }) => {
   if (!content) return null;
 
-  // Allow edits for Super_Admin, Administrator, or content owner
-  const isAdmin = currentUser?.role === 'Administrator';
-  const canEdit = isSuperAdmin || isAdmin || currentUser?.id === content?.user_id;
+  // Allow edits only for Super_Admin or content owner
+  const canEdit = isSuperAdmin || currentUser?.id === content?.user_id;
   const textStyle = {
     fontSize: "16px",
     fontWeight: 600,

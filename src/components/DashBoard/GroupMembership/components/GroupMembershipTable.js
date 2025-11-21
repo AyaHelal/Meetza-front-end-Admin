@@ -15,7 +15,7 @@ export const GroupMembershipTable = ({
   isAdmin,
 }) => {
   return (
-    <div className="table-responsive overflow-hidden user-table-container rounded-3">
+    <div className="table-responsive user-table-container rounded-3">
       <table className="table table-borderless">
         <thead className="table-header-sticky">
           <tr className="mx-5">
@@ -28,19 +28,19 @@ export const GroupMembershipTable = ({
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan="3" className="text-center py-4 text-muted">
+              <td colSpan="4" className="text-center py-4 text-muted">
                 Loading...
               </td>
             </tr>
           ) : error ? (
             <tr>
-              <td colSpan="3" className="text-center py-4 text-danger">
+              <td colSpan="4" className="text-center py-4 text-danger">
                 {error}
               </td>
             </tr>
           ) : memberships.length === 0 ? (
             <tr>
-              <td colSpan="3" className="text-center py-4 text-muted">
+              <td colSpan="4" className="text-center py-4 text-muted">
                 No memberships found
               </td>
             </tr>
