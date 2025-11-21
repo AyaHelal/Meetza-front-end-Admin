@@ -19,8 +19,9 @@ export const usePositionData = (userId) => {
         api.get(`/position`),
       ]);
 
-      const allUsers = userRes.data || [];
-      const allPositions = posRes.data || [];
+      // Handle nested response structure consistently
+      const allUsers = Array.isArray(userRes.data) ? userRes.data : userRes.data?.data || [];
+      const allPositions = Array.isArray(posRes.data) ? posRes.data : posRes.data?.data || [];
 
       const currentUser = allUsers.find((u) => u.id === userId);
 
