@@ -1,12 +1,20 @@
 // GroupModalComponent.jsx
 import React from "react";
+import Select from "react-select";
 import { X } from "phosphor-react";
 
-const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, positions = [] }) => {
+const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, positions = [], contents = [] }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
+
+    const contentOptions = contents.map(content => ({
+        value: content.id,
+        label: content.content_name
+    }));
+
+    const selectedContent = formData.group_content_id ? contentOptions.find(opt => opt.value === formData.group_content_id) : null;
 
     return (
         <div
@@ -75,10 +83,32 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
                                             ))}
                                         </select>
                                     </div>
+
+                                    {/* Group Content select */}
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold" style={{ color: "#010101" }}>
+                                            Group Content
+                                        </label>
+                                        <Select
+                                            options={contentOptions}
+                                            value={selectedContent}
+                                            onChange={(option) => setFormData({ ...formData, group_content_id: option?.value || null })}
+                                            placeholder="Select group content (optional)"
+                                            isClearable
+                                            styles={{
+                                                control: (base) => ({
+                                                    ...base,
+                                                    borderRadius: 12,
+                                                    border: '2px solid #E9ECEF',
+                                                    boxShadow: 'none'
+                                                })
+                                            }}
+                                        />
+                                    </div>
                                 </>
                             ) : (
                                 <>
-                                    {/* Edit mode: only edit name per requirement */}
+                                    {/* Edit mode: edit name and group content */}
                                     <div className="mb-3">
                                         <label className="form-label fw-semibold" style={{ color: "#010101" }}>
                                             Name <span style={{ color: "#FF0000" }}>*</span>
@@ -91,6 +121,28 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
                                             onChange={handleChange}
                                             placeholder="Enter group name"
                                             style={{ border: "2px solid #E9ECEF", padding: "0.75rem", fontSize: "16px" }}
+                                        />
+                                    </div>
+
+                                    {/* Group Content select in edit mode */}
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold" style={{ color: "#010101" }}>
+                                            Group Content
+                                        </label>
+                                        <Select
+                                            options={contentOptions}
+                                            value={selectedContent}
+                                            onChange={(option) => setFormData({ ...formData, group_content_id: option?.value || null })}
+                                            placeholder="Select group content (optional)"
+                                            isClearable
+                                            styles={{
+                                                control: (base) => ({
+                                                    ...base,
+                                                    borderRadius: 12,
+                                                    border: '2px solid #E9ECEF',
+                                                    boxShadow: 'none'
+                                                })
+                                            }}
                                         />
                                     </div>
                                 </>

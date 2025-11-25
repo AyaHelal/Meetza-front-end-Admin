@@ -1,8 +1,8 @@
-
 // GroupMainContent.jsx
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useGroupData } from "./hooks/useGroupData";
+import useGroupContentData from "../GroupContent/hooks/useGroupContentData";
 import { GroupHeader } from "./components/GroupHeader";
 import { GroupTable } from "./components/GroupTable";
 import { SearchBar } from "../shared/SearchBar";
@@ -27,6 +27,8 @@ const GroupMainContent = ({ currentUser }) => {
         fetchData,
     } = useGroupData();
 
+    const { contents } = useGroupContentData();
+
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [formData, setFormData] = useState({});
     const [showForm, setShowForm] = useState(false);
@@ -38,14 +40,17 @@ const GroupMainContent = ({ currentUser }) => {
 
     const openCreateForm = () => {
         setModalMode("create");
-        setFormData({ group_name: "", position_id: "" });
+        setFormData({ group_name: "", position_id: "", group_content_id: null });
         setSelectedGroup(null);
         setShowForm(true);
     };
 
     const openEditModal = (group) => {
         setModalMode("edit");
-        setFormData({ name: group.name });
+        setFormData({ 
+            name: group.name,
+            group_content_id: group.group_content_id || null 
+        });
         setSelectedGroup({
             ...group,
             position_id: group.position_id || group.positionId
@@ -66,7 +71,7 @@ const GroupMainContent = ({ currentUser }) => {
         }
 
         try {
-            await createGroup(formData.group_name, formData.position_id);
+            await createGroup(formData.group_name, formData.position_id, formData.group_content_id || null);
             setShowForm(false);
             toast.success("Group created successfully");
             fetchData();
@@ -91,7 +96,7 @@ const GroupMainContent = ({ currentUser }) => {
         console.log("Payload sent:", payload);
 
         try {
-            const res = await updateGroup(groupId, formData.name, selectedGroup.position_id);
+            const res = await updateGroup(groupId, formData.name, selectedGroup.position_id, formData.group_content_id || undefined);
             console.log("Response from backend:", res);
             setShowEditModal(false);
             toast.success("Group updated successfully");
@@ -198,6 +203,7 @@ const GroupMainContent = ({ currentUser }) => {
                                 getPositionName={getPositionName}
                                 getAdminName={getAdminName}
                                 isAdmin={isAdmin}
+                                contents={contents}
                             />
                         </>
                     ) : (
@@ -267,6 +273,30 @@ const GroupMainContent = ({ currentUser }) => {
                                                 </select>
                                             </div>
 
+                                            <div className="mb-4">
+                                                <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                    Group Content
+                                                </label>
+                                                <select
+                                                    className="form-select rounded-3"
+                                                    name="group_content_id"
+                                                    value={formData.group_content_id || ''}
+                                                    onChange={handleFormChange}
+                                                    style={{
+                                                        border: "2px solid #E9ECEF",
+                                                        fontSize: "16px",
+                                                        width: "70%",
+                                                    }}
+                                                >
+                                                    <option value="">Select group content (optional)</option>
+                                                    {contents.map((c) => (
+                                                        <option key={c.id} value={c.id}>
+                                                            {c.content_name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
                                             <div className="align-items-center
                                             justify-content-center">
                                                 <button
@@ -300,6 +330,7 @@ const GroupMainContent = ({ currentUser }) => {
                     formData={formData}
                     setFormData={setFormData}
                     positions={positions}
+                    contents={contents}
                     onSave={modalMode === 'create' ? handleCreateGroup : handleUpdateGroup}
                     onClose={() => setShowEditModal(false)}
                 />

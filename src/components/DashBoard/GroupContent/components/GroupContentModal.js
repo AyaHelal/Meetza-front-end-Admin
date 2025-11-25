@@ -2,7 +2,7 @@ import React from "react";
 import { X } from "phosphor-react";
 
 
-const MeetingContentModal = ({ mode = 'create', data = {}, onChange, onClose, onSubmit }) => {
+const GroupContentModal = ({ mode = 'create', data = {}, onChange, onClose, onSubmit }) => {
     const title = mode === 'create' ? 'Create Content' : 'Update Content';
 
     return (
@@ -53,4 +53,4 @@ const MeetingContentModal = ({ mode = 'create', data = {}, onChange, onClose, on
     );
 };
 
-export default MeetingContentModal;
+export default GroupContentModal;

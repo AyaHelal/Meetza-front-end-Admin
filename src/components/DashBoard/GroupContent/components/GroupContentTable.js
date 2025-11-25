@@ -1,9 +1,9 @@
-import { MeetingContentRow } from "./MeetingContentRow";
+import { GroupContentRow } from "./GroupContentRow";
 import { PlusCircle } from "phosphor-react";
 import { SearchBar } from "../../shared/SearchBar";
 import '../../CSS/Table.css';
 
-export const MeetingContentTable = ({
+export const GroupContentTable = ({
   contents,
   loading,
   error,
@@ -23,7 +23,7 @@ export const MeetingContentTable = ({
     <div className="m-4 rounded-3" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
       <div className="card shadow-sm rounded-3 border-0">
         <div className="d-flex justify-content-between align-items-center p-4">
-          <h2 className="h4 m-0 fw-semibold">Meeting Content Management</h2>
+          <h2 className="h4 m-0 fw-semibold">Group Content Management</h2>
             <div className="d-flex gap-3 align-items-center">
             {isSuperAdmin && (
               <button
@@ -69,7 +69,7 @@ export const MeetingContentTable = ({
               ) : (
                 <>
                   {contents.map((content) => (
-                    <MeetingContentRow
+                    <GroupContentRow
                       key={content.id}
                       content={content}
                       onDelete={onDelete}

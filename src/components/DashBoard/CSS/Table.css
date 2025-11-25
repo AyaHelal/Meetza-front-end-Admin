@@ -42,3 +42,21 @@ tbody tr,
 tbody td {
   border-bottom: none !important;
 }
+
+/* Make tables responsive: allow content to wrap instead of forcing horizontal scroll */
+.user-table-container table {
+  width: 100%;
+  table-layout: auto;
+}
+
+.user-table-container td,
+.user-table-container th {
+  white-space: normal !important;
+  word-break: break-word;
+}
+
+.user-table-container td a {
+  word-break: break-all;
+  white-space: normal;
+  display: inline-block;
+}

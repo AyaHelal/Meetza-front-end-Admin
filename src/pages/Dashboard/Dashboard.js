@@ -6,20 +6,19 @@ import {
     IdentificationCard,
     VideoCamera,
     File,
-    Bell,
-    Gear,
     SignOut,
 } from "phosphor-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import UserMainContent from "../../components/DashBoard/User/UserMainContent";
 import Position from "../../components/DashBoard/Position/Position";
-import MeetingContent from "../../components/DashBoard/MeetingContent/MeetingContent.js";
+import GroupContent from "../../components/DashBoard/GroupContent/GroupContent.js";
 import Meeting from "../../components/DashBoard/Meeting/Meeting.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GroupMainContent from "../../components/DashBoard/Group/GroupMainContent";
 import GroupMembershipContent from "../../components/DashBoard/GroupMembership/GroupMembershipContent";
 import VideoDisplay from "../../components/DashBoard/Videos/VideoDisplay";
+import ResourcesPage from "../../components/DashBoard/Resources/ResourcesPage";
 
 const UserDashboard = () => {
     // ---------- STATE ----------
@@ -55,8 +54,9 @@ const UserDashboard = () => {
         { id: "position", icon: UserList, label: "Position" },
         { id: "group", icon: UsersThree, label: "Group" },
         { id: "membership", icon: IdentificationCard, label: "Group Membership" },
+        { id: "content", icon: File, label: "Group Content" },
+        { id: "resources", icon: File, label: "Resources" },
         { id: "meeting", icon: VideoCamera, label: "Meeting" },
-        { id: "content", icon: File, label: "Meeting Content" },
         { id: "videos", icon: VideoCamera, label: "Videos" },
         // { id: "likes", icon: Heart, label: "Likes" },
         // { id: "comments", icon: ChatCircleDots, label: "Comments" },
@@ -156,7 +156,10 @@ const UserDashboard = () => {
                     <Position />
                 )}
                 {activeMenu === "content" && (
-                    <MeetingContent />
+                    <GroupContent />
+                )}
+                {activeMenu === "resources" && (
+                    <ResourcesPage />
                 )}
                 {activeMenu === "meeting" && (
                     <Meeting />
@@ -171,7 +174,7 @@ const UserDashboard = () => {
                     <VideoDisplay currentUser={currentUser} />
                 )}
 
-                {activeMenu !== "user" && activeMenu !== "position" && activeMenu !== "content" && activeMenu !== "meeting" && activeMenu !== "group" && activeMenu !== "membership" && activeMenu !== "videos" && (
+                {activeMenu !== "user" && activeMenu !== "position" && activeMenu !== "content" && activeMenu !== "resources" && activeMenu !== "meeting" && activeMenu !== "group" && activeMenu !== "membership" && activeMenu !== "videos" && (
                     <div className="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
                         <h4 className="mb-2">{getMenuLabel(activeMenu)}</h4>
                         <p className="mb-0">Main component for {getMenuLabel(activeMenu)} goes here.</p>

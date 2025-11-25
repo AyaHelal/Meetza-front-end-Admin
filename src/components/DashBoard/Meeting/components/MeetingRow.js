@@ -62,7 +62,9 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, curre
     const inputStyle = { fontSize: "16px", fontWeight: 500, border: "2px solid #E9ECEF", borderRadius: "8px", padding: "0.5rem", width: "100%" };
     const textStyle = { fontSize: "16px", fontWeight: 600, padding: "8px 20px", color: "#6C757D" };
 
+    // Try to find content in the contents array, but also fallback to meeting.content_name if available
     const selectedContent = contents?.find((c) => c.id === data.meeting_content_id);
+    const displayContentName = selectedContent?.content_name || meeting?.content_name || "No Content";
 
     return (
         <tr className="align-middle">
@@ -103,7 +105,7 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, curre
                 ))}
             </select>
             ) : (
-            <div style={textStyle}>{selectedContent?.content_name || "No Content"}</div>
+            <div style={textStyle}>{displayContentName}</div>
             )}
         </td>
 
