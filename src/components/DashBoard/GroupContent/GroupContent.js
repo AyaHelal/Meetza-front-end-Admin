@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { smartToast } from "../../../utils/toastManager";
-import useMeetingContentData from "./hooks/useMeetingContentData";
-import { MeetingContentTable } from "./components/MeetingContentTable";
-import MeetingContentModal from "./components/MeetingContentModal";
+import useGroupContentData from "./hooks/useGroupContentData";
+import { GroupContentTable } from "./components/GroupContentTable";
+import GroupContentModal from "./components/GroupContentModal";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
 import "../User/UserMainComponent.css";
 
-export default function MeetingContent() {
+export default function GroupContent() {
     const [currentUser, setCurrentUser] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [searchTimeout, setSearchTimeout] = useState(null);
@@ -22,9 +22,8 @@ export default function MeetingContent() {
         deleteContent,
         fetchContents,
         searchContents
-    } = useMeetingContentData();
+    } = useGroupContentData();
 
-    // تحميل currentUser من localStorage
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"));
         if (user) setCurrentUser(user);
@@ -73,7 +72,6 @@ export default function MeetingContent() {
         };
     }, [searchTimeout]);
 
-    // modal state for create/edit
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
     const [modalData, setModalData] = useState({ content_name: '', content_description: '', id: null });
@@ -104,12 +102,12 @@ export default function MeetingContent() {
                 userName={currentUser?.name || currentUser?.username || "User"}
                 description={
                     (currentUser?.role === 'Super_Admin' || currentUser?.role === 'Administrator')
-                        ? "Welcome back! Manage all meeting contents."
-                        : "Welcome back! Manage your meeting contents."
+                        ? "Welcome back! Manage all group contents."
+                        : "Welcome back! Manage your group contents."
                 }
             />
 
-            <MeetingContentTable
+            <GroupContentTable
                 contents={contents}
                 loading={loading}
                 error={error?.message || error}
@@ -124,8 +122,10 @@ export default function MeetingContent() {
                 currentUser={currentUser}
             />
             {modalOpen && (
-                <MeetingContentModal mode={modalMode} data={modalData} onChange={setModalData} onClose={closeModal} onSubmit={handleModalSubmit} />
+                <GroupContentModal mode={modalMode} data={modalData} onChange={setModalData} onClose={closeModal} onSubmit={handleModalSubmit} />
             )}
         </main>
     );
 }
+
+export { GroupContent };

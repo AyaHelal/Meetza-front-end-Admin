@@ -17,12 +17,17 @@ export const useGroupData = () => {
       const res = await api.get("/group");
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
 
+      // Get saved group content map from localStorage
+      const savedGroupContentMap = JSON.parse(localStorage.getItem('groupContentMap') || '{}');
+
       const normalized = payload.map((g) => ({
         id: g.id,
         name: g.name || g.group_name,
         group_name: g.group_name,
         position_id: g.position_id,
         description: g.description || "",
+        // Use API value if available, otherwise use saved value from localStorage
+        group_content_id: g.group_content_id || savedGroupContentMap[g.id] || null,
         memberCount: g.memberCount || g.member_count || 0,
         admin_id: g.admin_id || g.adminId || g.administrator_id || g.user_id || g.admin?.id || null,
         admin_name: g.admin?.name || g.admin_name || g.administrator_name || null,
@@ -61,14 +66,26 @@ export const useGroupData = () => {
   }, []);
 
   // ➕ Create new group
-  const createGroup = async (group_name, position_id) => {
+  const createGroup = async (group_name, position_id, group_content_id = null) => {
     try {
-      const res = await api.post("/group", {
+      const payload = {
         group_name,
         position_id,
-      });
+      };
+      if (group_content_id) {
+        payload.group_content_id = group_content_id;
+      }
+      const res = await api.post("/group", payload);
 
       const newGroup = res.data;
+
+      // Save the group_content_id mapping locally
+      if (group_content_id && newGroup?.id) {
+        const savedMap = JSON.parse(localStorage.getItem('groupContentMap') || '{}');
+        savedMap[newGroup.id] = group_content_id;
+        localStorage.setItem('groupContentMap', JSON.stringify(savedMap));
+      }
+
       await fetchData();
       return newGroup;
     } catch (e) {
@@ -77,14 +94,27 @@ export const useGroupData = () => {
     }
   };
 
-  // ✏️ Update existing group (UI updates name only)
-  const updateGroup = async (id, name, position_id = undefined) => {
+  // ✏️ Update existing group
+  const updateGroup = async (id, name, position_id = undefined, group_content_id = undefined) => {
   try {
     const payload = { group_name: name };
     if (position_id !== undefined && position_id !== null && position_id !== "") payload.position_id = position_id;
+    if (group_content_id !== undefined) payload.group_content_id = group_content_id;
     console.log(`[updateGroup] ID: ${id}, Payload:`, payload);
     const res = await api.put(`/group/${id}`, payload);
     console.log(`[updateGroup] Success response:`, res.data);
+
+    // Save the group_content_id mapping locally
+    if (group_content_id !== undefined) {
+      const savedMap = JSON.parse(localStorage.getItem('groupContentMap') || '{}');
+      if (group_content_id === null) {
+        delete savedMap[id];
+      } else {
+        savedMap[id] = group_content_id;
+      }
+      localStorage.setItem('groupContentMap', JSON.stringify(savedMap));
+    }
+
     const updatedGroup = res.data;
     await fetchData();
     return updatedGroup;
@@ -114,12 +144,18 @@ export const useGroupData = () => {
       const res = await api.get(`/group?name=${query}`, {
       });
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+
+      // Get saved group content map from localStorage
+      const savedGroupContentMap = JSON.parse(localStorage.getItem('groupContentMap') || '{}');
+
       const normalized = payload.map((g) => ({
         id: g.id,
         name: g.name || g.group_name,
         group_name: g.group_name,
         position_id: g.position_id,
         description: g.description || "",
+        // Use API value if available, otherwise use saved value from localStorage
+        group_content_id: g.group_content_id || savedGroupContentMap[g.id] || null,
         memberCount: g.memberCount || g.member_count || 0,
         admin_id: g.admin_id || g.adminId || g.administrator_id || g.user_id || g.admin?.id || null,
         admin_name: g.admin?.name || g.admin_name || g.administrator_name || null,

@@ -2,30 +2,29 @@ import { useState, useEffect } from "react";
 import { smartToast } from "../../../../utils/toastManager";
 import apiCommon from "../../../../utils/api";
 
-export default function useMeetingContentData() {
+export default function useGroupContentData() {
     const [contents, setContents] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
 
-    // -------- GET ALL / SEARCH --------
     const fetchContents = async (query = "") => {
         setLoading(true);
         setError(null);
 
         try {
         const urlSuffix = query ? `?name=${encodeURIComponent(query)}` : '';
-        const response = await apiCommon.get(`/meeting-contents${urlSuffix}`);
+        const response = await apiCommon.get(`/group-contents${urlSuffix}`);
 
         if (response.data.success) {
             const user = JSON.parse(localStorage.getItem("user"));
             setCurrentUser(user);
-            // Show all contents for Super_Admin or Administrator; others see only their own
-            const isSuperAdmin = user?.role === "Super_Admin" || user?.role === "Administrator";
+            const isSuperAdmin = user?.role === "Super_Admin";
 
-            const filteredContents = response.data.data.filter(
-            (c) => isSuperAdmin || c.user_id === user?.id
-            );
+            // Super_Admin sees all, Administrator sees only their own (by administrator_id)
+            const filteredContents = isSuperAdmin 
+              ? response.data.data 
+              : response.data.data.filter((c) => c.administrator_id === user?.id);
 
             setContents(filteredContents || []);
         } else {
@@ -41,12 +40,11 @@ export default function useMeetingContentData() {
         }
     };
 
-    // -------- CREATE --------
     const addContent = async (data) => {
         try {
-        const response = await apiCommon.post(`/meeting-contents`, data);
+        const response = await apiCommon.post(`/group-contents`, data);
         if (response.data.success) {
-            smartToast.success("Meeting content created successfully");
+            smartToast.success("Group content created successfully");
             fetchContents();
         } else {
             smartToast.error(response.data.message || "Failed to create content");
@@ -58,12 +56,11 @@ export default function useMeetingContentData() {
         }
     };
 
-    // -------- UPDATE --------
     const updateContent = async (id, updatedData) => {
         try {
-        const response = await apiCommon.put(`/meeting-contents/${id}`, updatedData);
+        const response = await apiCommon.put(`/group-contents/${id}`, updatedData);
         if (response.data.success) {
-            smartToast.success("Meeting content updated successfully");
+            smartToast.success("Group content updated successfully");
             fetchContents();
         } else {
             smartToast.error(response.data.message || "Failed to update content");
@@ -75,14 +72,13 @@ export default function useMeetingContentData() {
         }
     };
 
-    // -------- DELETE --------
     const deleteContent = async (id) => {
         if (!window.confirm("Are you sure you want to delete this content?")) return;
         try {
-        const response = await apiCommon.delete(`/meeting-contents/${id}`);
+        const response = await apiCommon.delete(`/group-contents/${id}`);
         if (response.data.success) {
             setContents((prev) => prev.filter((c) => c.id !== id));
-            smartToast.success("Meeting content deleted successfully");
+            smartToast.success("Group content deleted successfully");
         } else {
             smartToast.error(response.data.message || "Failed to delete content");
         }
@@ -93,7 +89,6 @@ export default function useMeetingContentData() {
         }
     };
 
-    // -------- SEARCH WRAPPER --------
     const searchContents = async (query) => {
         if (query.trim() === "") {
         await fetchContents();

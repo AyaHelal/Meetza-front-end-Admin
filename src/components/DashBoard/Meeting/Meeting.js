@@ -3,10 +3,9 @@ import { smartToast } from "../../../utils/toastManager";
 import useMeetingData from "./hooks/useMeetingData";
 import { MeetingTable } from "./components/MeetingTable";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
-import useMeetingContentData from "../MeetingContent/hooks/useMeetingContentData";
+import useGroupContentData from "../GroupContent/hooks/useGroupContentData";
 import { useGroupData } from "../Group/hooks/useGroupData";
 import MeetingModal from "./components/MeetingModal";
-import axios from "axios";
 
 export default function Meeting() {
     const [currentUser, setCurrentUser] = useState({});
@@ -23,7 +22,7 @@ export default function Meeting() {
     const [modalData, setModalData] = useState({ title: '', datetime: '', status: 'Scheduled', meeting_content_id: '', group_id: '', id: null });
 
     const { meetings, loading, error, addMeeting, updateMeeting, deleteMeeting, fetchMeetings, searchMeetings } = useMeetingData();
-    const { contents, fetchContents } = useMeetingContentData();
+    const { contents, fetchContents } = useGroupContentData();
 
 
     useEffect(() => {

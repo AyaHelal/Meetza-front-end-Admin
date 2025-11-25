@@ -8,7 +8,12 @@ export const GroupRow = ({
   getPositionName,
   getAdminName,
   isAdmin,
+  contents = [],
 }) => {
+  // If group has a linked group_content_id use that, otherwise fall back to any contents that reference this group
+  const selectedContent = contents.find(c => c.id === group.group_content_id);
+  const groupContents = selectedContent ? [selectedContent] : contents.filter(c => c.group_id === group.id);
+  const contentNames = groupContents.map(c => c.content_name).join(", ") || "—";
   return (
     <tr className="align-middle">
       <td className="px-4">
@@ -33,6 +38,9 @@ export const GroupRow = ({
       </td>
       <td className="fw-semibold" style={{ color: "#888888", fontSize: "16px" }}>
         {getAdminName(group.admin_id, group.admin_name)}
+      </td>
+      <td className="fw-semibold" style={{ color: "#888888", fontSize: "16px" }}>
+        {contentNames}
       </td>
       <td>
         <div className="d-flex gap-2">

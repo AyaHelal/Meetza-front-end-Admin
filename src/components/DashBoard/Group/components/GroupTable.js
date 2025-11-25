@@ -12,6 +12,7 @@ export const GroupTable = ({
   getPositionName,
   getAdminName,
   isAdmin,
+  contents = [],
 }) => {
   return (
     <div className="table-responsive  user-table-container rounded-3">
@@ -21,25 +22,26 @@ export const GroupTable = ({
             <th style={{ color: "#888888" }} className="fw-semibold px-4">Name</th>
             <th style={{ color: "#888888" }} className="fw-semibold">Position</th>
             <th style={{ color: "#888888" }} className="fw-semibold">Admin</th>
+            <th style={{ color: "#888888" }} className="fw-semibold">Group Content</th>
             <th style={{ color: "#888888" }} className="fw-semibold">Actions</th>
           </tr>
         </thead>
         <tbody>
           {loading ? (
             <tr style={{ borderBottom: "none" }}>
-              <td colSpan="4" className="text-center py-4 text-muted" style={{ borderBottom: "none" }}>
+              <td colSpan="5" className="text-center py-4 text-muted" style={{ borderBottom: "none" }}>
                 Loading...
               </td>
             </tr>
           ) : error ? (
             <tr style={{ borderBottom: "none" }}>
-              <td colSpan="4" className="text-center py-4 text-danger" style={{ borderBottom: "none" }}>
+              <td colSpan="5" className="text-center py-4 text-danger" style={{ borderBottom: "none" }}>
                 {error}
               </td>
             </tr>
           ) : groups.length === 0 ? (
             <tr style={{ borderBottom: "none" }}>
-              <td colSpan="4" className="text-center py-4 text-muted" style={{ borderBottom: "none" }}>
+              <td colSpan="5" className="text-center py-4 text-muted" style={{ borderBottom: "none" }}>
                 No groups found
               </td>
             </tr>
@@ -53,6 +55,7 @@ export const GroupTable = ({
                 getPositionName={getPositionName}
                 getAdminName={getAdminName}
                 isAdmin={isAdmin}
+                contents={contents}
               />
             ))
           )}
