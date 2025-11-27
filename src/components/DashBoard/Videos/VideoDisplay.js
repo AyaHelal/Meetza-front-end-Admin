@@ -753,10 +753,14 @@ const VideoDisplay = ({ currentUser }) => {
                                 background: 'linear-gradient(to right, #FFFFFF, #80BAF5)',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                overflow: 'visible'
+                                overflow: 'hidden',
+                                maxHeight: 'calc(100vh - 100px)'
                             }}>
-                                <div className="card-body p-4 d-flex flex-column h-820 responsive-aside" style={{ overflow: 'visible' }}>
-                                    <div className="d-flex align-items-center gap-3 mb-3">
+                                <div className="card-body ps-4 pb-4 pt-4  d-flex flex-column h-820 responsive-aside" style={{
+                                    overflow: 'hidden',
+                                    paddingRight: "13px"
+                                }}>
+                                    <div className="d-flex align-items-center gap-3 mb-3" >
                                         <button
                                             className="btn btn-sm d-flex align-items-center gap-2"
                                             onClick={() => {
@@ -785,7 +789,7 @@ const VideoDisplay = ({ currentUser }) => {
                                         </h2>
                                     </div>
 
-                                    <div className="row justify-content-center video-upload-form-container" style={{ flex: 1, overflow: 'visible', display: 'flex' }}>
+                                    <div className="row justify-content-center video-upload-form-container videos-sidebar-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', display: 'flex', minHeight: 0 }}>
                                         <div className="col-12" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                             <div className="border-0 p-3 video-upload-form" style={{ border: "2px solid #E9ECEF", borderRadius: "12px", flex: 1, display: 'flex', flexDirection: 'column', overflow: 'visible' }}>
                                                 <div className=" ps-4 g-3">
