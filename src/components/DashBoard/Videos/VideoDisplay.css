@@ -1,7 +1,11 @@
 @media (max-width: 1550px) and (min-width: 1441px) {
   .width-850 {
-    width: 900px;
+    width: 1000px;
     margin-left: 5%;
+    max-height: 900px !important;
+  }
+  .h-820 {
+    height: 820px !important;
   }
 }
 @media (max-height: 900px) {
@@ -12,8 +16,9 @@
     width: 590px !important;
   }
 }
+
 .comment_scrollbar_height::-webkit-scrollbar-button {
-  display: none; /* ده بيشيل الأسهم فوق وتحت */
+  display: none;
 }
 
 .comment_scrollbar_height::-webkit-scrollbar {
@@ -56,4 +61,353 @@
     opacity: 1;
     transform: scale(1);
   }
+}
+
+/* Consistent placeholder color for all video upload form inputs */
+.video-upload-form input::placeholder,
+.video-upload-form textarea::placeholder {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+.video-upload-form input::-webkit-input-placeholder,
+.video-upload-form textarea::-webkit-input-placeholder {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+.video-upload-form input:-moz-placeholder,
+.video-upload-form textarea:-moz-placeholder {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+.video-upload-form input::-moz-placeholder,
+.video-upload-form textarea::-moz-placeholder {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+.video-upload-form input:-ms-input-placeholder,
+.video-upload-form textarea:-ms-input-placeholder {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+/* Style select dropdown option for "Select a group" */
+.video-upload-form select option:first-child {
+  color: #000000 !important;
+}
+
+.video-upload-form select:invalid,
+.video-upload-form select option[value=""] {
+  color: #000000 !important;
+}
+
+.video-upload-form select:not(:focus):invalid {
+  color: #000000 !important;
+}
+
+/* Beautiful Date Picker Styles */
+.custom-date-input {
+  position: relative;
+}
+
+.custom-date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.5) sepia(1) saturate(5) hue-rotate(200deg);
+  opacity: 0.7;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.custom-date-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background-color: rgba(0, 118, 234, 0.1);
+  transform: scale(1.1);
+}
+
+/* Date input focus styles */
+.custom-date-input:focus {
+  outline: none;
+  border-color: #0076ea !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 118, 234, 0.25) !important;
+}
+
+/* Custom styling for the date input value */
+.custom-date-input::-webkit-datetime-edit {
+  padding: 0;
+  color: #212529;
+  font-weight: 500;
+}
+
+.custom-date-input::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+.custom-date-input::-webkit-datetime-edit-text {
+  color: #888888;
+  padding: 0 4px;
+}
+
+.custom-date-input::-webkit-datetime-edit-month-field,
+.custom-date-input::-webkit-datetime-edit-day-field,
+.custom-date-input::-webkit-datetime-edit-year-field {
+  color: #212529;
+  padding: 0 2px;
+}
+
+.custom-date-input::-webkit-inner-spin-button {
+  display: none;
+}
+
+/* For Firefox */
+.custom-date-input::-moz-placeholder {
+  color: #888888;
+  opacity: 1;
+}
+
+/* Calendar dropdown styling (limited browser support) */
+input[type="date"] {
+  color-scheme: light;
+}
+
+/* Beautiful Calendar Icon */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%230076EA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+  background-size: 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Attempt to style the calendar popup - limited browser support */
+input[type="date"]::-webkit-calendar-picker-popup {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  font-family: inherit;
+}
+
+/* Style calendar month/year header */
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #212529;
+  font-weight: 500;
+}
+
+/* Firefox date input styling */
+input[type="date"]::-moz-placeholder {
+  color: #888888;
+}
+
+/* For browsers that support color-scheme, use light theme for calendar */
+input[type="date"] {
+  color-scheme: light;
+}
+
+/* File input button styling - seamless connection */
+.video-upload-form .d-flex[style*="gap: 0"] {
+  display: flex !important;
+  gap: 0 !important;
+}
+
+.video-upload-form .d-flex[style*="gap: 0"] button {
+  border-right: none !important;
+  z-index: 1;
+}
+
+.video-upload-form .d-flex[style*="gap: 0"] input[type="text"] {
+  border-left: none !important;
+  margin-left: -2px;
+}
+
+/* Ensure file input button and text input are same height */
+.video-upload-form .d-flex[style*="gap: 0"] button,
+.video-upload-form .d-flex[style*="gap: 0"] input[type="text"] {
+  height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+/* Date input placeholder styling */
+.video-upload-form input[type="date"]:invalid {
+  color: #888888;
+}
+
+.video-upload-form input[type="date"]::-webkit-datetime-edit-text {
+  color: #888888;
+}
+
+.video-upload-form input[type="date"]:not(:valid)::-webkit-datetime-edit {
+  color: #888888;
+}
+/* Video Upload Form Styles */
+.video-upload-form input::placeholder,
+.video-upload-form textarea::placeholder,
+.video-upload-form select {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+.video-upload-form input:focus,
+.video-upload-form textarea:focus,
+.video-upload-form select:focus {
+  outline: none !important;
+  border: 1px solid #0076ea !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: #0076ea !important;
+  box-shadow: 0 0 0 3px rgba(0, 118, 234, 0.1) !important;
+}
+
+/* Ensure borders don't disappear on focus for all inputs */
+.video-upload-form input,
+.video-upload-form textarea,
+.video-upload-form select {
+  border: 1px solid #ababab !important;
+}
+
+.video-upload-form input:focus,
+.video-upload-form textarea:focus,
+.video-upload-form select:focus {
+  border: 1px solid #0076ea !important;
+}
+
+/* File input styling */
+.video-upload-form input[type="file"]::-webkit-file-upload-button {
+  padding: 8px 16px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: 12px;
+  transition: all 0.2s ease;
+}
+
+.video-upload-form input[type="file"]::-webkit-file-upload-button:hover {
+  background: #e5e7eb;
+}
+
+/* Date picker styling */
+.custom-date-picker-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+  background-size: 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.custom-date-picker-input::-webkit-calendar-picker-indicator:hover {
+  background-color: rgba(0, 118, 234, 0.08);
+}
+
+/* Date input text styling */
+.custom-date-picker-input::-webkit-datetime-edit {
+  padding: 0;
+  color: #000000;
+}
+
+.custom-date-picker-input::-webkit-datetime-edit-text {
+  color: #9ca3af;
+  padding: 0 2px;
+}
+
+.custom-date-picker-input::-webkit-datetime-edit-month-field,
+.custom-date-picker-input::-webkit-datetime-edit-day-field,
+.custom-date-picker-input::-webkit-datetime-edit-year-field {
+  color: #000000;
+  padding: 0 2px;
+}
+
+/* Button hover effect */
+.video-upload-form button:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 118, 234, 0.3);
+}
+
+.video-upload-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Select arrow for better visibility */
+.video-upload-form select {
+  cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .video-upload-form input,
+  .video-upload-form select,
+  .video-upload-form textarea {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+}
+
+/* Progress bar animation */
+.progress-bar {
+  transition: width 0.3s ease-in-out;
+}
+
+/* Text muted styling */
+.text-muted {
+  color: #6b7280 !important;
+}
+
+/* Small text styling */
+small {
+  font-size: 13px;
+  line-height: 1.4;
+}
+.f::placeholder {
+  color: #000000 !important;
+}
+.videos-sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Remove arrow buttons completely and remove their space */
+.videos-sidebar-scroll::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Track & thumb */
+.videos-sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.videos-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: #c5c6c6;
+  border-radius: 10px;
+}
+
+.videos-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+
+/* Firefox */
+.videos-sidebar-scroll ::-webkit-scrollbar-button {
+  scrollbar-width: thin;
+  display: none !important;
+  scrollbar-color: #c5c6c6 transparent;
 }

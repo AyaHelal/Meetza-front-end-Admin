@@ -51,26 +51,45 @@
 }
 
 /* ===== FORM INPUT STYLES ===== */
-input::placeholder {
+/* Only apply placeholder styles to login form inputs */
+.form input::placeholder {
   color: #888888 !important;
   opacity: 1 !important;
 }
 
-/* Ensure input text is readable and visible */
-input.form-control {
+/* Ensure input text is readable and visible - Only for login form */
+.form input.form-control {
   color: #212529 !important;
 }
 
-input.form-control::-webkit-input-placeholder {
-  color: black !important;
+/* Remove focus border/outline - Only for login form inputs */
+.form input:focus,
+.form input:focus-visible,
+.form input:active,
+.form input.form-control:focus,
+.form input.form-control:focus-visible,
+.form input.form-control:active {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Prevent parent container border from changing on input focus - Only for login form */
+.form .d-flex.border:focus-within {
+  box-shadow: none !important;
+}
+
+/* Only apply to login form inputs */
+.form input.form-control::-webkit-input-placeholder {
+  color: #888888 !important;
   opacity: 1 !important;
 }
 
-input.form-control:-ms-input-placeholder {
+.form input.form-control:-ms-input-placeholder {
   color: #888888 !important;
 }
 
-input.form-control::-ms-input-placeholder {
+.form input.form-control::-ms-input-placeholder {
   color: #888888 !important;
 }
 

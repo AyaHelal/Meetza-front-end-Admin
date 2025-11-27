@@ -1,7 +1,12 @@
 /* GroupMainComponent.css */
 
 .search-input::placeholder {
-  color: rgba(255, 255, 255, 0.8);
+  color: #888888 !important;
+}
+
+.search-input {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
 }
 
 .search-input:focus {

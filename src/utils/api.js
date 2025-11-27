@@ -14,6 +14,15 @@ api.interceptors.request.use((config) => {
     try {
         const token = localStorage.getItem("authToken");
         const locale = localStorage.getItem("locale") || navigator.language?.slice(0, 2) || "en";
+
+        // If data is FormData and Content-Type is not explicitly set, remove default JSON Content-Type
+        // to let axios set it automatically with boundary
+        if (config.data instanceof FormData) {
+            if (config.headers && config.headers['Content-Type'] === 'application/json') {
+                delete config.headers['Content-Type'];
+            }
+        }
+
         if (token) {
             config.headers = config.headers || {};
             config.headers.Authorization = `Bearer ${token}`;
