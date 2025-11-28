@@ -7,7 +7,6 @@ import { GroupMembershipHeader } from "./components/GroupMembershipHeader";
 import { GroupMembershipTable } from "./components/GroupMembershipTable";
 import { SearchBar } from "../shared/SearchBar";
 import { PlusCircle } from "phosphor-react";
-import GroupMembershipModal from "./GroupMembershipModal";
 import "../User/UserMainComponent.css";
 import { ArrowLeft } from "phosphor-react";
 const GroupMembershipContent = ({ currentUser }) => {
@@ -21,30 +20,17 @@ const GroupMembershipContent = ({ currentUser }) => {
         error,
         createMembership,
         deleteMembership,
-        updateMembership,
         searchMemberships,
         fetchData,
     } = useGroupMembershipData();
 
     const [showForm, setShowForm] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
     const [formData, setFormData] = useState({ group_id: "", member_email: "" });
-    const [editingMembership, setEditingMembership] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
 
     const openCreateForm = () => {
         setFormData({ group_id: "", member_email: "" });
         setShowForm(true);
-    };
-
-    const openEditForm = (membership) => {
-        setEditingMembership(membership);
-        const memberEmail = getMemberEmail(membership.member_id) || "";
-        setFormData({
-            group_id: membership.group_id || membership.groupId || "",
-            member_email: memberEmail,
-        });
-        setShowEditModal(true);
     };
 
     // form changes are handled directly by modal via setFormData
@@ -73,16 +59,8 @@ const GroupMembershipContent = ({ currentUser }) => {
             // Use user_id from member table (required by foreign key constraint)
             const memberId = selectedMember.user_id || selectedMember.id;
 
-            if (editingMembership) {
-                // update existing membership
-                await updateMembership(editingMembership.id, formData.group_id, memberId);
-                toast.success("Group membership updated successfully");
-                setEditingMembership(null);
-                setShowEditModal(false);
-            } else {
-                await createMembership(formData.group_id, memberId);
-                toast.success("Group membership created successfully");
-            }
+            await createMembership(formData.group_id, memberId);
+            toast.success("Group membership created successfully");
             setShowForm(false);
         } catch (error) {
             const msg = error?.response?.data?.message || error.message || "Failed to create group membership";
@@ -91,7 +69,7 @@ const GroupMembershipContent = ({ currentUser }) => {
     };
 
     const handleDeleteMembership = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this membership?")) return;
+        // Note: Confirm dialog is already shown in the row component
         try {
             const res = await deleteMembership(id);
             if (res.success) {
@@ -100,7 +78,9 @@ const GroupMembershipContent = ({ currentUser }) => {
                 toast.error(res.message || "Failed to delete group membership");
             }
         } catch (error) {
-            toast.error("Error deleting membership");
+            console.error("Delete error:", error);
+            const errorMsg = error?.response?.data?.message || error.message || "Error deleting membership";
+            toast.error(errorMsg);
         }
     };
 
@@ -186,7 +166,6 @@ const GroupMembershipContent = ({ currentUser }) => {
                                 loading={loading}
                                 error={error}
                                 onDelete={handleDeleteMembership}
-                                onEdit={openEditForm}
                                 getGroupName={getGroupName}
                                 getMemberName={getMemberName}
                                 getMemberEmail={getMemberEmail}
@@ -289,17 +268,6 @@ const GroupMembershipContent = ({ currentUser }) => {
                         </>
                     )}
                 </div>
-
-                {showEditModal && editingMembership && (
-                    <GroupMembershipModal
-                        mode="edit"
-                        formData={formData}
-                        setFormData={setFormData}
-                        groups={groups}
-                        onSave={handleCreateMembership}
-                        onClose={() => { setShowEditModal(false); setEditingMembership(null); }}
-                    />
-                )}
             </div>
         </main>
     );

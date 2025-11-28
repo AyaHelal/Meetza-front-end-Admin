@@ -7,14 +7,15 @@ import { HeartStraight } from 'phosphor-react';
 import { ChatTeardropDots } from 'phosphor-react';
 import { PencilSimpleLine } from 'phosphor-react';
 import { Trash } from 'phosphor-react';
-import { MagnifyingGlass, X } from 'phosphor-react';
+import { MagnifyingGlass, X, ArrowLeft } from 'phosphor-react';
+import { UploadSimple } from 'phosphor-react';
+import CustomDatePicker from './CustomDatePicker';
 import './VideoDisplay.css';
 const VideoDisplay = ({ currentUser }) => {
     const [videos, setVideos] = useState([]);
     const [currentVideo, setCurrentVideo] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [members, setMembers] = useState([]);
     const [likeCounts, setLikeCounts] = useState({});
     const [searchQuery, setSearchQuery] = useState('');
     const [searchTimeout, setSearchTimeout] = useState(null);
@@ -22,11 +23,38 @@ const VideoDisplay = ({ currentUser }) => {
     const searchContainerRef = useRef(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [editFormData, setEditFormData] = useState({ title: '', poster_url: '', id: null });
+    const [showUploadModal, setShowUploadModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [videoToDelete, setVideoToDelete] = useState(null);
+    const [groups, setGroups] = useState([]);
+    const [uploadFormData, setUploadFormData] = useState({
+        title: '',
+        poster_file: null,
+        video_file: null,
+        date_recorded: '',
+        group_id: '',
+        description: ''
+    });
+    const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     // Fetch videos from API
     useEffect(() => {
         fetchVideos();
+        fetchGroups();
     }, []);
+
+    // Fetch groups for dropdown
+    const fetchGroups = async () => {
+        try {
+            const res = await api.get('/group');
+            const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+            setGroups(payload);
+        } catch (err) {
+            console.error('Failed to fetch groups:', err);
+            toast.error('Failed to load groups');
+        }
+    };
 
     // Cleanup search timeout on unmount
     useEffect(() => {
@@ -60,15 +88,15 @@ const VideoDisplay = ({ currentUser }) => {
             setError(null);
             const response = await api.get('/video');
             console.log('API /video response:', response.data);
-            
+
             // Handle both response structures: array directly or nested in data property
-            const videosArray = Array.isArray(response.data) 
-                ? response.data 
+            const videosArray = Array.isArray(response.data)
+                ? response.data
                 : (Array.isArray(response.data?.data) ? response.data.data : []);
-            
+
             console.log('Parsed videos array:', videosArray);
             console.log('First video structure:', videosArray[0]);
-            
+
             if (videosArray && videosArray.length > 0) {
                 setVideos(videosArray);
                 setCurrentVideo(videosArray[0]);
@@ -151,11 +179,11 @@ const VideoDisplay = ({ currentUser }) => {
     };
 
     const handleVideoSelect = (video) => {
+        // Close upload form if it's open
+        setShowUploadModal(false);
         setCurrentVideo(video);
     };
 
-    // Build full file URL for poster/video paths returned from the API
-    // Build full file URL for poster/video paths returned from the API
     // Build full file URL for poster/video paths returned from the API
     const buildFileUrl = (path) => {
         if (!path) return '';
@@ -404,25 +432,35 @@ const VideoDisplay = ({ currentUser }) => {
         }
     };
 
-    const handleDeleteVideo = async (videoId) => {
-        if (!window.confirm("Are you sure you want to delete this video?")) return;
+    const handleDeleteVideo = (videoId) => {
+        setVideoToDelete(videoId);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDeleteVideo = async () => {
+        if (!videoToDelete) return;
 
         try {
-            await api.delete(`/video/${videoId}`);
+            await api.delete(`/video/${videoToDelete}`);
 
             toast.success("Video deleted successfully");
             // Remove video from list
-            const updatedVideos = videos.filter(v => v._id !== videoId && v.id !== videoId);
+            const updatedVideos = videos.filter(v => v._id !== videoToDelete && v.id !== videoToDelete);
             setVideos(updatedVideos);
 
             // If deleted video was current, set first video as current
-            if (currentVideo._id === videoId || currentVideo.id === videoId) {
+            if (currentVideo && (currentVideo._id === videoToDelete || currentVideo.id === videoToDelete)) {
                 setCurrentVideo(updatedVideos.length > 0 ? updatedVideos[0] : null);
             }
+
+            setShowDeleteModal(false);
+            setVideoToDelete(null);
         } catch (err) {
             console.error("Error deleting video:", err);
             const errorMsg = err.response?.data?.message || "Failed to delete video";
             toast.error(errorMsg);
+            setShowDeleteModal(false);
+            setVideoToDelete(null);
         }
     };
 
@@ -463,6 +501,179 @@ const VideoDisplay = ({ currentUser }) => {
         }
     };
 
+    // Upload Video Handlers
+    const handleUploadFormChange = (e) => {
+        const { name, value } = e.target;
+        setUploadFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleFileChange = (e) => {
+        const { name } = e.target;
+        const file = e.target.files[0];
+        if (file) {
+            // Check file size (100MB limit - adjust as needed)
+            const maxSize = 100 * 1024 * 1024; // 100MB in bytes
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+            if (name === 'video_file' && file.size > maxSize) {
+                toast.error(`Video file is too large (${fileSizeMB}MB). Maximum size is 100MB. Please compress the video or choose a smaller file.`);
+                e.target.value = ''; // Clear the input
+                return;
+            }
+
+            if (name === 'poster_file' && file.size > 10 * 1024 * 1024) {
+                toast.error(`Poster image is too large (${fileSizeMB}MB). Maximum size is 10MB.`);
+                e.target.value = ''; // Clear the input
+                return;
+            }
+
+            setUploadFormData(prev => ({ ...prev, [name]: file }));
+        }
+    };
+
+    const handleUploadVideo = async () => {
+        // Validation
+        if (!uploadFormData.title.trim()) {
+            toast.error("Title is required");
+            return;
+        }
+        if (!uploadFormData.video_file) {
+            toast.error("Video file is required");
+            return;
+        }
+        if (!uploadFormData.group_id) {
+            toast.error("Please select a group");
+            return;
+        }
+        if (!uploadFormData.date_recorded) {
+            toast.error("Date recorded is required");
+            return;
+        }
+
+        try {
+            setUploading(true);
+            const formData = new FormData();
+            formData.append('title', uploadFormData.title);
+            formData.append('video_file', uploadFormData.video_file);
+            formData.append('date_recorded', uploadFormData.date_recorded);
+            formData.append('group_id', uploadFormData.group_id);
+            formData.append('description', uploadFormData.description || '');
+
+            if (uploadFormData.poster_file) {
+                formData.append('poster_file', uploadFormData.poster_file);
+            }
+
+            // Reset progress
+            setUploadProgress(0);
+
+            // Configure timeout for large file uploads (10 minutes = 600000ms)
+            const uploadConfig = {
+                timeout: 600000, // 10 minutes timeout for large video files
+                onUploadProgress: (progressEvent) => {
+                    if (progressEvent.total) {
+                        const percentCompleted = Math.round(
+                            (progressEvent.loaded * 100) / progressEvent.total
+                        );
+                        setUploadProgress(percentCompleted);
+                        console.log(`Upload progress: ${percentCompleted}%`);
+                    }
+                },
+            };
+
+            // Try /video/create endpoint first (as specified by user)
+            // Then fallback to /video if that doesn't work
+            try {
+                await api.post('/video/create', formData, uploadConfig);
+                console.log('POST /video/create succeeded');
+            } catch (createErr) {
+                console.log('POST /video/create failed:', createErr.response?.status || createErr.message);
+
+                // If it's a 404, try /video as fallback
+                if (createErr.response?.status === 404) {
+                    console.log('Trying /video as fallback...');
+                    try {
+                        await api.post('/video', formData, uploadConfig);
+                        console.log('POST /video succeeded');
+                    } catch (videoErr) {
+                        console.error('All upload attempts failed.');
+                        console.error('/video/create error:', {
+                            status: createErr.response?.status,
+                            message: createErr.message,
+                            code: createErr.code
+                        });
+                        console.error('/video error:', {
+                            status: videoErr.response?.status,
+                            message: videoErr.message,
+                            code: videoErr.code
+                        });
+                        // Throw the original error from /video/create
+                        throw createErr;
+                    }
+                } else {
+                    // For other errors (413, 400, etc.), throw immediately
+                    throw createErr;
+                }
+            }
+
+            toast.success("Video uploaded successfully!");
+            setShowUploadModal(false);
+            setUploadProgress(0);
+            setUploadFormData({
+                title: '',
+                poster_file: null,
+                video_file: null,
+                date_recorded: '',
+                group_id: '',
+                description: ''
+            });
+
+            // Refresh videos list
+            await fetchVideos();
+        } catch (err) {
+            console.error("Error uploading video:", err);
+            console.error("Error details:", {
+                status: err.response?.status,
+                statusText: err.response?.statusText,
+                message: err.message,
+                code: err.code,
+                data: err.response?.data
+            });
+            setUploadProgress(0); // Reset progress on error
+
+            // Check if the error message contains 413 (sometimes network errors hide the status)
+            const errorString = JSON.stringify(err).toLowerCase();
+            const has413 = errorString.includes('413') || err.response?.status === 413;
+
+            // Handle specific error cases
+            if (has413 || err.response?.status === 413) {
+                const fileSizeMB = uploadFormData.video_file
+                    ? (uploadFormData.video_file.size / (1024 * 1024)).toFixed(2)
+                    : 'unknown';
+                toast.error(
+                    `File too large (${fileSizeMB}MB). The server cannot accept files of this size. ` +
+                    `Please compress the video or use a smaller file. Maximum recommended size: 50MB.`
+                );
+            } else if (err.response?.status === 404) {
+                toast.error("Video upload endpoint not found. Please contact the administrator.");
+            } else if (err.response?.status >= 500) {
+                toast.error("Server error. Please try again later or contact the administrator.");
+            } else if (err.message && err.message.includes('Network Error')) {
+                toast.error(
+                    "Network error: Unable to connect to server. Please check your internet connection and try again."
+                );
+            } else {
+                const errorMsg = err.response?.data?.message ||
+                    err.response?.data?.error ||
+                    err.message ||
+                    "Failed to upload video. Please check your file size and try again.";
+                toast.error(errorMsg);
+            }
+        } finally {
+            setUploading(false);
+            setUploadProgress(0);
+        }
+    };
+
     // note: copy actions use direct navigator.clipboard.writeText where needed
 
     // Format date
@@ -494,7 +705,7 @@ const VideoDisplay = ({ currentUser }) => {
 
 
     return (
-        <div className="flex-fill" style={{ backgroundColor: '#f5f5f5', minHeight: '100vh', padding: '20px' }}>
+        <div className="flex-fill ps-0" style={{ backgroundColor: '#f5f5f5', minHeight: '100vh', padding: '20px' }}>
             <style>{`
                .video-main-col {
     width: 100%;
@@ -502,7 +713,6 @@ const VideoDisplay = ({ currentUser }) => {
     margin: 0 auto;
 }
 
-/* شاشات كبيرة جدًا 1900px أو أكتر */
 @media (max-width: 1900px) {
     .video-main-col {
         width: 815px;
@@ -510,7 +720,6 @@ const VideoDisplay = ({ currentUser }) => {
     }
 }
 
-/* لو العرض أقل من 1800px */
 @media (max-width: 1500px) {
     .video-main-col {
         width: 746px;
@@ -518,7 +727,7 @@ const VideoDisplay = ({ currentUser }) => {
     }
 }
             `}</style>
-            <div className="row  ">
+            <div className="d-flex   ">
                 {/* Main Video Section */}
                 <style>{`
     .responsive-a {
@@ -536,8 +745,244 @@ const VideoDisplay = ({ currentUser }) => {
     }
 `}
                 </style>
-                <div className=" col-xl-8 col-lg-8 col-md-7 video-main-col responsive-aside responsive-a align-items-start" >
-                    {currentVideo ? (
+                <div className=" ps-0 ms-0 video-main-col responsive-aside responsive-a align-items-start" >
+                    {showUploadModal ? (
+                        <>
+                            <div className="card border-0 mt-4 width-850 video-upload-card" style={{
+                                borderRadius: '20px',
+                                background: 'linear-gradient(to right, #FFFFFF, #80BAF5)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                overflow: 'hidden',
+                                maxHeight: 'calc(100vh - 100px)'
+                            }}>
+                                <div className="card-body ps-4 pb-4 pt-4  d-flex flex-column h-820 responsive-aside" style={{
+                                    overflow: 'hidden',
+                                    paddingRight: "13px"
+                                }}>
+                                    <div className="d-flex align-items-center gap-3 mb-3" >
+                                        <button
+                                            className="btn btn-sm d-flex align-items-center gap-2"
+                                            onClick={() => {
+                                                setShowUploadModal(false);
+                                                setUploadFormData({
+                                                    title: '',
+                                                    poster_file: null,
+                                                    video_file: null,
+                                                    date_recorded: '',
+                                                    group_id: '',
+                                                    description: ''
+                                                });
+                                                setUploadProgress(0);
+                                            }}
+                                            style={{
+                                                backgroundColor: "#0076EA",
+                                                color: "#ffffff",
+                                                border: "none",
+                                                borderRadius: "12px",
+                                            }}
+                                        >
+                                            <ArrowLeft size={24} />
+                                        </button>
+                                        <h2 className="h5 mb-0 fw-semibold" style={{ fontSize: "24px" }}>
+                                            Upload Video
+                                        </h2>
+                                    </div>
+
+                                    <div className="row justify-content-center video-upload-form-container videos-sidebar-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', display: 'flex', minHeight: 0 }}>
+                                        <div className="col-12" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                            <div className="border-0 p-3 video-upload-form" style={{ border: "2px solid #E9ECEF", borderRadius: "12px", flex: 1, display: 'flex', flexDirection: 'column', overflow: 'visible' }}>
+                                                <div className=" ps-4 g-3">
+                                                    {/* Title */}
+                                                    <div className="mb-3">
+                                                        <label className="form-label fw-semibold" style={{ color: "#888888", fontSize: "18px" }}>
+                                                            Title <span style={{ color: "#FF0000" }}>*</span>
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control rounded-4 py-2  w-75"
+                                                            name="title"
+                                                            value={uploadFormData.title}
+                                                            onChange={handleUploadFormChange}
+                                                            placeholder="Enter video title"
+                                                            style={{
+                                                                border: "1px solid #ABABAB",
+                                                                fontSize: "16px",
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                    {/* Group */}
+                                                    <div className="col-md-12 mb-3">
+                                                        <label className="form-label fw-semibold" style={{ color: "#888888", fontSize: "18px" }}>
+                                                            Group <span style={{ color: "#FF0000" }}>*</span>
+                                                        </label>
+                                                        <select
+                                                            className="form-select rounded-4 py-2  w-75"
+                                                            name="group_id"
+                                                            value={uploadFormData.group_id}
+                                                            onChange={handleUploadFormChange}
+                                                            style={{
+                                                                border: "1px solid #ABABAB",
+                                                                fontSize: "16px",
+                                                                color: uploadFormData.group_id ? "#212529" : "#888888",
+                                                            }}
+                                                        >
+                                                            <option value="" style={{ color: "#888888" }}>Select a group</option>
+                                                            {groups.map((group) => (
+                                                                <option key={group.id} value={group.id}>
+                                                                    {group.name || group.group_name || `Group ${group.id}`}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+
+                                                    {/* Date Recorded */}
+                                                    <div className="col-lg-6 col-md-12 mb-3">
+                                                        <label className="form-label fw-semibold" style={{ color: "#888888", fontSize: "18px" }}>
+                                                            Date Recorded <span style={{ color: "#FF0000" }}>*</span>
+                                                        </label>
+                                                        <CustomDatePicker
+                                                            name="date_recorded"
+                                                            value={uploadFormData.date_recorded}
+                                                            onChange={handleUploadFormChange}
+                                                            className="custom-date-picker-input py-2"
+                                                        />
+                                                    </div>
+
+                                                    {/* Description - Full Width */}
+                                                    <div className=" mb-3">
+                                                        <label className="form-label fw-semibold" style={{ color: "#888888", fontSize: "18px" }}>
+                                                            Description
+                                                        </label>
+                                                        <textarea
+                                                            className="form-control f rounded-4 w-75 "
+                                                            name="description"
+                                                            value={uploadFormData.description}
+                                                            onChange={handleUploadFormChange}
+                                                            placeholder="Enter video description (optional)"
+                                                            rows="2"
+                                                            style={{
+                                                                borderColor: "#ABABAB",
+                                                                border: "1px solid #ABABAB",
+                                                                fontSize: "16px",
+                                                                resize: "vertical"
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                    {/* Poster File */}
+                                                    <div className="mb-3">
+                                                        <label className="form-label fw-semibold" style={{ color: "#888888", fontSize: "18px" }}>
+                                                            Poster Image
+                                                        </label>
+                                                        <input
+                                                            type="file"
+                                                            className="form-control rounded-4 py-2 w-75"
+                                                            name="poster_file"
+                                                            accept="image/*"
+                                                            onChange={handleFileChange}
+                                                            style={{
+                                                                border: "1px solid #ABABAB",
+                                                                fontSize: "16px",
+                                                            }}
+                                                        />
+                                                        {uploadFormData.poster_file && (
+                                                            <div className="mt-1">
+                                                                <small className="text-muted d-block">
+                                                                    Selected: {uploadFormData.poster_file.name}
+                                                                </small>
+                                                                <small className="text-muted d-block">
+                                                                    Size: {(uploadFormData.poster_file.size / (1024 * 1024)).toFixed(2)} MB
+                                                                </small>
+                                                            </div>
+                                                        )}
+                                                        <small className="text-muted mt-1 d-block">
+                                                            Maximum file size: 10MB
+                                                        </small>
+                                                    </div>
+
+                                                    {/* Video File */}
+                                                    <div className=" mb-3">
+                                                        <label className="form-label fw-semibold" style={{ color: "#888888", fontSize: "18px" }}>
+                                                            Video File <span style={{ color: "#FF0000" }}>*</span>
+                                                        </label>
+                                                        <input
+                                                            type="file"
+                                                            className="form-control rounded-4 py-2 w-75"
+                                                            name="video_file"
+                                                            accept="video/*"
+                                                            onChange={handleFileChange}
+                                                            style={{
+                                                                border: "1px solid #ABABAB",
+                                                                fontSize: "16px",
+                                                            }}
+                                                        />
+                                                        {uploadFormData.video_file && (
+                                                            <div className="mt-1">
+                                                                <small className="text-muted d-block">
+                                                                    Selected: {uploadFormData.video_file.name}
+                                                                </small>
+                                                                <small className="text-muted d-block">
+                                                                    Size: {(uploadFormData.video_file.size / (1024 * 1024)).toFixed(2)} MB
+                                                                </small>
+                                                            </div>
+                                                        )}
+                                                        <small className="text-muted mt-1 d-block">
+                                                            Maximum file size: 100MB (recommended: 50MB or less)
+                                                        </small>
+                                                    </div>
+                                                </div>
+
+                                                {/* Upload Progress */}
+                                                {uploading && (
+                                                    <div className="mb-3">
+                                                        <div className="d-flex justify-content-between align-items-center mb-2">
+                                                            <small className="text-muted fw-semibold">Uploading video...</small>
+                                                            <small className="text-muted fw-semibold">{uploadProgress}%</small>
+                                                        </div>
+                                                        <div className="progress" style={{ height: '10px', borderRadius: '8px', backgroundColor: '#E9ECEF' }}>
+                                                            <div
+                                                                className="progress-bar progress-bar-striped progress-bar-animated"
+                                                                role="progressbar"
+                                                                style={{
+                                                                    width: `${uploadProgress}%`,
+                                                                    backgroundColor: '#00DC85',
+                                                                    transition: 'width 0.3s ease'
+                                                                }}
+                                                                aria-valuenow={uploadProgress}
+                                                                aria-valuemin="0"
+                                                                aria-valuemax="100"
+                                                            ></div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Submit Button */}
+                                                <div className="d-flex justify-content-center mt-3">
+                                                    <button
+                                                        type="button"
+                                                        className="btn rounded-3 px-5 py-2"
+                                                        onClick={handleUploadVideo}
+                                                        disabled={uploading}
+                                                        style={{
+                                                            background: "#0076EA",
+                                                            color: "white",
+                                                            border: "none",
+                                                            fontSize: "16px",
+                                                            fontWeight: "600",
+                                                        }}
+                                                    >
+                                                        {uploading ? 'Uploading...' : 'Upload Video'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    ) : currentVideo ? (
                         <>
                             <div className="card border-0 mt-4 width-850 " style={{
                                 borderRadius: '20px',
@@ -565,7 +1010,7 @@ const VideoDisplay = ({ currentUser }) => {
                             </div>
                             {/* Video Info */}
                             <div className="card-body my-3">
-                                <div className="d-flex align-items-center mb-3 p-2  bg-light  shadow-sm width-850
+                                <div className="d-flex align-items-center mb-3 ps-3 p-2  bg-light  shadow-sm width-850
                         " style={{
                                         fontSize: "14px",
                                         borderRadius: "24px"
@@ -671,21 +1116,13 @@ const VideoDisplay = ({ currentUser }) => {
                 </div>
 
                 {/* Videos Sidebar */}
-                <div className="col-lg-4 col-xl-4 col-md-5 mt-4 " >
-                    <style>{`
-                .responsive-aside {
-                    height: 936px;
-                }
-                @media (max-height: 1024px) {
-                    .responsive-aside {
-                        height: calc(100vh - 80px);
-                    }
-                }
-            `}</style>
-                    <div className="card border-0 bg-white responsive-aside" style={{
-                        width: "330px",
+                <div className=" mt-4 " >
+                    <div className="card border-0 bg-white" style={{
+                        width: "367px",
                         borderRadius: '24px',
-
+                        height: showUploadModal ? '936px' : 'calc(936px - 80px)',
+                        maxHeight: showUploadModal ? 'calc(100vh - 80px)' : 'calc(100vh - 140px)',
+                        overflow: 'auto'
                     }} >
                         <div className="card-header border-0 d-flex justify-content-between align-items-center p-3 bg-white"
                             style={{ borderRadius: '24px' }} >
@@ -769,7 +1206,7 @@ const VideoDisplay = ({ currentUser }) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="card-body p-2" style={{ maxHeight: '800px', overflowY: 'auto' }}>
+                        <div className="card-body p-2 videos-sidebar-scroll" style={{ maxHeight: showUploadModal ? '800px' : 'calc(800px - 80px)', overflowY: 'auto' }}>
                             {videos.length > 0 ? (
                                 videos.map((video) => (
                                     <div
@@ -788,30 +1225,28 @@ const VideoDisplay = ({ currentUser }) => {
                                             <h6 className="mb-1 small">{video.title}</h6>
                                             <p className="mb-0 text-muted small"> {formatDate(video.date_recorded)}</p>
                                         </div>
-                                        <div className="d-flex gap-2">
+                                        <div className="d-flex gap-1 ">
                                             <button
-                                                className="btn btn-sm p-1"
+                                                className="btn btn-sm p-0 rounded-5"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleEditVideo(video);
                                                 }}
-                                                style={{ backgroundColor: "#00DC85", borderRadius: "20px" }}
                                             >
                                                 <span style={{ color: "white" }}>
-                                                    <PencilSimpleLine size={24} />
+                                                    <PencilSimpleLine size={20} color="#000000" />
                                                 </span>
                                             </button>
 
                                             <button
-                                                className="btn btn-sm p-1"
+                                                className="btn btn-sm p-0 rounded-5"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleDeleteVideo(video._id || video.id);
                                                 }}
-                                                style={{ backgroundColor: "#FF0000", borderRadius: "20px" }}
                                             >
                                                 <span style={{ color: "white" }}>
-                                                    <Trash size={24} />
+                                                    <Trash size={20} style={{ color: "#FF0000" }} />
                                                 </span>
                                             </button>
 
@@ -825,8 +1260,118 @@ const VideoDisplay = ({ currentUser }) => {
                             )}
                         </div>
                     </div>
+                    {/* Upload Video Button - Outside the card */}
+                    {!showUploadModal && (
+                        <div className="mt-3" style={{ width: "367px" }}>
+                            <button
+                                className="btn w-100 d-flex align-items-center justify-content-center gap-2"
+                                onClick={() => setShowUploadModal(true)}
+                                style={{
+                                    backgroundColor: "#0076EA",
+                                    color: "#FFFFFF",
+                                    border: "none",
+                                    borderRadius: "12px",
+                                    padding: "12px 24px",
+                                    fontSize: "16px",
+                                    fontWeight: "600",
+                                    transition: "all 0.2s ease"
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = "#0066CC";
+                                    e.currentTarget.style.transform = "translateY(-1px)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = "#0076EA";
+                                    e.currentTarget.style.transform = "translateY(0)";
+                                }}
+                            >
+                                <UploadSimple size={20} />
+
+                                <span>Upload video</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
+
+            {/* Delete Video Confirmation Modal */}
+            {showDeleteModal && (
+                <div
+                    className="modal show d-block"
+                    style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+                    onClick={() => {
+                        setShowDeleteModal(false);
+                        setVideoToDelete(null);
+                    }}
+                >
+                    <div
+                        className="modal-dialog modal-dialog-centered"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="modal-content rounded-4 border-0" style={{ boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
+                            <div className="modal-header border-0 pb-0">
+                                <h5 className="modal-title fw-bold" style={{ fontSize: "24px", color: "#010101" }}>
+                                    Delete Video
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => {
+                                        setShowDeleteModal(false);
+                                        setVideoToDelete(null);
+                                    }}
+                                    aria-label="Close"
+                                    style={{ fontSize: "14px" }}
+                                >
+                                </button>
+                            </div>
+
+                            <div className="modal-body pt-3">
+                                <p style={{ fontSize: "16px", color: "#010101" }}>
+                                    Are you sure you want to delete this video? This action cannot be undone.
+                                </p>
+                            </div>
+
+                            <div className="modal-footer border-0 pt-0">
+                                <button
+                                    type="button"
+                                    className="btn rounded-3"
+                                    onClick={() => {
+                                        setShowDeleteModal(false);
+                                        setVideoToDelete(null);
+                                    }}
+                                    style={{
+                                        backgroundColor: "#F4F6F8",
+                                        color: "#010101",
+                                        border: "none",
+                                        padding: "10px 24px",
+                                        fontSize: "16px",
+                                        fontWeight: "600"
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn rounded-3"
+                                    onClick={confirmDeleteVideo}
+                                    style={{
+                                        backgroundColor: "#FF0000",
+                                        color: "#FFFFFF",
+                                        border: "none",
+                                        padding: "10px 24px",
+                                        fontSize: "16px",
+                                        fontWeight: "600",
+                                        marginLeft: "12px"
+                                    }}
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Edit Video Modal */}
             {showEditModal && (
@@ -851,7 +1396,6 @@ const VideoDisplay = ({ currentUser }) => {
                                     aria-label="Close"
                                     style={{ fontSize: "14px" }}
                                 >
-                                    <X size={24} weight="bold" />
                                 </button>
                             </div>
 
@@ -897,10 +1441,10 @@ const VideoDisplay = ({ currentUser }) => {
                                 </form>
                             </div>
 
-                            <div className="modal-footer border-0 pt-0">
+                            <div className="modal-footer border-0 pt-0 w-100 align-items-center justify-content-center">
                                 <button
                                     type="button"
-                                    className="btn rounded-3 px-4 py-2"
+                                    className="btn rounded-3 px-4 py-2 w-50 "
                                     onClick={handleUpdateVideo}
                                     style={{
                                         flex: 1,
@@ -912,6 +1456,271 @@ const VideoDisplay = ({ currentUser }) => {
                                     }}
                                 >
                                     Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Old Upload Video Modal - Removed, using inline form instead */}
+            {false && showUploadModal && (
+                <div
+                    className="modal show d-block"
+                    style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+                    onClick={() => setShowUploadModal(false)}
+                >
+                    <div
+                        className="modal-dialog modal-dialog-centered"
+                        style={{ maxWidth: "600px" }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="modal-content rounded-4 border-0" style={{ boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
+                            <div className="modal-header border-0 pb-0">
+                                <h5 className="modal-title fw-bold" style={{ fontSize: "24px", color: "#010101" }}>
+                                    Upload Video
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => {
+                                        setShowUploadModal(false);
+                                        setUploadFormData({
+                                            title: '',
+                                            poster_file: null,
+                                            video_file: null,
+                                            date_recorded: '',
+                                            group_id: '',
+                                            description: ''
+                                        });
+                                    }}
+                                    aria-label="Close"
+                                    style={{ fontSize: "14px" }}
+                                >
+                                    <X size={24} weight="bold" />
+                                </button>
+                            </div>
+
+                            <div className="modal-body pt-3">
+                                <form>
+                                    {/* Title */}
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold" style={{ color: "#010101" }}>
+                                            Title <span style={{ color: "#FF0000" }}>*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control rounded-3"
+                                            name="title"
+                                            value={uploadFormData.title}
+                                            onChange={handleUploadFormChange}
+                                            placeholder="Enter video title"
+                                            style={{
+                                                border: "2px solid #E9ECEF",
+                                                padding: "0.75rem",
+                                                fontSize: "16px"
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Group */}
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold" style={{ color: "#010101" }}>
+                                            Group <span style={{ color: "#FF0000" }}>*</span>
+                                        </label>
+                                        <select
+                                            className="form-select rounded-3"
+                                            name="group_id"
+                                            value={uploadFormData.group_id}
+                                            onChange={handleUploadFormChange}
+                                            style={{
+                                                border: "2px solid #E9ECEF",
+                                                padding: "0.75rem",
+                                                fontSize: "16px"
+                                            }}
+                                        >
+                                            <option value="">Select a group</option>
+                                            {groups.map((group) => (
+                                                <option key={group.id} value={group.id}>
+                                                    {group.name || group.group_name || `Group ${group.id}`}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    {/* Date Recorded */}
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold" style={{ color: "#010101" }}>
+                                            Date Recorded <span style={{ color: "#FF0000" }}>*</span>
+                                        </label>
+                                        <input
+                                            type="date"
+                                            className="form-control rounded-3"
+                                            name="date_recorded"
+                                            value={uploadFormData.date_recorded}
+                                            onChange={handleUploadFormChange}
+                                            style={{
+                                                border: "2px solid #E9ECEF",
+                                                padding: "0.75rem",
+                                                fontSize: "16px"
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Description */}
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold" style={{ color: "#010101" }}>
+                                            Description
+                                        </label>
+                                        <textarea
+                                            className="form-control rounded-3"
+                                            name="description"
+                                            value={uploadFormData.description}
+                                            onChange={handleUploadFormChange}
+                                            placeholder="Enter video description (optional)"
+                                            rows="3"
+                                            style={{
+                                                border: "2px solid #E9ECEF",
+                                                padding: "0.75rem",
+                                                fontSize: "16px",
+                                                resize: "vertical"
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Poster File */}
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold" style={{ color: "#010101" }}>
+                                            Poster Image
+                                        </label>
+                                        <input
+                                            type="file"
+                                            className="form-control rounded-3"
+                                            name="poster_file"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                            style={{
+                                                border: "2px solid #E9ECEF",
+                                                padding: "0.75rem",
+                                                fontSize: "16px"
+                                            }}
+                                        />
+                                        {uploadFormData.poster_file && (
+                                            <div className="mt-1">
+                                                <small className="text-muted d-block">
+                                                    Selected: {uploadFormData.poster_file.name}
+                                                </small>
+                                                <small className="text-muted d-block">
+                                                    Size: {(uploadFormData.poster_file.size / (1024 * 1024)).toFixed(2)} MB
+                                                </small>
+                                            </div>
+                                        )}
+                                        <small className="text-muted mt-1 d-block">
+                                            Maximum file size: 10MB
+                                        </small>
+                                    </div>
+
+                                    {/* Video File */}
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold" style={{ color: "#010101" }}>
+                                            Video File <span style={{ color: "#FF0000" }}>*</span>
+                                        </label>
+                                        <input
+                                            type="file"
+                                            className="form-control rounded-3"
+                                            name="video_file"
+                                            accept="video/*"
+                                            onChange={handleFileChange}
+                                            style={{
+                                                border: "2px solid #E9ECEF",
+                                                padding: "0.75rem",
+                                                fontSize: "16px"
+                                            }}
+                                        />
+                                        {uploadFormData.video_file && (
+                                            <div className="mt-1">
+                                                <small className="text-muted d-block">
+                                                    Selected: {uploadFormData.video_file.name}
+                                                </small>
+                                                <small className="text-muted d-block">
+                                                    Size: {(uploadFormData.video_file.size / (1024 * 1024)).toFixed(2)} MB
+                                                </small>
+                                            </div>
+                                        )}
+                                        <small className="text-muted mt-1 d-block">
+                                            Maximum file size: 100MB (recommended: 50MB or less)
+                                        </small>
+                                    </div>
+                                </form>
+
+                                {/* Upload Progress */}
+                                {uploading && (
+                                    <div className="mt-3">
+                                        <div className="d-flex justify-content-between align-items-center mb-2">
+                                            <small className="text-muted fw-semibold">Uploading video...</small>
+                                            <small className="text-muted fw-semibold">{uploadProgress}%</small>
+                                        </div>
+                                        <div className="progress" style={{ height: '10px', borderRadius: '8px', backgroundColor: '#E9ECEF' }}>
+                                            <div
+                                                className="progress-bar progress-bar-striped progress-bar-animated"
+                                                role="progressbar"
+                                                style={{
+                                                    width: `${uploadProgress}%`,
+                                                    backgroundColor: '#00DC85',
+                                                    transition: 'width 0.3s ease'
+                                                }}
+                                                aria-valuenow={uploadProgress}
+                                                aria-valuemin="0"
+                                                aria-valuemax="100"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="modal-footer border-0 pt-0">
+                                <button
+                                    type="button"
+                                    className="btn rounded-3 px-4 py-2 me-2"
+                                    onClick={() => {
+                                        setShowUploadModal(false);
+                                        setUploadFormData({
+                                            title: '',
+                                            poster_file: null,
+                                            video_file: null,
+                                            date_recorded: '',
+                                            group_id: '',
+                                            description: ''
+                                        });
+                                        setUploadProgress(0);
+                                    }}
+                                    disabled={uploading}
+                                    style={{
+                                        flex: 1,
+                                        background: '#E9ECEF',
+                                        color: '#000',
+                                        borderRadius: 8,
+                                        padding: '10px 12px',
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn rounded-3 px-4 py-2"
+                                    onClick={handleUploadVideo}
+                                    disabled={uploading}
+                                    style={{
+                                        flex: 1,
+                                        background: '#00DC85',
+                                        color: 'white',
+                                        borderRadius: 8,
+                                        padding: '10px 12px',
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    {uploading ? 'Uploading...' : 'Upload Video'}
                                 </button>
                             </div>
                         </div>

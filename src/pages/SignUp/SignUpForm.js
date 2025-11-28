@@ -46,12 +46,12 @@ export default function SignUpForm() {
         setApiError("");
         setIsLoading(true);
         try {
-                const response = await axios.post('https://meetza-backend.vercel.app/api/auth/register', {
-                    name: formData.name,
-                    password: formData.password,
-                    email: formData.email,
-                    role: 'Administrator'
-                });
+            const response = await axios.post('https://meetza-backend.vercel.app/api/auth/register', {
+                name: formData.name,
+                password: formData.password,
+                email: formData.email,
+                role: 'Administrator'
+            });
             console.log(response);
             localStorage.setItem("userEmail", formData.email);
             navigate('/verify-email');
@@ -207,15 +207,13 @@ export default function SignUpForm() {
                         ) : 'Creat Account'}
                     </motion.button>
 
-                     <motion.div
+                    <motion.div
                         className="mt-4"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: 0.3 }}
                     >
-                        <div className="text-center mb-3">
-                            <span className="text-muted">Or sign up with</span>
-                        </div>
+
                         <SocialLoginButtons />
                     </motion.div>
                 </form>

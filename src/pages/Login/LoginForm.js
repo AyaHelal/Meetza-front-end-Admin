@@ -289,9 +289,7 @@ export default function LoginForm() {
                             ) : 'Continue'}
                         </motion.button>
 
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.4 }} className="mt-3">
-                            <span className="text-888888">or continue with</span>
-                        </motion.div>
+
 
                         <div className="mt-2">
                             <SocialLoginButtons />

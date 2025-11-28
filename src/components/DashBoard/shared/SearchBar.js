@@ -13,7 +13,7 @@ export const SearchBar = ({ value, onChange, placeholder = "Search by position n
         border: "2px solid #E9ECEF",
         paddingTop: "0.75rem",
         paddingBottom: "0.75rem",
-        background: "linear-gradient(to right, #0076EA, #00DC85)",
+        backgroundColor: "#FFFFFF",
       }}
     />
     <MagnifyingGlass
@@ -24,7 +24,7 @@ export const SearchBar = ({ value, onChange, placeholder = "Search by position n
         left: 15,
         top: "50%",
         transform: "translateY(-50%)",
-        color: "white",
+        color: "#000000",
       }}
     />
   </div>
