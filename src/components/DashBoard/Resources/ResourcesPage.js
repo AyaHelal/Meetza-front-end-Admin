@@ -66,46 +66,78 @@ const ResourcesPage = () => {
         <UserWelcomeHeader userName={currentUser?.name || currentUser?.username || 'User'} description="Manage resources attached to group contents." />
 
         {/* If Super Admin allow selecting content to attach to */}
-        {currentUser?.role === 'Super_Admin' && (
-            <div className="m-4">
-                <label className="form-label fw-semibold" style={{color: "#888888"}}>Select Group Content</label>
-                <Select
-                    className="mb-3 rounded-3"
-                    options={contentOptions}
-                    value={selectedContent ? { value: selectedContent, label: contents.find(c => c.id === selectedContent)?.content_name } : null}
-                    onChange={(s) => setSelectedContent(s?.value || null)}
-                    placeholder="Select group content..."
-                    menuPortalTarget={document.body}
-                    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                />
+{currentUser?.role === 'Super_Admin' && (
+    <div className="m-4 p-4 bg-white rounded-3 shadow-sm">
+        <div className="mb-2">
+            <label className="form-label fw-semibold" style={{color: "#888888"}}>Select Group Content</label>
+            <div className="d-flex gap-3 align-items-center">
+                <div className="flex-grow-1">
+                    <Select
+                        className="rounded-3"
+                        options={contentOptions}
+                        value={selectedContent ? { value: selectedContent, label: contents.find(c => c.id === selectedContent)?.content_name } : null}
+                        onChange={(s) => setSelectedContent(s?.value || null)}
+                        placeholder="Select group content..."
+                        menuPortalTarget={document.body}
+                        styles={{ 
+                            menuPortal: base => ({ ...base, zIndex: 9999 }),
+                            control: (provided) => ({
+                                ...provided,
+                                border: '1px solid #dee2e6',
+                                boxShadow: 'none',
+                                '&:hover': {
+                                    borderColor: '#86b7fe',
+                                }
+                            })
+                        }}
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+)}
+
+{/* For Administrator, allow selecting from their content */}
+{currentUser?.role === 'Administrator' && (
+    <>
+        {contents.length > 0 ? (
+            <div className="m-4 p-4 bg-white rounded-3 shadow-sm">
+                <div className="mb-2">
+                    <label className="form-label fw-semibold" style={{color: "#888888"}}>Select Your Group Content</label>
+                    <div className="d-flex gap-3 align-items-center">
+                        <div className="flex-grow-1">
+                            <Select
+                                className="rounded-3"
+                                options={contentOptions}
+                                value={selectedContent ? { value: selectedContent, label: contents.find(c => c.id === selectedContent)?.content_name } : null}
+                                onChange={(s) => setSelectedContent(s?.value || null)}
+                                placeholder="Select your content..."
+                                menuPortalTarget={document.body}
+                                styles={{ 
+                                    menuPortal: base => ({ ...base, zIndex: 9999 }),
+                                    control: (provided) => ({
+                                        ...provided,
+                                        border: '1px solid #dee2e6',
+                                        boxShadow: 'none',
+                                        '&:hover': {
+                                            borderColor: '#86b7fe',
+                                        }
+                                    })
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        ) : (
+            <div className="m-4 p-3 rounded-3" style={{ backgroundColor: '#fff3cd', borderLeft: '4px solid #ffc107' }}>
+                <p className="mb-0" style={{color: "#856404", fontWeight: 500}}>
+                    No content available. Please create a group content first to manage resources.
+                </p>
             </div>
         )}
-
-        {/* For Administrator, allow selecting from their content */}
-        {currentUser?.role === 'Administrator' && (
-            <>
-                {contents.length > 0 ? (
-                    <div className="m-4">
-                        <label className="form-label fw-semibold" style={{color: "#888888"}}>Select Your Group Content</label>
-                        <Select
-                            className="mb-3 rounded-3"
-                            options={contentOptions}
-                            value={selectedContent ? { value: selectedContent, label: contents.find(c => c.id === selectedContent)?.content_name } : null}
-                            onChange={(s) => setSelectedContent(s?.value || null)}
-                            placeholder="Select your content..."
-                            menuPortalTarget={document.body}
-                            styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                        />
-                    </div>
-                ) : (
-                    <div className="m-4 p-3 rounded-3" style={{ backgroundColor: '#fff3cd', borderLeft: '4px solid #ffc107' }}>
-                        <p className="mb-0" style={{color: "#856404", fontWeight: 500}}>
-                            No content available. Please create a group content first to manage resources.
-                        </p>
-                    </div>
-                )}
-            </>
-        )}
+    </>
+)}
 
         <input ref={fileInputRef} type="file" style={{ display: 'none' }} onChange={handleFileChange} />
 
