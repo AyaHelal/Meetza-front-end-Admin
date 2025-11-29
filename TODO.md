@@ -1,0 +1,2 @@
+- [x] Update GroupMembershipTable.js: Change table headers to 'Group' and 'Membership Info', update colSpan to 2 for loading/error states.
+- [x] Update GroupMembershipRow.js: Replace the two separate columns with one 'Membership Info' column containing a single dropdown.

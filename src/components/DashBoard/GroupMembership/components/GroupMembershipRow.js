@@ -12,7 +12,6 @@ export const GroupMembershipRow = ({
   // Extract members list - membership.members is an array of member objects
   const members = membership.members || [];
   const [isExpanded, setIsExpanded] = useState(false);
-  const [hoveredMemberIndex, setHoveredMemberIndex] = useState(null);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -42,30 +41,30 @@ export const GroupMembershipRow = ({
       <td className="fw-semibold" style={{ color: "#888888", fontSize: "16px" }}>
         <div style={{ maxWidth: "400px" }}>
           {members.length > 0 ? (
-            <div>
+            <div style={{ width: "600px" }}>
               <button
                 onClick={toggleExpand}
-                className="btn btn-sm d-flex align-items-center gap-2"
+                className="btn btn-sm d-flex align-items-center"
                 style={{
-                  backgroundColor: isExpanded ? "#E9ECEF" : "transparent",
-                  border: "1px solid #E9ECEF",
+                  backgroundColor: isExpanded ? "transparent" : "transparent",
+                  border: isExpanded ? "none" : "none",
                   borderRadius: "8px",
                   padding: "6px 12px",
                   color: "#888888",
                   fontSize: "14px",
                   width: "100%",
-                  justifyContent: "space-between",
+                  justifyContent: "flex-start",
                   cursor: "pointer",
                   transition: "background-color 0.2s",
                 }}
                 onMouseEnter={(e) => {
-                  if (!isExpanded) e.target.style.backgroundColor = "#F8F9FA";
+                  if (!isExpanded) e.target.style.backgroundColor = "transparent";
                 }}
                 onMouseLeave={(e) => {
                   if (!isExpanded) e.target.style.backgroundColor = "transparent";
                 }}
               >
-                <span>
+                <span style={{ marginRight: "8px" }}>
                   {members.length} {members.length === 1 ? "Member" : "Members"}
                 </span>
                 {isExpanded ? <CaretUp size={18} /> : <CaretDown size={18} />}
@@ -75,192 +74,74 @@ export const GroupMembershipRow = ({
                   style={{
                     marginTop: "8px",
                     padding: "12px",
-                    backgroundColor: "#F8F9FA",
-                    borderRadius: "8px",
+                    backgroundColor: "transparent",
+                    borderRadius: "12px",
                     maxHeight: "200px",
                     overflowY: "auto",
                     border: "1px solid #E9ECEF",
                   }}
                 >
+                  <div
+                    className="d-flex align-items-center"
+                    style={{
+                      padding: "4px",
+                      marginBottom: "8px",
+                      borderBottom: "2px solid #E9ECEF",
+                      fontWeight: "bold",
+                      color: "#888888",
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>Name</div>
+                    <div style={{ flex: 1 }}>Email</div>
+                  </div>
                   {members.map((member, index) => (
                     <div
                       key={member.composite_id || index}
                       className="d-flex align-items-center justify-content-between"
                       style={{
-                        padding: "8px 12px",
+                        padding: "4px",
                         margin: "4px 0",
                         borderBottom: index < members.length - 1 ? "1px solid #E9ECEF" : "none",
                         borderRadius: "6px",
                         transition: "background-color 0.2s",
                         position: "relative",
                       }}
-                      onMouseEnter={() => {
-                        setHoveredMemberIndex(`name-${index}`);
-                      }}
-                      onMouseLeave={() => {
-                        setHoveredMemberIndex(null);
-                      }}
                     >
-                      <span style={{ color: "#888888", cursor: "pointer", flex: 1 }}>
-                        {getMemberName(member.member_id, member.member_name) || "N/A"}
-                      </span>
-                      {isAdmin && (
-                        <div 
-                          className="d-flex gap-1 align-items-center"
-                          style={{ 
-                            opacity: hoveredMemberIndex === `name-${index}` ? 1 : 0, 
-                            transition: "opacity 0.2s",
-                          }}
-                          onMouseEnter={() => {
-                            setHoveredMemberIndex(`name-${index}`);
-                          }}
-                          onMouseLeave={() => {
-                            setHoveredMemberIndex(null);
-                          }}
-                        >
-                          <button
-                            className="btn btn-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (window.confirm(`Remove ${member.member_name || member.member_email} from ${membership.group_name || 'this group'}?`)) {
-                                onDelete(member.composite_id || `${membership.group_id}_${member.member_id}`);
-                              }
-                            }}
-                            style={{
-                              backgroundColor: "transparent",
-                              border: "none",
-                              padding: "4px",
-                              color: "#888888",
-                            }}
-                            title={`Delete ${member.member_name || member.member_email}`}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.color = "#FF0000";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.color = "#888888";
-                            }}
-                          >
-                            <Trash size={16} weight="regular" />
-                          </button>
+                      <div className="d-flex" style={{ flex: 1 }}>
+                        <div style={{ flex: 1, color: "black", fontWeight: "semi-bold" }}>
+                          {getMemberName(member.member_id, member.member_name) || "N/A"}
                         </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            <span style={{ color: "#999" }}>No members</span>
-          )}
-        </div>
-      </td>
-      <td className="fw-semibold" style={{ color: "#888888", fontSize: "16px" }}>
-        <div style={{ maxWidth: "400px" }}>
-          {members.length > 0 ? (
-            <div>
-              <button
-                onClick={toggleExpand}
-                className="btn btn-sm d-flex align-items-center gap-2"
-                style={{
-                  backgroundColor: isExpanded ? "#E9ECEF" : "transparent",
-                  border: "1px solid #E9ECEF",
-                  borderRadius: "8px",
-                  padding: "6px 12px",
-                  color: "#888888",
-                  fontSize: "14px",
-                  width: "100%",
-                  justifyContent: "space-between",
-                  cursor: "pointer",
-                  transition: "background-color 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  if (!isExpanded) e.target.style.backgroundColor = "#F8F9FA";
-                }}
-                onMouseLeave={(e) => {
-                  if (!isExpanded) e.target.style.backgroundColor = "transparent";
-                }}
-              >
-                <span>
-                  {members.length} {members.length === 1 ? "Email" : "Emails"}
-                </span>
-                {isExpanded ? <CaretUp size={18} /> : <CaretDown size={18} />}
-              </button>
-              {isExpanded && (
-                <div
-                  style={{
-                    marginTop: "8px",
-                    padding: "12px",
-                    backgroundColor: "#F8F9FA",
-                    borderRadius: "8px",
-                    maxHeight: "200px",
-                    overflowY: "auto",
-                    border: "1px solid #E9ECEF",
-                  }}
-
-                >
-                  {members.map((member, index) => (
-                    <div
-                      key={member.composite_id || index}
-                      className="d-flex align-items-center justify-content-between"
-                      style={{
-                        padding: "8px 12px",
-                        margin: "4px 0",
-                        borderBottom: index < members.length - 1 ? "1px solid #E9ECEF" : "none",
-                        borderRadius: "6px",
-                        transition: "background-color 0.2s",
-                        wordBreak: "break-word",
-                        position: "relative",
-                      }}
-                      onMouseEnter={() => {
-                        setHoveredMemberIndex(`email-${index}`);
-                      }}
-                      onMouseLeave={() => {
-                        setHoveredMemberIndex(null);
-                      }}
-                    >
-                      <span style={{ color: "#888888", cursor: "pointer", flex: 1 }}>
-                        {getMemberEmail(member.member_id, member.member_email) || "N/A"}
-                      </span>
+                        <div style={{ flex: 1, color: "black", wordBreak: "break-word", fontWeight: "semi-bold" }}>
+                          {getMemberEmail(member.member_id, member.member_email) || "N/A"}
+                        </div>
+                      </div>
                       {isAdmin && (
-                        <div 
-                          className="d-flex gap-1 align-items-center"
-                          style={{ 
-                            opacity: hoveredMemberIndex === `email-${index}` ? 1 : 0, 
-                            transition: "opacity 0.2s",
+                        <button
+                          className="btn btn-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm(`Remove ${member.member_name || member.member_email} from ${membership.group_name || 'this group'}?`)) {
+                              onDelete(member.composite_id || `${membership.group_id}_${member.member_id}`);
+                            }
+
+                          }}
+                          style={{
+                            backgroundColor: "transparent",
+                            border: "none",
+                            padding: "4px",
+                            color: "#FF0000",
                             marginLeft: "8px",
                           }}
-                          onMouseEnter={() => {
-                            setHoveredMemberIndex(`email-${index}`);
+                          title={`Delete ${member.member_name || member.member_email}`}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = "#FF0000";
                           }}
-                          onMouseLeave={() => {
-                            setHoveredMemberIndex(null);
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = "#FF0000";
                           }}
                         >
-                          <button
-                            className="btn btn-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (window.confirm(`Remove ${member.member_name || member.member_email} from ${membership.group_name || 'this group'}?`)) {
-                                onDelete(member.composite_id || `${membership.group_id}_${member.member_id}`);
-                              }
-                            }}
-                            style={{
-                              backgroundColor: "transparent",
-                              border: "none",
-                              padding: "4px",
-                              color: "#888888",
-                            }}
-                            title={`Delete ${member.member_name || member.member_email}`}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.color = "#FF0000";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.color = "#888888";
-                            }}
-                          >
-                            <Trash size={16} weight="regular" />
-                          </button>
-                        </div>
+                          <Trash size={16} weight="regular" />
+                        </button>
                       )}
                     </div>
                   ))}

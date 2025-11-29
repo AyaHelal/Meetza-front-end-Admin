@@ -18,27 +18,26 @@ export const GroupMembershipTable = ({
       <table className="table table-borderless">
         <thead className="table-header-sticky">
           <tr className="mx-5">
-            <th style={{ color: "#888888" }} className="fw-semibold px-4">Group</th>
-            <th style={{ color: "#888888" }} className="fw-semibold">Member Name</th>
-            <th style={{ color: "#888888" }} className="fw-semibold">Member Email</th>
+            <th style={{ color: "#888888", width: "30%" }} className="fw-semibold px-4">Group</th>
+            <th style={{ color: "#888888" }} className="fw-semibold">Membership Info</th>
           </tr>
         </thead>
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan="3" className="text-center py-4 text-muted">
+              <td colSpan="2" className="text-center py-4 text-muted">
                 Loading...
               </td>
             </tr>
           ) : error ? (
             <tr>
-              <td colSpan="3" className="text-center py-4 text-danger">
+              <td colSpan="2" className="text-center py-4 text-danger">
                 {error}
               </td>
             </tr>
           ) : memberships.length === 0 ? (
             <tr>
-              <td colSpan="3" className="text-center py-4 text-muted">
+              <td colSpan="2" className="text-center py-4 text-muted">
                 No memberships found
               </td>
             </tr>
