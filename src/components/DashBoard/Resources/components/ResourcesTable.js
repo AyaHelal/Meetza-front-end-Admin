@@ -1,4 +1,3 @@
-import React, { useMemo } from "react";
 import { PlusCircle } from "phosphor-react";
 import '../../CSS/Table.css';
 import ResourcesRow from "./ResourcesRow";
