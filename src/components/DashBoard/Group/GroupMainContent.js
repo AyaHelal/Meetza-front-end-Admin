@@ -1,5 +1,5 @@
 // GroupMainContent.jsx
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { toast } from "react-toastify";
 import { useGroupData } from "./hooks/useGroupData";
 import useGroupContentData from "../GroupContent/hooks/useGroupContentData";
@@ -27,7 +27,28 @@ const GroupMainContent = ({ currentUser }) => {
         fetchData,
     } = useGroupData();
 
-    const { contents } = useGroupContentData();
+    const { contents: allContents = [] } = useGroupContentData();
+
+    // Filter contents to only show unassigned ones (group_id is null) or the one already assigned to the current group
+    // In GroupMainContent.js
+const getAvailableContents = useMemo(() => {
+  return (currentGroupId) => {
+    const assignedContentIds = new Set(
+      groups
+        .filter(g => g.group_content_id && g.id !== currentGroupId) // exclude current group
+        .map(g => g.group_content_id)
+    );
+
+    const currentGroup = groups.find(g => g.id === currentGroupId);
+    const currentContentId = currentGroup?.group_content_id;
+
+    return allContents.filter(content =>
+      (!assignedContentIds.has(content.id)) &&
+      (content.group_id === null || content.id === currentContentId)
+    );
+  };
+}, [groups, allContents]);
+
 
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [formData, setFormData] = useState({});
@@ -40,16 +61,16 @@ const GroupMainContent = ({ currentUser }) => {
 
     const openCreateForm = () => {
         setModalMode("create");
-        setFormData({ group_name: "", position_id: "", group_content_id: null });
+        setFormData({ group_name: "", position_id: "", year: "", semester: "", group_content_id: null });
         setSelectedGroup(null);
         setShowForm(true);
     };
 
     const openEditModal = (group) => {
         setModalMode("edit");
-        setFormData({ 
+        setFormData({
             name: group.name,
-            group_content_id: group.group_content_id || null 
+            group_content_id: group.group_content_id ?? null
         });
         setSelectedGroup({
             ...group,
@@ -59,19 +80,31 @@ const GroupMainContent = ({ currentUser }) => {
     };
 
 
-    const handleFormChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+    // Handle content change - just update formData (actual save happens on Save button)
+    const handleContentChange = (e) => {
+        const { name, value,type } = e.target;
+        const newValue = value === "" ? null : type === "number" ? Number(value) : value;
+
+    setFormData({
+        ...formData,
+        [name]: newValue
+    });
     };
 
     const handleCreateGroup = async () => {
-        if (!formData.group_name || !formData.position_id) {
-            toast.error("Please fill all required fields");
+        if (!formData.group_name || !formData.position_id || !formData.year || !formData.semester) {
+            toast.error("Please fill all required fields: group name, position, year and semester");
             return;
         }
 
         try {
-            await createGroup(formData.group_name, formData.position_id, formData.group_content_id || null);
+            await createGroup(
+                formData.group_name,
+                formData.position_id,
+                formData.year,
+                formData.semester,
+                formData.group_content_id || null
+            );
             setShowForm(false);
             toast.success("Group created successfully");
             fetchData();
@@ -89,6 +122,9 @@ const GroupMainContent = ({ currentUser }) => {
 
         const groupId = selectedGroup.id;
         console.log("Selected Group ID:", groupId);
+        console.log("Form Data:", formData);
+        console.log("Selected Group:", selectedGroup);
+
         const payload = {
             group_name: formData.name,
             position_id: selectedGroup.position_id
@@ -96,7 +132,17 @@ const GroupMainContent = ({ currentUser }) => {
         console.log("Payload sent:", payload);
 
         try {
-            const res = await updateGroup(groupId, formData.name, selectedGroup.position_id, formData.group_content_id || undefined);
+            // ensure we send explicit null when the user cleared the group content
+            const contentIdToSend = formData.group_content_id === undefined ? undefined : formData.group_content_id === null ? null : formData.group_content_id;
+            console.log("Content ID to send:", contentIdToSend);
+            console.log("Calling updateGroup with:", {
+                id: groupId,
+                group_name: formData.name,
+                position_id: selectedGroup.position_id,
+                group_content_id: contentIdToSend
+            });
+
+            const res = await updateGroup(groupId, formData.name, selectedGroup.position_id, contentIdToSend);
             console.log("Response from backend:", res);
             setShowEditModal(false);
             toast.success("Group updated successfully");
@@ -169,14 +215,12 @@ const GroupMainContent = ({ currentUser }) => {
                                     <button
                                         className="btn rounded-4 d-flex align-items-center gap-2"
                                         onClick={openCreateForm}
+                                        disabled={showForm}
                                         style={{
                                             background: "linear-gradient(to right, #0076EA, #00DC85)",
                                             color: "white",
                                             fontSize: "16px",
-                                            paddingTop: "0.75rem",
-                                            paddingBottom: "0.75rem",
-                                            paddingLeft: "1.5rem",
-                                            paddingRight: "1.5rem",
+                                            padding: "0.75rem 1.5rem",
                                             border: "none",
                                         }}
                                     >
@@ -203,7 +247,8 @@ const GroupMainContent = ({ currentUser }) => {
                                 getPositionName={getPositionName}
                                 getAdminName={getAdminName}
                                 isAdmin={isAdmin}
-                                contents={contents}
+                                currentUser={currentUser}
+                                contents={allContents}
                             />
                         </>
                     ) : (
@@ -239,7 +284,7 @@ const GroupMainContent = ({ currentUser }) => {
                                                     className="form-control rounded-3"
                                                     name="group_name"
                                                     value={formData.group_name || ''}
-                                                    onChange={handleFormChange}
+                                                    onChange={handleContentChange}
                                                     placeholder="Enter group name"
                                                     style={{
                                                         border: "2px solid #E9ECEF",
@@ -257,7 +302,7 @@ const GroupMainContent = ({ currentUser }) => {
                                                     className="form-select rounded-3"
                                                     name="position_id"
                                                     value={formData.position_id || ''}
-                                                    onChange={handleFormChange}
+                                                    onChange={handleContentChange}
                                                     style={{
                                                         border: "2px solid #E9ECEF",
                                                         fontSize: "16px",
@@ -273,6 +318,50 @@ const GroupMainContent = ({ currentUser }) => {
                                                 </select>
                                             </div>
 
+                                            <div className="mb-4 d-flex gap-4">
+                                                <div style={{ minWidth: 200 }}>
+                                                    <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                        Year <span style={{ color: "#FF0000" }}>*</span>
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-control rounded-3"
+                                                        name="year"
+                                                        min={1}
+                                                        value={formData.year || ''}
+                                                        onChange={handleContentChange}
+                                                        placeholder="Enter year"
+                                                        style={{
+                                                            border: "2px solid #E9ECEF",
+                                                            fontSize: "16px",
+                                                            width: "100%",
+                                                        }}
+                                                    />
+                                                </div>
+
+                                                <div style={{ minWidth: 200 }}>
+                                                    <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                        Semester <span style={{ color: "#FF0000" }}>*</span>
+                                                    </label>
+                                                    <select
+                                                        className="form-select rounded-3"
+                                                        name="semester"
+                                                        value={formData.semester || ''}
+                                                        onChange={handleContentChange}
+                                                        style={{
+                                                            border: "2px solid #E9ECEF",
+                                                            fontSize: "16px",
+                                                            width: "100%",
+                                                        }}
+                                                    >
+                                                        <option value="">Select semester</option>
+                                                        <option value="Fall">Fall</option>
+                                                        <option value="Spring">Spring</option>
+                                                        <option value="Summer">Summer</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
                                             <div className="mb-4">
                                                 <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
                                                     Group Content
@@ -280,8 +369,8 @@ const GroupMainContent = ({ currentUser }) => {
                                                 <select
                                                     className="form-select rounded-3"
                                                     name="group_content_id"
-                                                    value={formData.group_content_id || ''}
-                                                    onChange={handleFormChange}
+                                                    value={formData.group_content_id ?? ''}
+                                                    onChange={handleContentChange}
                                                     style={{
                                                         border: "2px solid #E9ECEF",
                                                         fontSize: "16px",
@@ -289,7 +378,7 @@ const GroupMainContent = ({ currentUser }) => {
                                                     }}
                                                 >
                                                     <option value="">Select group content (optional)</option>
-                                                    {contents.map((c) => (
+                                                    {getAvailableContents(selectedGroup?.id).map((c) => (
                                                         <option key={c.id} value={c.id}>
                                                             {c.content_name}
                                                         </option>
@@ -330,7 +419,7 @@ const GroupMainContent = ({ currentUser }) => {
                     formData={formData}
                     setFormData={setFormData}
                     positions={positions}
-                    contents={contents}
+                    contents={getAvailableContents(selectedGroup?.id)}
                     onSave={modalMode === 'create' ? handleCreateGroup : handleUpdateGroup}
                     onClose={() => setShowEditModal(false)}
                 />

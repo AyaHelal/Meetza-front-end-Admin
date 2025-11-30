@@ -8,8 +8,20 @@ export const GroupRow = ({
   getPositionName,
   getAdminName,
   isAdmin,
+  currentUser,
   contents = [],
 }) => {
+  // Check if current user can edit/delete this group
+  const canEditDelete = isAdmin && (
+    currentUser?.role === "Super_Admin" ||
+    (currentUser?.role === "Administrator" && (
+      group.admin_id === currentUser?.id ||
+      group.adminId === currentUser?.id ||
+      group.administrator_id === currentUser?.id ||
+      group.user_id === currentUser?.id ||
+      group.admin?.id === currentUser?.id
+    ))
+  );
   // If group has a linked group_content_id use that, otherwise fall back to any contents that reference this group
   const selectedContent = contents.find(c => c.id === group.group_content_id);
   const groupContents = selectedContent ? [selectedContent] : contents.filter(c => c.group_id === group.id);
@@ -53,7 +65,7 @@ export const GroupRow = ({
               <PencilSimpleLine size={24} />
             </span>
           </button>
-          {isAdmin && (
+          {canEditDelete && (
             <button
               className="btn btn-sm"
               onClick={() => onDelete(group.id)}
@@ -69,4 +81,6 @@ export const GroupRow = ({
     </tr>
   );
 };
+
+export default GroupRow;
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { GroupRow } from "./GroupRow";
+import GroupRow from "./GroupRow";
 import '../../CSS/Table.css';
 export const GroupTable = ({
   groups,
@@ -12,10 +12,12 @@ export const GroupTable = ({
   getPositionName,
   getAdminName,
   isAdmin,
+  currentUser = null,
   contents = [],
 }) => {
   return (
     <div className="table-responsive  user-table-container rounded-3">
+      { !GroupRow && console.error('GroupRow component is undefined. Check export/import in GroupRow.js') }
       <table className="table table-borderless">
         <thead className="table-header-sticky">
           <tr className="mx-5">
@@ -55,6 +57,7 @@ export const GroupTable = ({
                 getPositionName={getPositionName}
                 getAdminName={getAdminName}
                 isAdmin={isAdmin}
+                currentUser={currentUser}
                 contents={contents}
               />
             ))
