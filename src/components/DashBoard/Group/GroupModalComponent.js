@@ -9,10 +9,10 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
         setFormData({ ...formData, [name]: value });
     };
 
-    const contentOptions = contents.map(content => ({
-        value: content.id,
-        label: content.content_name
-    }));
+    // Only include contents that are not assigned to any group, or include the currently selected content for this group
+    const contentOptions = contents
+        .filter(c => !c.assigned_group_id || c.id === formData.group_content_id)
+        .map(content => ({ value: content.id, label: content.content_name }));
 
     const selectedContent = formData.group_content_id ? contentOptions.find(opt => opt.value === formData.group_content_id) : null;
 
@@ -89,21 +89,38 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
                                         <label className="form-label fw-semibold" style={{ color: "#010101" }}>
                                             Group Content
                                         </label>
-                                        <Select
-                                            options={contentOptions}
-                                            value={selectedContent}
-                                            onChange={(option) => setFormData({ ...formData, group_content_id: option?.value || null })}
-                                            placeholder="Select group content (optional)"
-                                            isClearable
-                                            styles={{
-                                                control: (base) => ({
-                                                    ...base,
-                                                    borderRadius: 12,
-                                                    border: '2px solid #E9ECEF',
-                                                    boxShadow: 'none'
-                                                })
-                                            }}
-                                        />
+                                        <div className="d-flex align-items-center gap-2">
+                                            <div style={{ flex: 1 }}>
+                                                <Select
+                                                    options={contentOptions}
+                                                    value={selectedContent}
+                                                    onChange={(option) => setFormData({ ...formData, group_content_id: option?.value ?? null })}
+                                                    placeholder="Select group content (optional)"
+                                                    isClearable
+                                                    styles={{
+                                                        control: (base) => ({
+                                                            ...base,
+                                                            borderRadius: 12,
+                                                            border: '2px solid #E9ECEF',
+                                                            boxShadow: 'none'
+                                                        })
+                                                    }}
+                                                />
+                                            </div>
+                                            {/* explicit clear button to ensure null is set when user clicks X */}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setFormData({ ...formData, group_content_id: null });
+                                                    console.log('GroupModalComponent: clear group_content_id clicked');
+                                                }}
+                                                className="btn btn-outline-secondary"
+                                                style={{ borderRadius: 12, padding: '6px 8px' }}
+                                                aria-label="Clear group content"
+                                            >
+                                                <X size={18} />
+                                            </button>
+                                        </div>
                                     </div>
                                 </>
                             ) : (
@@ -129,21 +146,25 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
                                         <label className="form-label fw-semibold" style={{ color: "#010101" }}>
                                             Group Content
                                         </label>
-                                        <Select
-                                            options={contentOptions}
-                                            value={selectedContent}
-                                            onChange={(option) => setFormData({ ...formData, group_content_id: option?.value || null })}
-                                            placeholder="Select group content (optional)"
-                                            isClearable
-                                            styles={{
-                                                control: (base) => ({
-                                                    ...base,
-                                                    borderRadius: 12,
-                                                    border: '2px solid #E9ECEF',
-                                                    boxShadow: 'none'
-                                                })
-                                            }}
-                                        />
+                                        <div className="d-flex align-items-center gap-2">
+                                            <div style={{ flex: 1 }}>
+                                                <Select
+                                                    options={contentOptions}
+                                                    value={selectedContent}
+                                                    onChange={(option) => setFormData({ ...formData, group_content_id: option?.value ?? null })}
+                                                    placeholder="Select group content (optional)"
+                                                    isClearable
+                                                    styles={{
+                                                        control: (base) => ({
+                                                            ...base,
+                                                            borderRadius: 12,
+                                                            border: '2px solid #E9ECEF',
+                                                            boxShadow: 'none'
+                                                        })
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                 </>
                             )}

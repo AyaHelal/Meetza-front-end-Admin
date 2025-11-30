@@ -1,5 +1,5 @@
-import React from "react";
-import { X } from "phosphor-react";
+
+import "../../Group/GroupMainComponent.css";
 
 
 const GroupContentModal = ({ mode = 'create', data = {}, onChange, onClose, onSubmit }) => {
@@ -30,6 +30,8 @@ const GroupContentModal = ({ mode = 'create', data = {}, onChange, onClose, onSu
                         value={data.content_description || ''}
                         onChange={(e) => onChange({ ...data, content_description: e.target.value })}
                     />
+
+
 
                     <div className="d-flex gap-2" style={{ marginTop: 12 }}>
                         <button

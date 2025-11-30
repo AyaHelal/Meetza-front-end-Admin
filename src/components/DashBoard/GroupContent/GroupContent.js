@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import { smartToast } from "../../../utils/toastManager";
 import useGroupContentData from "./hooks/useGroupContentData";
+import { useGroupData } from "../Group/hooks/useGroupData";
 import { GroupContentTable } from "./components/GroupContentTable";
 import GroupContentModal from "./components/GroupContentModal";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
 import "../User/UserMainComponent.css";
+import apiCommon from "../../../utils/api";
 
 export default function GroupContent() {
     const [currentUser, setCurrentUser] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-    const [searchTimeout, setSearchTimeout] = useState(null);
     const [editing, setEditing] = useState({});
     const [addingNew, setAddingNew] = useState(false);
-
     const {
         contents,
         loading,
@@ -20,8 +20,7 @@ export default function GroupContent() {
         addContent,
         updateContent,
         deleteContent,
-        fetchContents,
-        searchContents
+        fetchContents
     } = useGroupContentData();
 
     useEffect(() => {
@@ -30,19 +29,33 @@ export default function GroupContent() {
         fetchContents();
     }, []);
 
-    const handleSave = async (id, data) => {
-        try {
-            if (id) await updateContent(id, data);
-            else await addContent(data);
+    // Note: availableGroups is no longer needed since group assignment is handled in Group module
 
-            setEditing({});
-            setAddingNew(false);
-            await fetchContents();
-        } catch(error) {
-            console.error("Failed to save content", error);
-            smartToast.error(error.response?.data?.message || "Failed to save content");
+
+
+    const handleSave = async (data) => {
+    try {
+        const contentData = {
+            content_name: data.content_name,
+            content_description: data.content_description
+        };
+
+        if (editing.id) {
+            await updateContent(editing.id, contentData);
+        } else {
+            await addContent(contentData);
         }
-    };
+
+        setEditing({});
+        setAddingNew(false);
+        await fetchContents();
+    } catch (error) {
+        console.error("Failed to save content", error);
+        smartToast.error(error.response?.data?.message || "Failed to save content");
+    }
+};
+
+
 
     const handleDelete = async (id) => {
         try {
@@ -54,46 +67,27 @@ export default function GroupContent() {
         }
     };
 
-    const handleSearch = async (query) => {
+    const handleSearch = (query) => {
         setSearchTerm(query);
-
-        if (searchTimeout) clearTimeout(searchTimeout);
-
-        const timeout = setTimeout(() => {
-            searchContents(query);
-        }, 500);
-
-        setSearchTimeout(timeout);
     };
-
-    useEffect(() => {
-        return () => {
-            if (searchTimeout) clearTimeout(searchTimeout);
-        };
-    }, [searchTimeout]);
-
-    const [modalOpen, setModalOpen] = useState(false);
-    const [modalMode, setModalMode] = useState('create');
-    const [modalData, setModalData] = useState({ content_name: '', content_description: '', id: null });
 
     const handleEdit = (id) => {
-        const item = contents.find((c) => c.id === id);
-        setModalMode('edit');
-        setModalData({ id: item?.id || null, content_name: item?.content_name || '', content_description: item?.content_description || '' });
-        setModalOpen(true);
-    };
+    const item = contents.find((c) => c.id === id);
+    setEditing({
+        id: item?.id || null,
+        content_name: item?.content_name || '',
+        content_description: item?.content_description || ''
+    });
+};
+
 
     const handleAdd = () => {
-        setModalMode('create');
-        setModalData({ content_name: '', content_description: '', id: null });
-        setModalOpen(true);
-    };
-
-    const closeModal = () => setModalOpen(false);
-
-    const handleModalSubmit = async (data) => {
-        await handleSave(data.id, data);
-        closeModal();
+        setAddingNew(true);
+        setEditing({
+            content_name: '',
+            content_description: '',
+            id: null
+        });
     };
 
     return (
@@ -121,8 +115,17 @@ export default function GroupContent() {
                 addingNew={addingNew}
                 currentUser={currentUser}
             />
-            {modalOpen && (
-                <GroupContentModal mode={modalMode} data={modalData} onChange={setModalData} onClose={closeModal} onSubmit={handleModalSubmit} />
+            {(addingNew || editing.id) && (
+                <GroupContentModal
+                    mode={editing.id ? 'edit' : 'create'}
+                    data={editing}
+                    onChange={setEditing}
+                    onClose={() => {
+                        setEditing({});
+                        setAddingNew(false);
+                    }}
+                    onSubmit={handleSave}
+                />
             )}
         </main>
     );
