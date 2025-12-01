@@ -9,6 +9,7 @@ import { SearchBar } from "../shared/SearchBar";
 import GroupModalComponent from "./GroupModalComponent";
 import GroupDetails from "./GroupDetails";
 import { PlusCircle, ArrowLeft } from "phosphor-react";
+import Select from 'react-select';
 import "./GroupMainComponent.css";
 
 const GroupMainContent = ({ currentUser }) => {
@@ -31,23 +32,23 @@ const GroupMainContent = ({ currentUser }) => {
 
     // Filter contents to only show unassigned ones (group_id is null) or the one already assigned to the current group
     // In GroupMainContent.js
-const getAvailableContents = useMemo(() => {
-  return (currentGroupId) => {
-    const assignedContentIds = new Set(
-      groups
-        .filter(g => g.group_content_id && g.id !== currentGroupId) // exclude current group
-        .map(g => g.group_content_id)
-    );
+    const getAvailableContents = useMemo(() => {
+        return (currentGroupId) => {
+            const assignedContentIds = new Set(
+                groups
+                    .filter(g => g.group_content_id && g.id !== currentGroupId) // exclude current group
+                    .map(g => g.group_content_id)
+            );
 
-    const currentGroup = groups.find(g => g.id === currentGroupId);
-    const currentContentId = currentGroup?.group_content_id;
+            const currentGroup = groups.find(g => g.id === currentGroupId);
+            const currentContentId = currentGroup?.group_content_id;
 
-    return allContents.filter(content =>
-      (!assignedContentIds.has(content.id)) &&
-      (content.group_id === null || content.id === currentContentId)
-    );
-  };
-}, [groups, allContents]);
+            return allContents.filter(content =>
+                (!assignedContentIds.has(content.id)) &&
+                (content.group_id === null || content.id === currentContentId)
+            );
+        };
+    }, [groups, allContents]);
 
 
     const [selectedGroup, setSelectedGroup] = useState(null);
@@ -61,7 +62,7 @@ const getAvailableContents = useMemo(() => {
 
     const openCreateForm = () => {
         setModalMode("create");
-        setFormData({ group_name: "", position_id: "", year: "", semester: "", group_content_id: null });
+        setFormData({ group_name: "", position_id: "", year: "", semester: "", group_content_id: null, description: "", posterFile: null });
         setSelectedGroup(null);
         setShowForm(true);
     };
@@ -70,7 +71,9 @@ const getAvailableContents = useMemo(() => {
         setModalMode("edit");
         setFormData({
             name: group.name,
-            group_content_id: group.group_content_id ?? null
+            group_content_id: group.group_content_id ?? null,
+            description: group.description || '',
+            posterFile: null
         });
         setSelectedGroup({
             ...group,
@@ -82,13 +85,19 @@ const getAvailableContents = useMemo(() => {
 
     // Handle content change - just update formData (actual save happens on Save button)
     const handleContentChange = (e) => {
-        const { name, value,type } = e.target;
-        const newValue = value === "" ? null : type === "number" ? Number(value) : value;
+        const { name, value, type, files } = e.target;
 
-    setFormData({
-        ...formData,
-        [name]: newValue
-    });
+        let newValue;
+        if (type === 'file') {
+            newValue = (files && files.length > 0) ? files[0] : null;
+        } else {
+            newValue = value === "" ? null : type === "number" ? Number(value) : value;
+        }
+
+        setFormData({
+            ...formData,
+            [name]: newValue
+        });
     };
 
     const handleCreateGroup = async () => {
@@ -103,7 +112,11 @@ const getAvailableContents = useMemo(() => {
                 formData.position_id,
                 formData.year,
                 formData.semester,
-                formData.group_content_id || null
+                formData.group_content_id || null,
+                // description (may be undefined or empty string)
+                formData.description ?? undefined,
+                // poster file (File object or undefined/null)
+                formData.posterFile ?? undefined
             );
             setShowForm(false);
             toast.success("Group created successfully");
@@ -142,7 +155,7 @@ const getAvailableContents = useMemo(() => {
                 group_content_id: contentIdToSend
             });
 
-            const res = await updateGroup(groupId, formData.name, selectedGroup.position_id, contentIdToSend);
+            const res = await updateGroup(groupId, formData.name, selectedGroup.position_id, contentIdToSend, formData.description ?? undefined, formData.posterFile ?? undefined);
             console.log("Response from backend:", res);
             setShowEditModal(false);
             toast.success("Group updated successfully");
@@ -253,7 +266,7 @@ const getAvailableContents = useMemo(() => {
                         </>
                     ) : (
                         <>
-                            <div className="card-body p-4">
+                            <div className="card-body p-4 form-scroll-container" style={{ overflowY: 'auto' }}>
                                 <div className="d-flex align-items-center gap-3 mb-4">
                                     <button
                                         className="btn btn-sm d-flex align-items-center gap-2"
@@ -274,7 +287,7 @@ const getAvailableContents = useMemo(() => {
 
                                 <div className="row justify-content-center">
                                     <div className="col-lg-7">
-                                        <div className="bg-white ps-5 border-0 p-4 align-items-center justify-content-center" style={{ border: "2px solid #E9ECEF" }}>
+                                        <div className="bg-white ps-5 border-0 p-4 align-items-center justify-content-center " style={{ border: "2px solid #E9ECEF" }}>
                                             <div className="mb-4">
                                                 <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
                                                     Group Name <span style={{ color: "#FF0000" }}>*</span>
@@ -298,28 +311,21 @@ const getAvailableContents = useMemo(() => {
                                                 <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
                                                     Position <span style={{ color: "#FF0000" }}>*</span>
                                                 </label>
-                                                <select
-                                                    className="form-select rounded-3"
-                                                    name="position_id"
-                                                    value={formData.position_id || ''}
-                                                    onChange={handleContentChange}
-                                                    style={{
-                                                        border: "2px solid #E9ECEF",
-                                                        fontSize: "16px",
-                                                        width: "70%",
-                                                    }}
-                                                >
-                                                    <option value="">Select a position</option>
-                                                    {positions.map((p) => (
-                                                        <option key={p.id} value={p.id}>
-                                                            {p.name || p.position_name || p.title || `Position ${p.id}`}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                                <div style={{ width: '70%' }} className="rounded-3">
+                                                    <Select
+                                                        className="rounded-3"
+                                                        options={positions.map(p => ({ value: p.id, label: p.name || p.position_name || p.title || `Position ${p.id}` }))}
+                                                        value={formData.position_id ? { value: formData.position_id, label: positions.find(p => p.id === formData.position_id)?.name || `Position ${formData.position_id}` } : null}
+                                                        onChange={(opt) => setFormData({ ...formData, position_id: opt?.value ?? '' })}
+                                                        placeholder="Select a position"
+                                                        menuPortalTarget={document.body}
+                                                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                                    />
+                                                </div>
                                             </div>
 
-                                            <div className="mb-4 d-flex gap-4">
-                                                <div style={{ minWidth: 200 }}>
+                                            <div className="mb-4">
+                                                <div style={{ minWidth: 200 }} className="mb-4">
                                                     <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
                                                         Year <span style={{ color: "#FF0000" }}>*</span>
                                                     </label>
@@ -334,7 +340,7 @@ const getAvailableContents = useMemo(() => {
                                                         style={{
                                                             border: "2px solid #E9ECEF",
                                                             fontSize: "16px",
-                                                            width: "100%",
+                                                            width: "70%",
                                                         }}
                                                     />
                                                 </div>
@@ -343,22 +349,16 @@ const getAvailableContents = useMemo(() => {
                                                     <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
                                                         Semester <span style={{ color: "#FF0000" }}>*</span>
                                                     </label>
-                                                    <select
-                                                        className="form-select rounded-3"
-                                                        name="semester"
-                                                        value={formData.semester || ''}
-                                                        onChange={handleContentChange}
-                                                        style={{
-                                                            border: "2px solid #E9ECEF",
-                                                            fontSize: "16px",
-                                                            width: "100%",
-                                                        }}
-                                                    >
-                                                        <option value="">Select semester</option>
-                                                        <option value="Fall">Fall</option>
-                                                        <option value="Spring">Spring</option>
-                                                        <option value="Summer">Summer</option>
-                                                    </select>
+                                                    <div style={{ width: '70%' }}>
+                                                        <Select
+                                                            options={[{ value: 'Fall', label: 'Fall' }, { value: 'Spring', label: 'Spring' }, { value: 'Summer', label: 'Summer' }]}
+                                                            value={formData.semester ? { value: formData.semester, label: formData.semester } : null}
+                                                            onChange={(opt) => setFormData({ ...formData, semester: opt?.value ?? '' })}
+                                                            placeholder="Select semester"
+                                                            menuPortalTarget={document.body}
+                                                            styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -366,24 +366,56 @@ const getAvailableContents = useMemo(() => {
                                                 <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
                                                     Group Content
                                                 </label>
-                                                <select
-                                                    className="form-select rounded-3"
-                                                    name="group_content_id"
-                                                    value={formData.group_content_id ?? ''}
+                                                <div style={{ width: '70%' }}>
+                                                    <Select
+                                                        options={getAvailableContents(selectedGroup?.id).map(c => ({ value: c.id, label: c.content_name }))}
+                                                        value={formData.group_content_id ? { value: formData.group_content_id, label: getAvailableContents(selectedGroup?.id).find(c => c.id === formData.group_content_id)?.content_name || `Content ${formData.group_content_id}` } : null}
+                                                        onChange={(opt) => setFormData({ ...formData, group_content_id: opt?.value ?? null })}
+                                                        placeholder="Select group content (optional)"
+                                                        menuPortalTarget={document.body}
+                                                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                                        isClearable
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="mb-4">
+                                                <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                    Description
+                                                </label>
+                                                <textarea
+                                                    className="form-control rounded-3"
+                                                    name="description"
+                                                    value={formData.description || ''}
                                                     onChange={handleContentChange}
+                                                    placeholder="Enter group description (optional)"
                                                     style={{
                                                         border: "2px solid #E9ECEF",
                                                         fontSize: "16px",
                                                         width: "70%",
+                                                        minHeight: 90,
                                                     }}
-                                                >
-                                                    <option value="">Select group content (optional)</option>
-                                                    {getAvailableContents(selectedGroup?.id).map((c) => (
-                                                        <option key={c.id} value={c.id}>
-                                                            {c.content_name}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                                />
+                                            </div>
+
+                                            <div className="mb-4">
+                                                <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                    Poster (upload image)
+                                                </label>
+                                                <div style={{ width: '70%' }}>
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="form-control"
+                                                        name="posterFile"
+                                                        onChange={handleContentChange}
+                                                    />
+                                                    {formData.posterFile && (
+                                                        <div style={{ marginTop: 8 }}>
+                                                            <small>Selected file: {formData.posterFile.name}</small>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
 
                                             <div className="align-items-center

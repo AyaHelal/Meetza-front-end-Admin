@@ -5,7 +5,7 @@
 }
 
 .search-input {
-  background-color: #FFFFFF !important;
+  background-color: #ffffff !important;
   color: #000000 !important;
 }
 
@@ -78,6 +78,34 @@
   background: linear-gradient(to right, #0066cc, #00c775);
 }
 
+/* Fixed-size form container with internal scrolling (used by Create Group form) */
+.form-scroll-container {
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 10px; /* give some space for scrollbar so content doesn't shift */
+}
+
+@media (max-height: 900px) {
+  .form-scroll-container {
+    height: calc(100vh - 80px);
+  }
+}
+
+/* Reuse the same scrollbar styles used for .table-responsive */
+.form-scroll-container::-webkit-scrollbar {
+  width: 10px;
+}
+.form-scroll-container::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+.form-scroll-container::-webkit-scrollbar-thumb {
+  background: #c5c6c6;
+  border-radius: 10px;
+}
+.form-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #c5c6c6;
+}
+
 /* Badge styling */
 .badge {
   font-weight: 600;
@@ -98,7 +126,14 @@
 }
 
 .form-control::placeholder {
-  color: white;
+  color: white; /* keep global default (used elsewhere) */
+}
+
+/* Make placeholders inside group forms visible on white backgrounds */
+.form-scroll-container .form-control::placeholder,
+.modal-body .form-control::placeholder,
+.modal .form-control::placeholder {
+  color: #6c757d !important;
 }
 .ff::placeholder {
   color: #888888 !important;

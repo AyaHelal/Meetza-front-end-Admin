@@ -105,14 +105,29 @@ export const useGroupData = () => {
     }
   }, []);
 
-  const createGroup = async (group_name, position_id, year, semester, group_content_id = null) => {
+  // Accept optional description (string) and posterFile (File object). When posterFile is provided
+  // the request will be sent as multipart/form-data with the poster attached under the 'poster' key.
+  const createGroup = async (group_name, position_id, year, semester, group_content_id = null, description = undefined, posterFile = undefined) => {
     try {
       const payload = { group_name, position_id };
       if (year) payload.year = year;
       if (semester) payload.semester = semester;
       if (group_content_id) payload.group_content_id = group_content_id;
+      if (description !== undefined) payload.description = description;
 
-      const res = await api.post("/group", payload);
+      let res;
+      if (posterFile) {
+        const form = new FormData();
+        // append payload fields
+        Object.entries(payload).forEach(([k, v]) => {
+          if (v !== undefined && v !== null) form.append(k, v);
+        });
+        form.append('poster', posterFile);
+        res = await api.post('/group', form, { headers: { 'Content-Type': 'multipart/form-data' } });
+      } else {
+        res = await api.post('/group', payload);
+      }
+
       const newGroup = res.data?.data || res.data;
 
       if (group_content_id && newGroup?.id) {
@@ -122,50 +137,60 @@ export const useGroupData = () => {
       await fetchData();
       return newGroup;
     } catch (e) {
-      console.error("Create error:", e);
+      console.error('Create error:', e);
       throw e;
     }
   };
 
-  const updateGroup = async (id, group_name, position_id, group_content_id) => {
-  try {
-    const currentGroup = groups.find(g => g.id === id) || {};
-    const oldContentId = currentGroup.group_content_id;
+  const updateGroup = async (id, group_name, position_id, group_content_id, description = undefined, posterFile = undefined) => {
+    try {
+      const currentGroup = groups.find(g => g.id === id) || {};
+      const oldContentId = currentGroup.group_content_id;
 
-    // 🔹 Step 1: If changing content, unlink old content first
-    if (oldContentId && oldContentId !== group_content_id) {
-      await safeUpdateGroupContent(oldContentId, { group_id: null });
-    }
-
-    // 🔹 Step 2: If assigning new content, ensure it's unlinked from any other group first
-    if (group_content_id && group_content_id !== oldContentId) {
-      // Check if the new content is currently linked to another group
-      const contentToLink = contents.find(c => c.id === group_content_id);
-      if (contentToLink && contentToLink.group_id && contentToLink.group_id !== id) {
-        // Unlink from the other group first
-        await safeUpdateGroupContent(group_content_id, { group_id: null });
+      // 🔹 Step 1: If changing content, unlink old content first
+      if (oldContentId && oldContentId !== group_content_id) {
+        await safeUpdateGroupContent(oldContentId, { group_id: null });
       }
-      // Now link to current group
-      await safeUpdateGroupContent(group_content_id, { group_id: id });
+
+      // 🔹 Step 2: If assigning new content, ensure it's unlinked from any other group first
+      if (group_content_id && group_content_id !== oldContentId) {
+        // Check if the new content is currently linked to another group
+        const contentToLink = contents.find(c => c.id === group_content_id);
+        if (contentToLink && contentToLink.group_id && contentToLink.group_id !== id) {
+          // Unlink from the other group first
+          await safeUpdateGroupContent(group_content_id, { group_id: null });
+        }
+        // Now link to current group
+        await safeUpdateGroupContent(group_content_id, { group_id: id });
+      }
+
+      // 🔹 Step 3: Update group in DB
+      const payload = {
+        ...(group_name !== undefined && { group_name }),
+        ...(position_id !== undefined && { position_id }),
+        group_content_id: group_content_id ?? null,
+        ...(description !== undefined && { description })
+      };
+
+      let response;
+      if (posterFile) {
+        const form = new FormData();
+        Object.entries(payload).forEach(([k, v]) => { if (v !== undefined && v !== null) form.append(k, v); });
+        form.append('poster', posterFile);
+        response = await api.put(`/group/${id}`, form, { headers: { 'Content-Type': 'multipart/form-data' } });
+      } else {
+        response = await api.put(`/group/${id}`, payload);
+      }
+
+      // 🔹 Step 4: Update local state
+      setGroups(prev => prev.map(g => g.id === id ? { ...g, ...payload } : g));
+
+      return response.data;
+    } catch (err) {
+      console.error("Update group error:", err);
+      throw err;
     }
-
-    // 🔹 Step 3: Update group in DB
-    const payload = {
-      ...(group_name !== undefined && { group_name }),
-      ...(position_id !== undefined && { position_id }),
-      group_content_id: group_content_id ?? null
-    };
-    const response = await api.put(`/group/${id}`, payload);
-
-    // 🔹 Step 4: Update local state
-    setGroups(prev => prev.map(g => g.id === id ? { ...g, ...payload } : g));
-
-    return response.data;
-  } catch (err) {
-    console.error("Update group error:", err);
-    throw err;
-  }
-};
+  };
 
 
 
