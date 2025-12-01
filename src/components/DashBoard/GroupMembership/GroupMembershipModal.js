@@ -1,5 +1,5 @@
 import React from "react";
-import { X } from "phosphor-react";
+import Select from 'react-select';
 
 const GroupMembershipModal = ({ mode, formData, setFormData, groups, onSave, onClose }) => {
     const handleChange = (e) => {
@@ -19,26 +19,23 @@ const GroupMembershipModal = ({ mode, formData, setFormData, groups, onSave, onC
                         </button>
                     </div>
 
-                    <div className="modal-body pt-3">
+                    <div className="modal-body pt-3" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: 10 }}>
                         <form>
                             <div className="mb-3">
                                 <label className="form-label fw-semibold" style={{ color: "#010101" }}>
                                     Group <span style={{ color: "#FF0000" }}>*</span>
                                 </label>
-                                <select
-                                    className="form-select rounded-3"
-                                    name="group_id"
-                                    value={formData.group_id}
-                                    onChange={handleChange}
-                                    style={{ border: "2px solid #E9ECEF", padding: "0.75rem", fontSize: "16px" }}
-                                >
-                                    <option value="">Select a group</option>
-                                    {groups.map((group) => (
-                                        <option key={group.id} value={group.id}>
-                                            {group.name || group.group_name || `Group ${group.id}`}
-                                        </option>
-                                    ))}
-                                </select>
+                                <div>
+                                    <Select
+                                        options={groups.map(g => ({ value: g.id, label: g.name || g.group_name || `Group ${g.id}` }))}
+                                        value={formData.group_id ? { value: formData.group_id, label: groups.find(g => g.id === formData.group_id)?.name || `Group ${formData.group_id}` } : null}
+                                        onChange={(opt) => setFormData({ ...formData, group_id: opt?.value ?? '' })}
+                                        placeholder="Select a group"
+                                        menuPortalTarget={document.body}
+                                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                        isClearable
+                                    />
+                                </div>
                             </div>
 
                             <div className="mb-3">

@@ -7,6 +7,7 @@ import { GroupMembershipHeader } from "./components/GroupMembershipHeader";
 import { GroupMembershipTable } from "./components/GroupMembershipTable";
 import { SearchBar } from "../shared/SearchBar";
 import { PlusCircle } from "phosphor-react";
+import Select from 'react-select';
 import "../User/UserMainComponent.css";
 import { ArrowLeft } from "phosphor-react";
 const GroupMembershipContent = ({ currentUser }) => {
@@ -202,24 +203,17 @@ const GroupMembershipContent = ({ currentUser }) => {
                                                 <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
                                                     Group <span style={{ color: "#FF0000" }}>*</span>
                                                 </label>
-                                                <select
-                                                    className="form-select rounded-3"
-                                                    name="group_id"
-                                                    value={formData.group_id}
-                                                    onChange={handleFormChange}
-                                                    style={{
-                                                        border: "2px solid #E9ECEF",
-                                                        fontSize: "16px",
-                                                        width: "70%",
-                                                    }}
-                                                >
-                                                    <option value="">Select a group</option>
-                                                    {groups.map((group) => (
-                                                        <option key={group.id} value={group.id}>
-                                                            {group.name || group.group_name || `Group ${group.id}`}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                                <div style={{ width: '70%' }}>
+                                                    <Select
+                                                        options={groups.map(g => ({ value: g.id, label: g.name || g.group_name || `Group ${g.id}` }))}
+                                                        value={formData.group_id ? { value: formData.group_id, label: groups.find(g => g.id === formData.group_id)?.name || `Group ${formData.group_id}` } : null}
+                                                        onChange={(opt) => setFormData({ ...formData, group_id: opt?.value ?? '' })}
+                                                        placeholder="Select a group"
+                                                        menuPortalTarget={document.body}
+                                                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                                        isClearable
+                                                    />
+                                                </div>
                                             </div>
 
                                             <div className="mb-4">
