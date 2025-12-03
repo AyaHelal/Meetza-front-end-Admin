@@ -107,7 +107,6 @@ import apiCommon from "../../../../utils/api";
             title: data.title,
             datetime: formatForAPI(data.datetime),
             status: data.status,
-            meeting_content_id: data.meeting_content_id,
             group_id: data.group_id || originalMeeting?.group_id,
         };
 

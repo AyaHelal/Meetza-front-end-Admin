@@ -35,13 +35,22 @@ export const GroupRow = ({
             style={{
               width: 56,
               height: 56,
-              background: "linear-gradient(135deg, #0076EA, #00DC85)",
+              background: group.group_photo ? "transparent" : "linear-gradient(135deg, #0076EA, #00DC85)",
               color: "white",
               fontWeight: 600,
+              overflow: "hidden",
             }}
           >
-            <UsersThree size={28} weight="bold" />
-          </div>
+            {group.group_photo ? (
+        <img
+          src={group.group_photo}
+          alt={group.group_name}
+          style={{ width: "100%", height: "100%", objectFit: "cover" ,display: 'block',border:'1px solid #ddd' }}
+        />
+      ) : (
+        <UsersThree size={28} weight="bold" />
+      )}
+    </div>
           <span style={{ fontSize: "18px" }}>{group.name || group.group_name}</span>
         </div>
       </td>

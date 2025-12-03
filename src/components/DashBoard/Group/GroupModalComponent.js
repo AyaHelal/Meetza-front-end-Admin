@@ -107,7 +107,7 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
                                         <input
                                             type="file"
                                             accept="image/*"
-                                            name="posterFile"
+                                            name="group_photo"
                                             onChange={handleChange}
                                             className="form-control mb-3"
                                         />
@@ -136,8 +136,10 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    setFormData({ ...formData, group_content_id: null });
-                                                    console.log('GroupModalComponent: clear group_content_id clicked');
+                                                    setFormData(prev => ({
+                                                    ...prev,
+                                                    group_content_id: null
+                                                    }));
                                                 }}
                                                 className="btn btn-outline-secondary"
                                                 style={{ borderRadius: 12, padding: '6px 8px' }}
@@ -186,7 +188,7 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
                                         <input
                                             type="file"
                                             accept="image/*"
-                                            name="posterFile"
+                                            name="group_photo"
                                             onChange={handleChange}
                                             className="form-control mb-3"
                                         />

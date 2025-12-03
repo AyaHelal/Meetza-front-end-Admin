@@ -11,10 +11,14 @@ import GroupDetails from "./GroupDetails";
 import { PlusCircle, ArrowLeft } from "phosphor-react";
 import Select from 'react-select';
 import "./GroupMainComponent.css";
+import api from "../../../utils/api";
 
 const GroupMainContent = ({ currentUser }) => {
     const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator" || (currentUser?.role || "").toLowerCase() === "super_admin";
 
+    const updateContentGroupId = async (contentId, groupId) => {
+    return await api.put(`/group-contents/${contentId}`, { group_id: groupId });
+    };
     const {
         groups,
         positions,
@@ -29,6 +33,11 @@ const GroupMainContent = ({ currentUser }) => {
     } = useGroupData();
 
     const { contents: allContents = [] } = useGroupContentData();
+
+    const positionOptions = positions.map(p => ({
+        value: p.id,
+        label: p.name || p.position_name || p.title || `Position ${p.id}`
+    }));
 
     // Filter contents to only show unassigned ones (group_id is null) or the one already assigned to the current group
     // In GroupMainContent.js
@@ -62,7 +71,7 @@ const GroupMainContent = ({ currentUser }) => {
 
     const openCreateForm = () => {
         setModalMode("create");
-        setFormData({ group_name: "", position_id: "", year: "", semester: "", group_content_id: null, description: "", posterFile: null });
+        setFormData({ group_name: "", position_id: "", year: "", semester: "", group_content_id: null, description: "", group_photo: null });
         setSelectedGroup(null);
         setShowForm(true);
     };
@@ -73,7 +82,7 @@ const GroupMainContent = ({ currentUser }) => {
             name: group.name,
             group_content_id: group.group_content_id ?? null,
             description: group.description || '',
-            posterFile: null
+            group_photo: null
         });
         setSelectedGroup({
             ...group,
@@ -116,8 +125,11 @@ const GroupMainContent = ({ currentUser }) => {
                 // description (may be undefined or empty string)
                 formData.description ?? undefined,
                 // poster file (File object or undefined/null)
-                formData.posterFile ?? undefined
+                formData.group_photo ?? undefined
             );
+            if (formData.group_content_id) {
+            await updateContentGroupId(formData.group_content_id, formData.id);
+        }
             setShowForm(false);
             toast.success("Group created successfully");
             fetchData();
@@ -155,11 +167,15 @@ const GroupMainContent = ({ currentUser }) => {
                 group_content_id: contentIdToSend
             });
 
-            const res = await updateGroup(groupId, formData.name, selectedGroup.position_id, contentIdToSend, formData.description ?? undefined, formData.posterFile ?? undefined);
+            const res = await updateGroup(groupId, formData.name, selectedGroup.position_id, contentIdToSend, formData.description ?? undefined, formData.group_photo ?? undefined);
+            if (formData.group_content_id) {
+            await updateContentGroupId(formData.group_content_id, groupId);
+        }
             console.log("Response from backend:", res);
             setShowEditModal(false);
             toast.success("Group updated successfully");
             fetchData();
+
         } catch (error) {
             console.error("Update error:", error);
             const msg = error?.response?.data?.message || error.message || "Failed to update group";
@@ -210,6 +226,7 @@ const GroupMainContent = ({ currentUser }) => {
         const user = users.find((u) => u.id === adminId || u.id === Number(adminId) || String(u.id) === String(adminId));
         return user?.name || `User ${adminId}`;
     };
+
 
 
 
@@ -312,10 +329,11 @@ const GroupMainContent = ({ currentUser }) => {
                                                     Position <span style={{ color: "#FF0000" }}>*</span>
                                                 </label>
                                                 <div style={{ width: '70%' }} className="rounded-3">
+
                                                     <Select
                                                         className="rounded-3"
-                                                        options={positions.map(p => ({ value: p.id, label: p.name || p.position_name || p.title || `Position ${p.id}` }))}
-                                                        value={formData.position_id ? { value: formData.position_id, label: positions.find(p => p.id === formData.position_id)?.name || `Position ${formData.position_id}` } : null}
+                                                        options={positionOptions}
+                                                        value={positionOptions.find(opt => String(opt.value) === String(formData.position_id)) || null}
                                                         onChange={(opt) => setFormData({ ...formData, position_id: opt?.value ?? '' })}
                                                         placeholder="Select a position"
                                                         menuPortalTarget={document.body}
@@ -407,12 +425,12 @@ const GroupMainContent = ({ currentUser }) => {
                                                         type="file"
                                                         accept="image/*"
                                                         className="form-control"
-                                                        name="posterFile"
+                                                        name="group_photo"
                                                         onChange={handleContentChange}
                                                     />
-                                                    {formData.posterFile && (
+                                                    {formData.group_photo && (
                                                         <div style={{ marginTop: 8 }}>
-                                                            <small>Selected file: {formData.posterFile.name}</small>
+                                                            <small>Selected file: {formData.group_photo.name}</small>
                                                         </div>
                                                     )}
                                                 </div>
