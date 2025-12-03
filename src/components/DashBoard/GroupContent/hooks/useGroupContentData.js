@@ -72,7 +72,10 @@ export default function useGroupContentData() {
         try {
             const contentData = {
                 content_name: data.content_name,
-                content_description: data.content_description
+                content_description: data.content_description,
+                group_id: data.group_id,
+                role:data.role,
+                administrator_id:data.administrator_id,
             };
 
             // If group_id is provided, include it in the payload
@@ -112,6 +115,7 @@ export default function useGroupContentData() {
     const payload = {};
     if (updatedData.content_name !== undefined) payload.content_name = updatedData.content_name;
     if (updatedData.content_description !== undefined) payload.content_description = updatedData.content_description;
+    if (updatedData.group_id !== undefined) payload.group_id = updatedData.group_id;
 
     if (Object.keys(payload).length === 0) {
       smartToast.error("Nothing to update (group assignment cannot be changed here)");

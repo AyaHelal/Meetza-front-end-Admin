@@ -44,7 +44,8 @@ const PositionModal = ({ mode, data, users = [], onChange, onClose, onSubmit }) 
                         <>
                             <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>User</label>
                             <Select
-                                options={users.map(u => ({ value: u.id, label: u.name }))}
+                                options={users.filter(u => u.role === 'Administrator' || u.role === 'Super_Admin')
+                                .map(u => ({ value: u.id, label: u.name }))}
                                 value={data.selectedUser ? { value: data.selectedUser, label: users.find(u => u.id === data.selectedUser)?.name } : null}
                                 onChange={(s) => onChange({ ...data, selectedUser: s?.value || null })}
                                 placeholder="Select a user..."

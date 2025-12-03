@@ -9,6 +9,8 @@ export const useGroupData = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+
+
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
@@ -62,12 +64,14 @@ export const useGroupData = () => {
     try {
       const getRes = await api.get(`/group-contents/${contentId}`);
       const existing = getRes.data?.data || getRes.data || {};
+
       const fullPayload = {
         content_name: existing.content_name || existing.name || existing.title || "",
         content_description: existing.content_description || existing.description || existing.desc || "",
         administrator_id: existing.administrator_id || existing.admin_id || existing.user_id || undefined,
         ...patch,
       };
+      console.log('[safeUpdateGroupContent] PUT payload:', fullPayload);
       return await api.put(`/group-contents/${contentId}`, fullPayload);
     } catch (err) {
       console.error(`[safeUpdateGroupContent] Failed to update content ${contentId}`, err);
@@ -107,7 +111,7 @@ export const useGroupData = () => {
 
   // Accept optional description (string) and posterFile (File object). When posterFile is provided
   // the request will be sent as multipart/form-data with the poster attached under the 'poster' key.
-  const createGroup = async (group_name, position_id, year, semester, group_content_id = null, description = undefined, posterFile = undefined) => {
+  const createGroup = async (group_name, position_id, year, semester, group_content_id = null, description = undefined, group_photo = undefined) => {
     try {
       const payload = { group_name, position_id };
       if (year) payload.year = year;
@@ -116,13 +120,13 @@ export const useGroupData = () => {
       if (description !== undefined) payload.description = description;
 
       let res;
-      if (posterFile) {
+      if (group_photo) {
         const form = new FormData();
         // append payload fields
         Object.entries(payload).forEach(([k, v]) => {
           if (v !== undefined && v !== null) form.append(k, v);
         });
-        form.append('poster', posterFile);
+        form.append('group_photo', group_photo);
         res = await api.post('/group', form, { headers: { 'Content-Type': 'multipart/form-data' } });
       } else {
         res = await api.post('/group', payload);
@@ -142,7 +146,7 @@ export const useGroupData = () => {
     }
   };
 
-  const updateGroup = async (id, group_name, position_id, group_content_id, description = undefined, posterFile = undefined) => {
+  const updateGroup = async (id, group_name, position_id, group_content_id, description = undefined, group_photo = undefined) => {
     try {
       const currentGroup = groups.find(g => g.id === id) || {};
       const oldContentId = currentGroup.group_content_id;
@@ -173,10 +177,10 @@ export const useGroupData = () => {
       };
 
       let response;
-      if (posterFile) {
+      if (group_photo) {
         const form = new FormData();
         Object.entries(payload).forEach(([k, v]) => { if (v !== undefined && v !== null) form.append(k, v); });
-        form.append('poster', posterFile);
+        form.append('group_photo', group_photo);
         response = await api.put(`/group/${id}`, form, { headers: { 'Content-Type': 'multipart/form-data' } });
       } else {
         response = await api.put(`/group/${id}`, payload);

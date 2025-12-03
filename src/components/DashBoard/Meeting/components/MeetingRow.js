@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Trash, CheckCircle, PencilSimpleLine } from "phosphor-react";
 
-export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, currentUser, contents = [] }) => {
+export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, currentUser}) => {
     const [data, setData] = useState({
         title: meeting?.title || "",
         datetime: meeting?.datetime || "",
         status: meeting?.status || "Scheduled",
-        meeting_content_id: meeting?.meeting_content_id || "",
         group_id: meeting?.group_id || "",
     });
 
@@ -16,7 +15,6 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, curre
             title: meeting.title || "",
             datetime: meeting.datetime || "",
             status: meeting.status || "Scheduled",
-            meeting_content_id: meeting.meeting_content_id || "",
             group_id: meeting.group_id || "",
         });
         } else {
@@ -24,7 +22,6 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, curre
             title: "",
             datetime: "",
             status: "Scheduled",
-            meeting_content_id: "",
             group_id: "",
         });
         }
@@ -48,11 +45,10 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, curre
             title: meeting.title || "",
             datetime: meeting.datetime || "",
             status: meeting.status || "Scheduled",
-            meeting_content_id: meeting.meeting_content_id || "",
             group_id: meeting.group_id || "",
         });
         } else {
-        setData({ title: "", datetime: "", status: "Scheduled", meeting_content_id: "", group_id: "" });
+        setData({ title: "", datetime: "", status: "Scheduled",  group_id: "" });
         }
         onEdit(meeting?.id || "new");
     };
@@ -63,8 +59,6 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, curre
     const textStyle = { fontSize: "16px", fontWeight: 600, padding: "8px 20px", color: "#6C757D" };
 
     // Try to find content in the contents array, but also fallback to meeting.content_name if available
-    const selectedContent = contents?.find((c) => c.id === data.meeting_content_id);
-    const displayContentName = selectedContent?.content_name || meeting?.content_name || "No Content";
 
     return (
         <tr className="align-middle">
@@ -93,19 +87,6 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, curre
             </select>
             ) : (
             <div style={textStyle}>{data.status}</div>
-            )}
-        </td>
-
-        <td>
-            {showInput ? (
-            <select value={data.meeting_content_id} onChange={(e) => setData({ ...data, meeting_content_id: e.target.value })} style={inputStyle}>
-                <option value="">Select Content</option>
-                {contents.map((c) => (
-                <option key={c.id} value={c.id}>{c.content_name}</option>
-                ))}
-            </select>
-            ) : (
-            <div style={textStyle}>{displayContentName}</div>
             )}
         </td>
 

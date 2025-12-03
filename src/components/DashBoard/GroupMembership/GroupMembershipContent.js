@@ -29,6 +29,12 @@ const GroupMembershipContent = ({ currentUser }) => {
     const [formData, setFormData] = useState({ group_id: "", member_email: "" });
     const [searchQuery, setSearchQuery] = useState("");
 
+    const visibleGroups = groups.filter(g => {
+        if (currentUser.role.toLowerCase() === 'super_admin') return true;
+        if (currentUser.role.toLowerCase() === 'administrator') return g.adminId === currentUser.id;
+        return false;
+    });
+
     const openCreateForm = () => {
         setFormData({ group_id: "", member_email: "" });
         setShowForm(true);
@@ -49,7 +55,7 @@ const GroupMembershipContent = ({ currentUser }) => {
         try {
             // Find the member by email to get their user_id from member table
             const selectedMember = users.find((m) =>
-                m.email && m.email.toLowerCase() === formData.member_email.toLowerCase()
+                m.email && m.email.trim().toLowerCase() === formData.member_email.trim().toLowerCase()
             );
 
             if (!selectedMember) {
@@ -205,8 +211,8 @@ const GroupMembershipContent = ({ currentUser }) => {
                                                 </label>
                                                 <div style={{ width: '70%' }}>
                                                     <Select
-                                                        options={groups.map(g => ({ value: g.id, label: g.name || g.group_name || `Group ${g.id}` }))}
-                                                        value={formData.group_id ? { value: formData.group_id, label: groups.find(g => g.id === formData.group_id)?.name || `Group ${formData.group_id}` } : null}
+                                                        options={visibleGroups.filter(g => currentUser.role.toLowerCase() === 'super_admin' || g.adminId === currentUser.id).map(g => ({ value: g.id, label: g.name || g.group_name || `Group ${g.id}` }))}
+                                                        value={formData.group_id ? { value: formData.group_id, label: groups.find(g => g.id === formData.group_id)?.name || groups.find(g => g.id === formData.group_id)?.group_name || `Group ${formData.group_id}` } : null}
                                                         onChange={(opt) => setFormData({ ...formData, group_id: opt?.value ?? '' })}
                                                         placeholder="Select a group"
                                                         menuPortalTarget={document.body}

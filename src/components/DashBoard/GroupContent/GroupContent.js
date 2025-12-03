@@ -13,6 +13,8 @@ export default function GroupContent() {
     const [searchTerm, setSearchTerm] = useState("");
     const [editing, setEditing] = useState({});
     const [addingNew, setAddingNew] = useState(false);
+    const [groups, setGroups] = useState([]);
+    const [users, setUsers] = useState([]);
     const {
         contents,
         loading,
@@ -29,16 +31,51 @@ export default function GroupContent() {
         fetchContents();
     }, []);
 
+    useEffect(() => {
+    const fetchUsers = async () => {
+        const res = await apiCommon.get("/user");
+        setUsers(res.data.data || res.data);
+    };
+
+    fetchUsers();
+    }, []);
+
+
     // Note: availableGroups is no longer needed since group assignment is handled in Group module
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+            const res = await apiCommon.get("/group");
+            setGroups(res.data.data || res.data);
+            } catch (err) {
+            smartToast.error("Failed to load groups");
+            }
+        };
 
-
+        fetchGroups();
+        }, []);
 
     const handleSave = async (data) => {
     try {
         const contentData = {
             content_name: data.content_name,
-            content_description: data.content_description
+            content_description: data.content_description,
+            group_id: data.group_id ?? null,
+            administrator_id: data.administrator_id,
+            role: currentUser?.role,
         };
+
+
+
+        if (currentUser?.role === "Super_Admin") {
+            if (!contentData.administrator_id) {
+                smartToast.error("Please select an Administrator");
+                return;
+            }
+            contentData.administrator_id = data.administrator_id;
+            } else {
+            contentData.administrator_id = currentUser.id;
+            }
 
         if (editing.id) {
             await updateContent(editing.id, contentData);
@@ -50,7 +87,6 @@ export default function GroupContent() {
         setAddingNew(false);
         await fetchContents();
     } catch (error) {
-        console.error("Failed to save content", error);
         smartToast.error(error.response?.data?.message || "Failed to save content");
     }
 };
@@ -125,6 +161,9 @@ export default function GroupContent() {
                         setAddingNew(false);
                     }}
                     onSubmit={handleSave}
+                    groups={groups}
+                    users={users}
+                    currentUser={currentUser}
                 />
             )}
         </main>

@@ -1,11 +1,16 @@
 import React from "react";
 import Select from 'react-select';
 
-const GroupMembershipModal = ({ mode, formData, setFormData, groups, onSave, onClose }) => {
+const GroupMembershipModal = ({ currentUser, mode, formData, setFormData, groups, onSave, onClose }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
+    const visibleGroups = groups.filter(g => {
+        if (currentUser.role.toLowerCase() === 'super_admin') return true;
+        if (currentUser.role.toLowerCase() === 'administrator') return g.adminId === currentUser.id;
+        return false;
+    });
 
     return (
         <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }} onClick={onClose}>
@@ -27,8 +32,8 @@ const GroupMembershipModal = ({ mode, formData, setFormData, groups, onSave, onC
                                 </label>
                                 <div>
                                     <Select
-                                        options={groups.map(g => ({ value: g.id, label: g.name || g.group_name || `Group ${g.id}` }))}
-                                        value={formData.group_id ? { value: formData.group_id, label: groups.find(g => g.id === formData.group_id)?.name || `Group ${formData.group_id}` } : null}
+                                        options={visibleGroups.filter(g => currentUser.role.toLowerCase() === 'super_admin' || g.adminId === currentUser.id).map(g => ({ value: g.id, label: g.name || g.group_name || `Group ${g.id}` }))}
+                                        value={formData.group_id ? { value: formData.group_id, label: groups.find(g => g.id === formData.group_id)?.name || groups.find(g => g.id === formData.group_id)?.group_name || `Group ${formData.group_id}` } : null}
                                         onChange={(opt) => setFormData({ ...formData, group_id: opt?.value ?? '' })}
                                         placeholder="Select a group"
                                         menuPortalTarget={document.body}

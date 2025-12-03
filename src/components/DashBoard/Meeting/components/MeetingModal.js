@@ -2,7 +2,7 @@ import React from "react";
 import { X } from "phosphor-react";
 
 
-const MeetingModal = ({ mode, data, contents = [], groups = [], onChange, onClose, onSubmit }) => {
+const MeetingModal = ({ mode, data, groups = [], onChange, onClose, onSubmit }) => {
     const title = mode === 'create' ? 'Create Meeting' : 'Update Meeting';
     console.log('MeetingModal - groups received:', groups);
     const formatForInput = (value) => {
@@ -46,12 +46,6 @@ const MeetingModal = ({ mode, data, contents = [], groups = [], onChange, onClos
                     </select>
 
                     {/* Group is set silently by the parent (derived from existing meetings/groups). Hidden from the create UI. */}
-
-                    <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Content</label>
-                    <select className="form-select mb-3 rounded-3" value={data.meeting_content_id || ''} onChange={(e) => onChange({ ...data, meeting_content_id: e.target.value })}>
-                        <option value="">Select Content</option>
-                        {contents.map(c => (<option key={c.id} value={c.id}>{c.content_name}</option>))}
-                    </select>
 
                     <div className="d-flex gap-2" style={{ marginTop: 12 }}>
                         <button

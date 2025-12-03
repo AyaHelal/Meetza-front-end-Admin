@@ -3,7 +3,7 @@ import { PlusCircle } from "phosphor-react";
 import { SearchBar } from "../../shared/SearchBar";
 import '../../CSS/Table.css';
 
-export const MeetingTable = ({ meetings, loading, error, onSave, onDelete, onEdit, onAdd, searchTerm, onSearchChange, addingNew, editing, contents, currentUser }) => {
+export const MeetingTable = ({ meetings, loading, error, onSave, onDelete, onEdit, onAdd, searchTerm, onSearchChange, addingNew, editing, currentUser }) => {
     return (
         <div className="m-4 rounded-3" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
         <div className="card shadow-sm rounded-3 border-0">
@@ -25,7 +25,6 @@ export const MeetingTable = ({ meetings, loading, error, onSave, onDelete, onEdi
                     <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Title</th>
                     <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Datetime</th>
                     <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '200px' }}>Status</th>
-                    <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '200px' }}>Content Name</th>
                     <th className="fw-semibold" style={{ color: "#888888" }}>Actions</th>
                 </tr>
                         </thead>
@@ -39,9 +38,9 @@ export const MeetingTable = ({ meetings, loading, error, onSave, onDelete, onEdi
                             ) : (
                     <>
                     {meetings.map((m) => (
-                        <MeetingRow key={m.id} meeting={m} isEditing={editing[m.id]} onSave={onSave} onEdit={onEdit} onDelete={onDelete} contents={contents} currentUser={currentUser} />
+                        <MeetingRow key={m.id} meeting={m} isEditing={editing[m.id]} onSave={onSave} onEdit={onEdit} onDelete={onDelete} currentUser={currentUser} />
                     ))}
-                    {addingNew && <MeetingRow key="new" meeting={null} isEditing={true} onSave={onSave} contents={contents} currentUser={currentUser} />}
+                    {addingNew && <MeetingRow key="new" meeting={null} isEditing={true} onSave={onSave} currentUser={currentUser} />}
                     </>
                 )}
                         </tbody>
