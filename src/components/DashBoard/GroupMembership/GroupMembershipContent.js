@@ -23,17 +23,35 @@ const GroupMembershipContent = ({ currentUser }) => {
         deleteMembership,
         searchMemberships,
         fetchData,
-    } = useGroupMembershipData();
+    } = useGroupMembershipData(currentUser);
 
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({ group_id: "", member_email: "" });
     const [searchQuery, setSearchQuery] = useState("");
 
-    const visibleGroups = groups.filter(g => {
-        if (currentUser.role.toLowerCase() === 'super_admin') return true;
-        if (currentUser.role.toLowerCase() === 'administrator') return g.adminId === currentUser.id;
-        return false;
-    });
+    console.log("GroupMembershipContent - currentUser:", currentUser);
+    console.log("GroupMembershipContent - currentUser.id:", currentUser?.id);
+    console.log("GroupMembershipContent - currentUser keys:", Object.keys(currentUser || {}));
+    console.log("GroupMembershipContent - groups from hook:", groups);
+
+    // Filter groups based on user role (same logic as useGroupData.js)
+    const isSuperAdmin = (currentUser?.role || "").toLowerCase() === "super_admin";
+    const isAdministrator = (currentUser?.role || "").toLowerCase() === "administrator";
+
+    let visibleGroups = groups;
+
+    if (isAdministrator && !isSuperAdmin) {
+        // Administrator can only see groups they created (where admin_id matches their user ID)
+        visibleGroups = groups.filter(g =>
+            g.admin_id === currentUser?.id ||
+            g.adminId === currentUser?.id ||
+            g.administrator_id === currentUser?.id ||
+            g.user_id === currentUser?.id ||
+            g.admin?.id === currentUser?.id
+        );
+    }
+    // Super_Admin sees all groups (no filtering)
+
 
     const openCreateForm = () => {
         setFormData({ group_id: "", member_email: "" });
@@ -211,7 +229,7 @@ const GroupMembershipContent = ({ currentUser }) => {
                                                 </label>
                                                 <div style={{ width: '70%' }}>
                                                     <Select
-                                                        options={visibleGroups.filter(g => currentUser.role.toLowerCase() === 'super_admin' || g.adminId === currentUser.id).map(g => ({ value: g.id, label: g.name || g.group_name || `Group ${g.id}` }))}
+                                                        options={visibleGroups.map(g => ({ value: g.id, label: g.name || g.group_name || `Group ${g.id}` }))}
                                                         value={formData.group_id ? { value: formData.group_id, label: groups.find(g => g.id === formData.group_id)?.name || groups.find(g => g.id === formData.group_id)?.group_name || `Group ${formData.group_id}` } : null}
                                                         onChange={(opt) => setFormData({ ...formData, group_id: opt?.value ?? '' })}
                                                         placeholder="Select a group"

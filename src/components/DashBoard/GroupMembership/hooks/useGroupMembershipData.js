@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import api from "../../../../utils/api";
 
-export const useGroupMembershipData = () => {
+export const useGroupMembershipData = (currentUser = null) => {
   const [memberships, setMemberships] = useState([]);
   const [groups, setGroups] = useState([]);
   const [users, setUsers] = useState([]);
@@ -193,12 +193,52 @@ export const useGroupMembershipData = () => {
   const fetchGroups = useCallback(async () => {
     try {
       const res = await api.get("/group");
-      const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
-      setGroups(payload);
+      let payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+
+      console.log("fetchGroups - currentUser:", currentUser);
+      console.log("fetchGroups - all groups payload:", payload);
+
+      // Get current user from localStorage (same as useGroupData.js)
+      const user = JSON.parse(localStorage.getItem("user"));
+      const isSuperAdmin = user?.role === "Super_Admin";
+      const isAdministrator = user?.role === "Administrator";
+
+      console.log("fetchGroups - user from localStorage:", user);
+      console.log("fetchGroups - user id:", user?.id);
+      console.log("fetchGroups - user role:", user?.role);
+
+      let filteredGroups = payload;
+
+      // Filter groups based on user role
+      if (isAdministrator && !isSuperAdmin) {
+        // Administrator can only see groups they created (where admin_id matches their user ID)
+        console.log("fetchGroups - Administrator: filtering groups for user ID:", user?.id);
+        console.log("fetchGroups - All groups before filtering:", payload.map(g => ({
+          id: g.id,
+          name: g.name || g.group_name,
+          admin_id: g.admin_id,
+          adminId: g.adminId,
+          administrator_id: g.administrator_id,
+          user_id: g.user_id,
+          admin: g.admin
+        })));
+
+        filteredGroups = payload.filter(g =>
+          g.admin_id === user?.id ||
+          g.adminId === user?.id ||
+          g.administrator_id === user?.id ||
+          g.user_id === user?.id ||
+          g.admin?.id === user?.id
+        );
+        console.log("fetchGroups - filtered groups:", filteredGroups);
+      }
+      // Super_Admin sees all groups (no filtering)
+
+      setGroups(filteredGroups);
     } catch (err) {
       console.error("Failed to fetch groups:", err);
     }
-  }, []);
+  }, [currentUser]);
 
   // 🟩 Fetch members (from member endpoint or user endpoint)
   const fetchUsers = useCallback(async () => {
