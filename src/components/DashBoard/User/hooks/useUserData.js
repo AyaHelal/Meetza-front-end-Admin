@@ -25,7 +25,7 @@ export const useUserData = () => {
                         : u.role === "Member"
                             ? "member"
                             : (u.role || "").toString().toLowerCase(),
-                avatarUrl: u.avatarUrl || u.avatar_url,
+                avatarUrl: u.user_photo || u.avatarUrl || u.avatar_url,
             }));
 
             setUsers(normalized);
@@ -101,9 +101,8 @@ export const useUserData = () => {
                 id: u.id,
                 name: u.name,
                 email: u.email,
-                role: u.role
-                ,
-                avatarUrl: u.avatarUrl || u.avatar_url,
+                role: u.role,
+                avatarUrl: u.user_photo || u.avatarUrl || u.avatar_url,
             }));
             setUsers(normalized);
         } catch (e) {

@@ -49,7 +49,28 @@ const VideoDisplay = ({ currentUser }) => {
         try {
             const res = await api.get('/group');
             const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
-            setGroups(payload);
+
+            // Get current user to filter groups based on role
+            const user = JSON.parse(localStorage.getItem("user"));
+            const isSuperAdmin = user?.role === "Super_Admin";
+            const isAdministrator = user?.role === "Administrator";
+
+            let filteredGroups = payload;
+
+            // Filter groups based on user role
+            if (isAdministrator && !isSuperAdmin) {
+                // Administrator can only see groups they created (where admin_id matches their user ID)
+                filteredGroups = payload.filter(g =>
+                    g.admin_id === user?.id ||
+                    g.adminId === user?.id ||
+                    g.administrator_id === user?.id ||
+                    g.user_id === user?.id ||
+                    g.admin?.id === user?.id
+                );
+            }
+            // Super_Admin sees all groups (no filtering)
+
+            setGroups(filteredGroups);
         } catch (err) {
             console.error('Failed to fetch groups:', err);
             toast.error('Failed to load groups');

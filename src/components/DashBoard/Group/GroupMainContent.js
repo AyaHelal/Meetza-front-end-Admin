@@ -16,9 +16,6 @@ import api from "../../../utils/api";
 const GroupMainContent = ({ currentUser }) => {
     const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator" || (currentUser?.role || "").toLowerCase() === "super_admin";
 
-    const updateContentGroupId = async (contentId, groupId) => {
-    return await api.put(`/group-contents/${contentId}`, { group_id: groupId });
-    };
     const {
         groups,
         positions,
@@ -127,9 +124,6 @@ const GroupMainContent = ({ currentUser }) => {
                 // poster file (File object or undefined/null)
                 formData.group_photo ?? undefined
             );
-            if (formData.group_content_id) {
-            await updateContentGroupId(formData.group_content_id, formData.id);
-        }
             setShowForm(false);
             toast.success("Group created successfully");
             fetchData();
@@ -140,17 +134,17 @@ const GroupMainContent = ({ currentUser }) => {
     };
 
     const handleUpdateGroup = async () => {
-        if (!selectedGroup) {
-            console.error("No group selected for update");
-            return;
-        }
+    if (!selectedGroup) {
+        console.error("No group selected for update");
+        return;
+    }
 
-        const groupId = selectedGroup.id;
-        console.log("Selected Group ID:", groupId);
-        console.log("Form Data:", formData);
-        console.log("Selected Group:", selectedGroup);
+    const groupId = selectedGroup.id;
+    console.log("Selected Group ID:", groupId);
+    console.log("Form Data:", formData);
+    console.log("Selected Group:", selectedGroup);
 
-        const payload = {
+    const payload = {
             group_name: formData.name,
             position_id: selectedGroup.position_id
         };
@@ -168,20 +162,17 @@ const GroupMainContent = ({ currentUser }) => {
             });
 
             const res = await updateGroup(groupId, formData.name, selectedGroup.position_id, contentIdToSend, formData.description ?? undefined, formData.group_photo ?? undefined);
-            if (formData.group_content_id) {
-            await updateContentGroupId(formData.group_content_id, groupId);
-        }
-            console.log("Response from backend:", res);
-            setShowEditModal(false);
-            toast.success("Group updated successfully");
-            fetchData();
+        console.log("Response from backend:", res);
+        setShowEditModal(false);
+        toast.success("Group updated successfully");
+        fetchData();
 
-        } catch (error) {
-            console.error("Update error:", error);
-            const msg = error?.response?.data?.message || error.message || "Failed to update group";
-            toast.error(msg);
-        }
-    };
+    } catch (error) {
+        console.error("Update error:", error);
+        const msg = error?.response?.data?.message || error.message || "Failed to update group";
+        toast.error(msg);
+    }
+};
 
 
 

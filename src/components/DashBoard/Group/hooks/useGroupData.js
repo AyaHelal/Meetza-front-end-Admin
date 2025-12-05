@@ -45,6 +45,7 @@ export const useGroupData = () => {
         position_id: g.position_id,
         description: g.description || "",
         group_content_id: g.group_content_id || null, // Use API value directly
+        group_photo: g.group_photo || null,
         memberCount: g.memberCount || g.member_count || 0,
         admin_id: g.admin_id || g.adminId || g.administrator_id || g.user_id || g.admin?.id || null,
         admin_name: g.admin?.name || g.admin_name || g.administrator_name || null,
@@ -148,27 +149,7 @@ export const useGroupData = () => {
 
   const updateGroup = async (id, group_name, position_id, group_content_id, description = undefined, group_photo = undefined) => {
     try {
-      const currentGroup = groups.find(g => g.id === id) || {};
-      const oldContentId = currentGroup.group_content_id;
-
-      // 🔹 Step 1: If changing content, unlink old content first
-      if (oldContentId && oldContentId !== group_content_id) {
-        await safeUpdateGroupContent(oldContentId, { group_id: null });
-      }
-
-      // 🔹 Step 2: If assigning new content, ensure it's unlinked from any other group first
-      if (group_content_id && group_content_id !== oldContentId) {
-        // Check if the new content is currently linked to another group
-        const contentToLink = contents.find(c => c.id === group_content_id);
-        if (contentToLink && contentToLink.group_id && contentToLink.group_id !== id) {
-          // Unlink from the other group first
-          await safeUpdateGroupContent(group_content_id, { group_id: null });
-        }
-        // Now link to current group
-        await safeUpdateGroupContent(group_content_id, { group_id: id });
-      }
-
-      // 🔹 Step 3: Update group in DB
+      // Update group in DB with group_content_id directly
       const payload = {
         ...(group_name !== undefined && { group_name }),
         ...(position_id !== undefined && { position_id }),
@@ -186,7 +167,7 @@ export const useGroupData = () => {
         response = await api.put(`/group/${id}`, payload);
       }
 
-      // 🔹 Step 4: Update local state
+      // Update local state
       setGroups(prev => prev.map(g => g.id === id ? { ...g, ...payload } : g));
 
       return response.data;
@@ -243,6 +224,7 @@ export const useGroupData = () => {
         position_id: g.position_id,
         description: g.description || "",
         group_content_id: g.group_content_id || null,
+        group_photo: g.group_photo || null,
         memberCount: g.memberCount || g.member_count || 0,
         admin_id: g.admin_id || g.adminId || g.administrator_id || g.user_id || g.admin?.id || null,
         admin_name: g.admin?.name || g.admin_name || g.administrator_name || null,
