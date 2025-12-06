@@ -193,30 +193,6 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
                                             className="form-control mb-3"
                                         />
                                     </div>
-                                    <div className="mb-3">
-                                        <label className="form-label fw-semibold" style={{ color: "#010101" }}>
-                                            Group Content
-                                        </label>
-                                        <div className="d-flex align-items-center gap-2">
-                                            <div style={{ flex: 1 }}>
-                                                <Select
-                                                    options={contentOptions}
-                                                    value={selectedContent}
-                                                    onChange={(option) => setFormData({ ...formData, group_content_id: option?.value ?? null })}
-                                                    placeholder="Select group content (optional)"
-                                                    isClearable
-                                                    styles={{
-                                                        control: (base) => ({
-                                                            ...base,
-                                                            borderRadius: 12,
-                                                            border: '2px solid #E9ECEF',
-                                                            boxShadow: 'none'
-                                                        })
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
                                 </>
                             )}
                         </form>

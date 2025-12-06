@@ -107,8 +107,8 @@ const GroupMainContent = ({ currentUser }) => {
     };
 
     const handleCreateGroup = async () => {
-        if (!formData.group_name || !formData.position_id || !formData.year || !formData.semester) {
-            toast.error("Please fill all required fields: group name, position, year and semester");
+        if (!formData.group_name || !formData.position_id || !formData.year || !formData.semester || !formData.group_content_name) {
+            toast.error("Please fill all required fields: group name, position, year, semester and content name");
             return;
         }
 
@@ -118,7 +118,8 @@ const GroupMainContent = ({ currentUser }) => {
                 formData.position_id,
                 formData.year,
                 formData.semester,
-                formData.group_content_id || null,
+                formData.group_content_name,
+                formData.content_description ?? undefined,
                 // description (may be undefined or empty string)
                 formData.description ?? undefined,
                 // poster file (File object or undefined/null)
@@ -373,19 +374,40 @@ const GroupMainContent = ({ currentUser }) => {
 
                                             <div className="mb-4">
                                                 <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
-                                                    Group Content
+                                                    Content Name <span style={{ color: "#FF0000" }}>*</span>
                                                 </label>
-                                                <div style={{ width: '70%' }}>
-                                                    <Select
-                                                        options={getAvailableContents(selectedGroup?.id).map(c => ({ value: c.id, label: c.content_name }))}
-                                                        value={formData.group_content_id ? { value: formData.group_content_id, label: getAvailableContents(selectedGroup?.id).find(c => c.id === formData.group_content_id)?.content_name || `Content ${formData.group_content_id}` } : null}
-                                                        onChange={(opt) => setFormData({ ...formData, group_content_id: opt?.value ?? null })}
-                                                        placeholder="Select group content (optional)"
-                                                        menuPortalTarget={document.body}
-                                                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                                                        isClearable
-                                                    />
-                                                </div>
+                                                <input
+                                                    type="text"
+                                                    className="form-control rounded-3"
+                                                    name="group_content_name"
+                                                    value={formData.group_content_name || ''}
+                                                    onChange={handleContentChange}
+                                                    placeholder="Enter content name"
+                                                    style={{
+                                                        border: "2px solid #E9ECEF",
+                                                        fontSize: "16px",
+                                                        width: "70%",
+                                                    }}
+                                                />
+                                            </div>
+
+                                            <div className="mb-4">
+                                                <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                    Content Description
+                                                </label>
+                                                <textarea
+                                                    className="form-control rounded-3"
+                                                    name="content_description"
+                                                    value={formData.content_description || ''}
+                                                    onChange={handleContentChange}
+                                                    placeholder="Enter content description (optional)"
+                                                    style={{
+                                                        border: "2px solid #E9ECEF",
+                                                        fontSize: "16px",
+                                                        width: "70%",
+                                                        minHeight: 90,
+                                                    }}
+                                                />
                                             </div>
 
                                             <div className="mb-4">

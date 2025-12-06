@@ -35,9 +35,18 @@ const GroupContentModal = ({ mode = 'create', data = {}, onChange, onClose, onSu
     setAvailableGroups(updatedGroups );
 },[groups]);
 
+    useEffect(() => {
+        if (mode === 'edit' && currentUser?.role === "Super_Admin" && data.administrator_id !== currentUser.id) {
+            onChange({
+                ...data,
+                administrator_id: currentUser.id
+            });
+        }
+    }, [mode, currentUser, onChange, data.administrator_id]);
+
     return (
-        <div className="modal d-block" style={{ background: 'rgba(0,0,0,0.45)' }}>
-            <div className="card p-4 mx-auto" style={{ maxWidth: 560, borderRadius: 12, marginTop: '6rem' }}>
+        <div className="modal d-block" style={{ background: 'rgba(0,0,0,0.45)' }} onClick={onClose}>
+            <div className="card p-4 mx-auto" style={{ maxWidth: 560, borderRadius: 12, marginTop: '6rem' }} onClick={(e) => e.stopPropagation()}>
                 <div className="d-flex justify-content-between align-items-start">
                     <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>{title}</h3>
                     <button type="button" className="btn-close" onClick={onClose} aria-label="Close" style={{ fontSize: "14px" }}>
@@ -60,39 +69,43 @@ const GroupContentModal = ({ mode = 'create', data = {}, onChange, onClose, onSu
                         value={data.content_description || ''}
                         onChange={(e) => onChange({ ...data, content_description: e.target.value })}
                     />
-                    <label className="form-label" style={{ fontSize: 13, color: '#6c757d',marginTop: '5px', marginBottom: '8px' }}>
-                    Assign Group
-                    </label>
+                    {mode === 'create' && (
+                        <>
+                            <label className="form-label" style={{ fontSize: 13, color: '#6c757d',marginTop: '5px', marginBottom: '8px' }}>
+                            Assign Group
+                            </label>
 
-                    <div style={{ width: '100%' }}>
-                    <Select
-                        options={availableGroups.map(group => ({
-                        value: group.id,
-                        label: group.group_name
-                        }))}
-                        value={
-                        data.group_id
-                            ? {
-                                value: data.group_id,
-                                label: availableGroups.find(g => g.id === data.group_id)?.group_name
-                            }
-                            : null
-                        }
-                        onChange={(opt) =>
-                        onChange({
-                            ...data,
-                            group_id: opt?.value ?? ""
-                        })
-                        }
-                        placeholder="Select Group"
-                        menuPortalTarget={document.body}
-                        styles={{
-                        menuPortal: base => ({ ...base, zIndex: 9999 })
-                        }}
-                    />
-                    </div>
+                            <div style={{ width: '100%' }}>
+                            <Select
+                                options={availableGroups.map(group => ({
+                                value: group.id,
+                                label: group.group_name
+                                }))}
+                                value={
+                                data.group_id
+                                    ? {
+                                        value: data.group_id,
+                                        label: availableGroups.find(g => g.id === data.group_id)?.group_name
+                                    }
+                                    : null
+                                }
+                                onChange={(opt) =>
+                                onChange({
+                                    ...data,
+                                    group_id: opt?.value ?? ""
+                                })
+                                }
+                                placeholder="Select Group"
+                                menuPortalTarget={document.body}
+                                styles={{
+                                menuPortal: base => ({ ...base, zIndex: 9999 })
+                                }}
+                            />
+                            </div>
+                        </>
+                    )}
 
-                    {currentUser?.role === "Super_Admin" && (
+                    {mode === 'create' && currentUser?.role === "Super_Admin" && (
                         <>
                             <label className="form-label" style={{ fontSize: 13, color: '#6c757d', marginTop: '16px', marginBottom: '8px' }}>
                             Administrator
