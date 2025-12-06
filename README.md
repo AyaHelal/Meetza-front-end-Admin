@@ -1,70 +1,157 @@
-# Getting Started with Create React App
+# ![Meetza Logo](public/assets/meetza logo.png)(public/assets/MeetzaWord.png) Dashboard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A comprehensive React-based admin dashboard for managing the Meetza platform. This application provides administrators with powerful tools to manage users, groups, meetings, videos, resources, and more through an intuitive and responsive interface.
 
-## Available Scripts
+## 🚀 Live Demo
 
-In the project directory, you can run:
+Access the live application: [https://meetza-front-end-admin.vercel.app/](https://meetza-front-end-admin.vercel.app/)
 
-### `npm start`
+## 🎨 Design
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+View the Figma design: [https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Farida-Meetza?node-id=0-1&p=f&t=ehzpvGrgs7fbkPe3-0](https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Farida-Meetza?node-id=0-1&p=f&t=ehzpvGrgs7fbkPe3-0)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## ✨ Features
 
-### `npm test`
+- **User Management**: Create, read, update, and delete user accounts with role-based access control
+- **Group Management**: Organize users into groups with hierarchical structures
+- **Group Membership**: Manage user memberships within groups
+- **Group Content**: Handle content associated with specific groups
+- **Meeting Management**: Schedule and manage virtual meetings
+- **Video Management**: Upload, organize, and manage video content
+- **Resource Management**: Manage platform resources and assets
+- **Position Management**: Define and assign user positions/roles
+- **Authentication**: Secure login/logout with token-based authentication
+- **Responsive Design**: Optimized for both desktop and mobile devices
+- **Real-time Notifications**: Toast notifications for user feedback
+- **Form Validation**: Comprehensive client-side validation
+- **API Integration**: Seamless integration with Meetza backend API
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🛠 Tech Stack
 
-### `npm run build`
+### Frontend
+- **React 19.2.0**: Modern JavaScript library for building user interfaces
+- **React Router DOM 7.9.4**: Declarative routing for React applications
+- **Bootstrap 5.3.8**: Responsive CSS framework
+- **React Bootstrap 2.10.10**: Bootstrap components for React
+- **Framer Motion 12.23.22**: Animation library for React
+- **Axios 1.13.2**: HTTP client for API requests
+- **React Toastify 11.0.5**: Toast notifications
+- **Phosphor React 1.4.1**: Icon library
+- **Lottie React 2.4.1**: Lottie animations for React
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Development Tools
+- **Create React App**: Build setup and development server
+- **ESLint**: Code linting
+- **Cross-env**: Cross-platform environment variable setting
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🚀 Getting Started
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Prerequisites
 
-### `npm run eject`
+- Node.js (v14 or higher)
+- npm or yarn package manager
+- Git
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Installation
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd meetza-admin
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+3. **Environment Setup**
+   Create a `.env` file in the root directory and add your environment variables:
+   ```env
+   REACT_APP_API_BASE=https://meetza-backend.vercel.app/api
+   ```
 
-## Learn More
+4. **Start the development server**
+   ```bash
+   npm start
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+   The application will open at [http://localhost:3000](http://localhost:3000)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Available Scripts
 
-### Code Splitting
+- `npm start` - Runs the app in development mode
+- `npm run build` - Builds the app for production
+- `npm test` - Launches the test runner
+- `npm run eject` - Ejects from Create React App (irreversible)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 🔧 Configuration
 
-### Analyzing the Bundle Size
+### API Configuration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+The application uses Axios for API communication. The base URL is configured in `src/utils/api.js`:
 
-### Making a Progressive Web App
+```javascript
+const API_BASE = process.env.REACT_APP_API_BASE || "https://meetza-backend.vercel.app/api";
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Authentication
 
-### Advanced Configuration
+The app uses JWT tokens for authentication, stored in localStorage. Automatic token refresh and logout on token expiration are handled via Axios interceptors.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Routing
 
-### Deployment
+Protected routes are implemented using React Router with a `ProtectedRoute` component that checks for authentication tokens.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 📱 Usage
 
-### `npm run build` fails to minify
+1. **Login**: Access the admin dashboard using your credentials
+2. **Dashboard Navigation**: Use the sidebar to navigate between different management sections
+3. **CRUD Operations**: Perform create, read, update, and delete operations on various entities
+4. **Search and Filter**: Use search bars and filters to find specific data
+5. **Responsive Design**: The interface adapts to different screen sizes
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 🔒 Security Features
+
+- JWT-based authentication
+- Protected routes
+- Automatic logout on token expiration
+- Secure API communication with Axios interceptors
+- Client-side form validation
+
+## 🎯 Key Components
+
+### Dashboard Layout
+- Responsive sidebar navigation
+- Main content area with dynamic components
+- Toast notifications for user feedback
+
+### Data Management
+- Custom hooks for API data fetching (`useUserData`, `useGroupData`, etc.)
+- Modal components for create/edit operations
+- Table components with pagination and search
+
+### Forms and Validation
+- Reusable form input components
+- Custom validation hooks
+- Password visibility toggles
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is private and proprietary to Meetza.
+
+## 📞 Support
+
+For support or questions, please contact the development team.
+
+---
+
+**Meetza Admin Dashboard** - Empowering administrators to efficiently manage the Meetza platform.
