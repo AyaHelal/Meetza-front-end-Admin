@@ -1,4 +1,4 @@
-# ![Meetza Logo](public/assets/meetzalogo.png) ![Meetza Logo](public/assets/MeetzaWord.png) Dashboard
+# ![Meetza Logo](public/assets/MeetzaLogo.png) ![Meetza Logo](public/assets/MeetzaWord.png) Dashboard
 
 A comprehensive React-based admin dashboard for managing the Meetza platform. This application provides administrators with powerful tools to manage users, groups, meetings, videos, resources, and more through an intuitive and responsive interface.
 
