@@ -48,18 +48,6 @@ export const GroupContentRow = ({ content, onEdit, onDelete, currentUser, isSupe
                             >
                                 <PencilSimpleLine size={18} />
                             </button>
-                            <button
-                                className="btn btn-sm"
-                                style={{
-                                    backgroundColor: "#FF0000",
-                                    borderRadius: 12,
-                                    color: "#fff",
-                                    padding: '4px 8px'
-                                }}
-                                onClick={() => onDelete(content.id)}
-                            >
-                                <Trash size={18} />
-                            </button>
                         </>
                     )}
                 </div>

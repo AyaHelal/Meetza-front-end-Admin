@@ -32,23 +32,6 @@ export const GroupContentTable = ({
         <div className="d-flex justify-content-between align-items-center p-4">
           <h2 className="h4 m-0 fw-semibold">Group Content Management</h2>
             <div className="d-flex gap-3 align-items-center">
-            {isSuperAdmin && (
-              <button
-                className="btn rounded-4 d-flex align-items-center gap-2"
-                onClick={onAdd}
-                disabled={addingNew}
-                style={{
-                    background: "linear-gradient(to right, #0076EA, #00DC85)",
-                    color: "white",
-                    fontSize: "16px",
-                    padding: "0.75rem 1.5rem",
-                    border: "none",
-                }}
-              >
-                <PlusCircle size={20} weight="bold" />
-                <span className="fw-semibold">Create Content</span>
-              </button>
-            )}
             <SearchBar
               value={searchTerm}
               onChange={onSearchChange}
@@ -64,7 +47,7 @@ export const GroupContentTable = ({
               <tr>
                 <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Content Name</th>
                 <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '200px' }}>Content Description</th>
-                <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Assigned Group</th>
+                <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Group Name</th>
                 <th className="fw-semibold text-center" style={{ color: "#888888", width: '150px' }}>Actions</th>
               </tr>
             </thead>

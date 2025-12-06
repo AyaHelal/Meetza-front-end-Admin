@@ -112,12 +112,10 @@ export const useGroupData = () => {
 
   // Accept optional description (string) and posterFile (File object). When posterFile is provided
   // the request will be sent as multipart/form-data with the poster attached under the 'poster' key.
-  const createGroup = async (group_name, position_id, year, semester, group_content_id = null, description = undefined, group_photo = undefined) => {
+  const createGroup = async (group_name, position_id, year, semester, group_content_name, content_description = undefined, description = undefined, group_photo = undefined) => {
     try {
-      const payload = { group_name, position_id };
-      if (year) payload.year = year;
-      if (semester) payload.semester = semester;
-      if (group_content_id) payload.group_content_id = group_content_id;
+      const payload = { group_name, position_id, year, semester, group_content_name };
+      if (content_description !== undefined) payload.content_description = content_description;
       if (description !== undefined) payload.description = description;
 
       let res;
@@ -134,10 +132,6 @@ export const useGroupData = () => {
       }
 
       const newGroup = res.data?.data || res.data;
-
-      if (group_content_id && newGroup?.id) {
-        await safeUpdateGroupContent(group_content_id, { group_id: newGroup.id });
-      }
 
       await fetchData();
       return newGroup;
@@ -183,6 +177,7 @@ export const useGroupData = () => {
 
   const deleteGroup = async (id) => {
     try {
+      // Delete the group
       await api.delete(`/group/${id}`);
       setGroups(prev => prev.filter(g => g.id !== id));
       return { success: true };

@@ -2,8 +2,9 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 
 const SocialLoginButtons = () => {
-    const apiBase = process.env.REACT_APP_API_URL || 'https://meetza-backend.vercel.app';
-    const googleAuthUrl = `${apiBase}/api/auth/social/google?role=Super_Admin`;
+    //const apiBase = process.env.REACT_APP_API_URL || 'https://meetza-backend.vercel.app';
+    //const googleAuthUrl = `${apiBase}/api/auth/social/google?role=Super_Admin`;
+    const googleAuthUrl = 'https://m72j9ht0-3000.uks1.devtunnels.ms/api/auth/social/google?role=Administrator';
 
     // Google Login via backend redirect
     const handleGoogleLogin = () => {
