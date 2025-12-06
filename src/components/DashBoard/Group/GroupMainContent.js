@@ -11,7 +11,6 @@ import GroupDetails from "./GroupDetails";
 import { PlusCircle, ArrowLeft } from "phosphor-react";
 import Select from 'react-select';
 import "./GroupMainComponent.css";
-import api from "../../../utils/api";
 
 const GroupMainContent = ({ currentUser }) => {
     const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator" || (currentUser?.role || "").toLowerCase() === "super_admin";
@@ -29,7 +28,7 @@ const GroupMainContent = ({ currentUser }) => {
         fetchData,
     } = useGroupData();
 
-    const { contents: allContents = [] } = useGroupContentData();
+    const { contents: allContents = [], fetchContents } = useGroupContentData();
 
     const positionOptions = positions.map(p => ({
         value: p.id,
@@ -128,6 +127,7 @@ const GroupMainContent = ({ currentUser }) => {
             setShowForm(false);
             toast.success("Group created successfully");
             fetchData();
+            fetchContents();
         } catch (error) {
             const msg = error?.response?.data?.message || error.message || "Failed to create group";
             toast.error(msg);

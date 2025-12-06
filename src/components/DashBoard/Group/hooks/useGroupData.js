@@ -60,26 +60,6 @@ export const useGroupData = () => {
     }
   }, []);
 
-  const safeUpdateGroupContent = async (contentId, patch = {}) => {
-    if (!contentId) return;
-    try {
-      const getRes = await api.get(`/group-contents/${contentId}`);
-      const existing = getRes.data?.data || getRes.data || {};
-
-      const fullPayload = {
-        content_name: existing.content_name || existing.name || existing.title || "",
-        content_description: existing.content_description || existing.description || existing.desc || "",
-        administrator_id: existing.administrator_id || existing.admin_id || existing.user_id || undefined,
-        ...patch,
-      };
-      console.log('[safeUpdateGroupContent] PUT payload:', fullPayload);
-      return await api.put(`/group-contents/${contentId}`, fullPayload);
-    } catch (err) {
-      console.error(`[safeUpdateGroupContent] Failed to update content ${contentId}`, err);
-      throw err;
-    }
-  };
-
   const fetchPositions = useCallback(async () => {
     try {
       const res = await api.get("/position");
@@ -115,8 +95,10 @@ export const useGroupData = () => {
   const createGroup = async (group_name, position_id, year, semester, group_content_name, content_description = undefined, description = undefined, group_photo = undefined) => {
     try {
       const payload = { group_name, position_id, year, semester, group_content_name };
-      if (content_description !== undefined) payload.content_description = content_description;
-      if (description !== undefined) payload.description = description;
+      if (content_description !== undefined && content_description !== '') payload.group_content_description = content_description;
+      if (description !== undefined && description !== '') payload.description = description;
+
+      console.log('[createGroup] Payload being sent:', payload);
 
       let res;
       if (group_photo) {

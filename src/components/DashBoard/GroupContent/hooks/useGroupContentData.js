@@ -8,7 +8,7 @@ export default function useGroupContentData() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
-    const { updateGroup, fetchData: refetchGroups } = useGroupData();
+    const {  fetchData: refetchGroups } = useGroupData();
 
     // Fetch all contents with their assigned groups
     const fetchContents = async () => {
@@ -46,7 +46,7 @@ export default function useGroupContentData() {
 
             const contentsWithGroups = filteredContents.map((content) => {
                 const assignedGroup = groupsData.find(
-                    (g) => g.group_content_id === content.id
+                    (g) => String(g.id) === String(content.group_id)
                 );
                 return {
                     ...content,

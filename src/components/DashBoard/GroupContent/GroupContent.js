@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { smartToast } from "../../../utils/toastManager";
 import useGroupContentData from "./hooks/useGroupContentData";
-import { useGroupData } from "../Group/hooks/useGroupData";
 import { GroupContentTable } from "./components/GroupContentTable";
 import GroupContentModal from "./components/GroupContentModal";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
