@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate,useNavigate } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Signup from "./pages/SignUp/SignUp";
 import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
@@ -20,8 +20,30 @@ function ProtectedRoute({ children }) {
 
 function AnimatedRoutes() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [autoLoginAttempted, setAutoLoginAttempted] = useState(false);
+
+  // Handle social login redirect
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const token = urlParams.get('token');
+    const user = urlParams.get('user');
+
+    if (token && user) {
+      try {
+        const userData = JSON.parse(decodeURIComponent(user));
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('user', JSON.stringify(userData));
+        // Clean up URL
+        navigate(location.pathname, { replace: true });
+        // Navigate to dashboard
+        navigate('/dashboard');
+      } catch (error) {
+        console.error('Error parsing social login data:', error);
+      }
+    }
+  }, [location.search, navigate]);
 
   useEffect(() => {
     // Check for remember me token on app load
