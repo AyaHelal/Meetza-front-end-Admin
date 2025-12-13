@@ -2,13 +2,6 @@
 
 A comprehensive React-based admin dashboard for managing the Meetza platform. This application provides administrators with powerful tools to manage users, groups, meetings, videos, resources, and more through an intuitive and responsive interface.
 
-## 🚀 Live Demo
-
-Access the live application: [https://meetza-front-end-admin.vercel.app/](https://meetza-front-end-admin.vercel.app/)
-
-## 🎨 Design
-
-View the Figma design: [https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Farida-Meetza?node-id=0-1&p=f&t=ehzpvGrgs7fbkPe3-0](https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Farida-Meetza?node-id=0-1&p=f&t=ehzpvGrgs7fbkPe3-0)
 
 ## 📊 Presentation
 
