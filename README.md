@@ -3,10 +3,6 @@
 A comprehensive React-based admin dashboard for managing the Meetza platform. This application provides administrators with powerful tools to manage users, groups, meetings, videos, resources, and more through an intuitive and responsive interface.
 
 
-## 📊 Presentation
-
-- Project Presentation on Canva: https://www.canva.com/design/DAG6wME9m9I/6szllu6C4vuPiD5iRwwTcQ/edit
-
 ## ✨ Features
 
 - **User Management**: Create, read, update, and delete user accounts with role-based access control
