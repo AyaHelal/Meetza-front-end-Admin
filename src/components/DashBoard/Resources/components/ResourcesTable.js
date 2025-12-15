@@ -2,7 +2,7 @@ import { PlusCircle } from "phosphor-react";
 import '../../CSS/Table.css';
 import ResourcesRow from "./ResourcesRow";
 
-const ResourcesTable = ({ contents = [], currentUser, onUploadClick, onDelete, selectedContentId = null }) => {
+const ResourcesTable = ({ contents = [], currentUser, onUploadClick, onLinksClick, onDelete, selectedContentId = null }) => {
     // Find the selected content and get its resources directly
     const selectedContent = contents.find(c => c.id === selectedContentId);
     const visibleResources = selectedContent?.resources || [];
@@ -33,6 +33,14 @@ const ResourcesTable = ({ contents = [], currentUser, onUploadClick, onDelete, s
                 >
                 <PlusCircle size={20} weight="bold" />
                 <span className="fw-semibold">Upload Files</span>
+                </button>
+                <button
+                className="btn rounded-4 d-flex align-items-center gap-2"
+                onClick={onLinksClick}
+                style={{ background: "linear-gradient(to right, #0076EA, #00DC85)", color: "white", border: "none" }}
+                >
+                <PlusCircle size={20} weight="bold" />
+                <span className="fw-semibold">Add Links</span>
                 </button>
             </div>
             </div>
