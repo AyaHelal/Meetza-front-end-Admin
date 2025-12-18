@@ -3,6 +3,7 @@ import UserWelcomeHeader from "../shared/UserWelcomeHeader";
 import useGroupContentData from "../GroupContent/hooks/useGroupContentData";
 import useResourcesData from "./hooks/useResourcesData";
 import ResourcesTable from "./components/ResourcesTable";
+import ResourcesLinksModal from "./components/ResourcesLinksModal";
 import Select from "react-select";
 import { smartToast } from "../../../utils/toastManager";
 
@@ -10,9 +11,10 @@ const ResourcesPage = () => {
     const [currentUser, setCurrentUser] = useState(null);
     const fileInputRef = useRef(null);
     const [selectedContent, setSelectedContent] = useState(null);
+    const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
 
     const { contents, fetchContents } = useGroupContentData();
-    const { addResource, deleteResource } = useResourcesData(fetchContents);
+    const { addResource, addLinkResource, deleteResource } = useResourcesData(fetchContents);
 
     useEffect(() => {
         const u = JSON.parse(localStorage.getItem('user'));
@@ -59,6 +61,28 @@ const ResourcesPage = () => {
         }
     };
 
+    const onLinksClick = () => {
+        // If super admin, require selecting a group content first
+        if (currentUser?.role === 'Super_Admin' && !selectedContent) {
+            smartToast.error('Please select a group content before adding links');
+            return;
+        }
+        setIsLinksModalOpen(true);
+    };
+
+    const handleLinkSubmit = async (link) => {
+        const meetingContentId = currentUser?.role === 'Super_Admin' ? selectedContent : (selectedContent || (contents.find(c=> c.administrator_id === currentUser?.id)?.id));
+        if (!meetingContentId) {
+            smartToast.error('No group content available to attach this link');
+            return;
+        }
+        try {
+            await addLinkResource(meetingContentId, link);
+        } catch (err) {
+            // handled in hook
+        }
+    };
+
     const contentOptions = (contents || []).map(c => ({ value: c.id, label: c.content_name }));
 
     return (
@@ -79,7 +103,7 @@ const ResourcesPage = () => {
                         onChange={(s) => setSelectedContent(s?.value || null)}
                         placeholder="Select group content..."
                         menuPortalTarget={document.body}
-                        styles={{ 
+                        styles={{
                             menuPortal: base => ({ ...base, zIndex: 9999 }),
                             control: (provided) => ({
                                 ...provided,
@@ -113,7 +137,7 @@ const ResourcesPage = () => {
                                 onChange={(s) => setSelectedContent(s?.value || null)}
                                 placeholder="Select your content..."
                                 menuPortalTarget={document.body}
-                                styles={{ 
+                                styles={{
                                     menuPortal: base => ({ ...base, zIndex: 9999 }),
                                     control: (provided) => ({
                                         ...provided,
@@ -141,7 +165,9 @@ const ResourcesPage = () => {
 
         <input ref={fileInputRef} type="file" style={{ display: 'none' }} onChange={handleFileChange} />
 
-        <ResourcesTable contents={contents} currentUser={currentUser} onUploadClick={onUploadClick} onDelete={handleDelete} selectedContentId={selectedContent} />
+        <ResourcesTable contents={contents} currentUser={currentUser} onUploadClick={onUploadClick} onLinksClick={onLinksClick} onDelete={handleDelete} selectedContentId={selectedContent} />
+
+        <ResourcesLinksModal isOpen={isLinksModalOpen} onClose={() => setIsLinksModalOpen(false)} onSubmit={handleLinkSubmit} loading={false} />
         </main>
     );
 };

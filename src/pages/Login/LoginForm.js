@@ -292,7 +292,7 @@ export default function LoginForm() {
 
 
                         <div className="mt-2">
-                            <SocialLoginButtons />
+                            <SocialLoginButtons role={formData.role}/>
                         </div>
                     </form>
                 </div>
