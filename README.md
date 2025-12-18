@@ -37,6 +37,7 @@ View the Figma design: [https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Fari
 ## 🛠 Tech Stack
 
 ### Frontend
+
 - **React 19.2.0**: Modern JavaScript library for building user interfaces
 - **React Router DOM 7.9.4**: Declarative routing for React applications
 - **Bootstrap 5.3.8**: Responsive CSS framework
@@ -48,6 +49,7 @@ View the Figma design: [https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Fari
 - **Lottie React 2.4.1**: Lottie animations for React
 
 ### Development Tools
+
 - **Create React App**: Build setup and development server
 - **ESLint**: Code linting
 - **Cross-env**: Cross-platform environment variable setting
@@ -63,23 +65,27 @@ View the Figma design: [https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Fari
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd meetza-admin
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Environment Setup**
    Create a `.env` file in the root directory and add your environment variables:
+
    ```env
    REACT_APP_API_BASE=https://meetza-backend.vercel.app/api
    ```
 
 4. **Start the development server**
+
    ```bash
    npm start
    ```
@@ -100,7 +106,8 @@ View the Figma design: [https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Fari
 The application uses Axios for API communication. The base URL is configured in `src/utils/api.js`:
 
 ```javascript
-const API_BASE = process.env.REACT_APP_API_BASE || "https://meetza-backend.vercel.app/api";
+const API_BASE =
+  process.env.REACT_APP_API_BASE || "https://meetza-backend.vercel.app/api";
 ```
 
 ### Authentication
@@ -130,16 +137,19 @@ Protected routes are implemented using React Router with a `ProtectedRoute` comp
 ## 🎯 Key Components
 
 ### Dashboard Layout
+
 - Responsive sidebar navigation
 - Main content area with dynamic components
 - Toast notifications for user feedback
 
 ### Data Management
+
 - Custom hooks for API data fetching (`useUserData`, `useGroupData`, etc.)
 - Modal components for create/edit operations
 - Table components with pagination and search
 
 ### Forms and Validation
+
 - Reusable form input components
 - Custom validation hooks
 - Password visibility toggles

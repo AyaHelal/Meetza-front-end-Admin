@@ -33,7 +33,7 @@ export default function SignUpForm() {
     const handleToggleChange = (value) => {
         const isSignUpMode = value === 'signup';
         setIsSignUp(isSignUpMode);
-        navigate(isSignUpMode ? "/signup" : "/login");
+        navigate(isSignUpMode ? "/signup" : "/login", { replace: true });
     };
 
     const handleSubmit = (e) => {

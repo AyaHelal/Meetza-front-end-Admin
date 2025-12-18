@@ -1031,46 +1031,44 @@ const VideoDisplay = ({ currentUser }) => {
                             </div>
                             {/* Video Info */}
                             <div className="card-body my-3">
-                                <div className="d-flex align-items-center mb-3 ps-3 p-2  bg-light  shadow-sm width-850
-                        " style={{
+                                <div className="d-flex align-items-center justify-content-between mb-3 ps-3 p-2 bg-light shadow-sm width-850" style={{
                                         fontSize: "14px",
-                                        borderRadius: "24px"
+                                        borderRadius: "24px",
+                                        flexWrap: "wrap",
+                                        gap: "0.5rem"
                                     }}>
-                                    <span>URL:</span>
-                                    <input
-                                        type="text"
-                                        className="form-control form-control-sm border-0 bg-transparent input-custom-width"
-                                        value={buildFileUrl(currentVideo.video_url) || ''}
-                                        readOnly
-                                        style={{
-                                            overflow: "hidden"
-                                            , width: "400px"
-                                        }}
-                                    />
-                                    <button className="btn rounded-3 btn-sm ms-2 me-4 p-1 fw-semibold"
-                                        style={{ backgroundColor: "#00DC85", color: "#ffffff" }}
-                                        onClick={() => navigator.clipboard.writeText(buildFileUrl
-                                            (currentVideo.video_url) || '')}>Copy</button>
-                                    <button className='btn rounded-5 p-1 btn-sm' style={{ backgroundColor: "#E6E0E0", color: "#000000" }}>
-                                        <span className='m-1'>{likeCounts[currentVideo._id || currentVideo.id]?.dislike || 0}</span>
-                                        <ThumbsDown size={24} />
-
-
-                                    </button>
-                                    <button className='btn rounded-5 p-1 btn-sm mx-2' style={{ backgroundColor: "#E6E0E0", color: "#000000" }}>
-                                        <span className='m-1'>{likeCounts[currentVideo._id || currentVideo.id]?.like || 0}</span>
-                                        <HeartStraight size={24} />
-
-
-
-                                    </button>
-                                    <button className='btn rounded-5 p-1 btn-sm' style={{ backgroundColor: "#E6E0E0", color: "#000000" }}>
-                                        <span className='m-1'>{currentVideo.commentCount || 0}</span>
-                                        <ChatTeardropDots size={24} />
-
-
-
-                                    </button>
+                                    <div className="d-flex align-items-center flex-grow-1" style={{ minWidth: "200px", flexWrap: "wrap", gap: "0.5rem" }}>
+                                        <span>URL:</span>
+                                        <input
+                                            type="text"
+                                            className="form-control form-control-sm border-0 bg-transparent input-custom-width"
+                                            value={buildFileUrl(currentVideo.video_url) || ''}
+                                            readOnly
+                                            style={{
+                                                overflow: "hidden",
+                                                width: "400px",
+                                                maxWidth: "100%"
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="d-flex align-items-center" style={{ marginLeft: "auto", flexWrap: "nowrap", gap: "0.5rem" }}>
+                                        <button className="btn rounded-3 btn-sm p-1 fw-semibold"
+                                            style={{ backgroundColor: "#00DC85", color: "#ffffff" }}
+                                            onClick={() => navigator.clipboard.writeText(buildFileUrl
+                                                (currentVideo.video_url) || '')}>Copy</button>
+                                        <button className='btn rounded-5 p-1 btn-sm' style={{ backgroundColor: "#E6E0E0", color: "#000000" }}>
+                                            <span className='m-1'>{likeCounts[currentVideo._id || currentVideo.id]?.dislike || 0}</span>
+                                            <ThumbsDown size={24} />
+                                        </button>
+                                        <button className='btn rounded-5 p-1 btn-sm' style={{ backgroundColor: "#E6E0E0", color: "#000000" }}>
+                                            <span className='m-1'>{likeCounts[currentVideo._id || currentVideo.id]?.like || 0}</span>
+                                            <HeartStraight size={24} />
+                                        </button>
+                                        <button className='btn rounded-5 p-1 btn-sm' style={{ backgroundColor: "#E6E0E0", color: "#000000" }}>
+                                            <span className='m-1'>{currentVideo.commentCount || 0}</span>
+                                            <ChatTeardropDots size={24} />
+                                        </button>
+                                    </div>
                                 </div>
 
                             </div>
@@ -1229,12 +1227,21 @@ const VideoDisplay = ({ currentUser }) => {
                         </div>
                         <div className="card-body p-2 videos-sidebar-scroll" style={{ maxHeight: showUploadModal ? '800px' : 'calc(800px - 80px)', overflowY: 'auto' }}>
                             {videos.length > 0 ? (
-                                videos.map((video) => (
+                                videos.map((video) => {
+                                    const videoId = video._id || video.id;
+                                    const currentVideoId = currentVideo?._id || currentVideo?.id;
+                                    const isSelected = currentVideo && videoId === currentVideoId;
+                                    
+                                    return (
                                     <div
-                                        key={video._id || video.id}
-                                        className={`d-flex align-items-center bg-white shadow-sm p-2 mb-2 rounded ${currentVideo?._id === video._id || currentVideo?.id === video.id ? 'bg-light' : ''}`}
+                                        key={videoId}
+                                        className="d-flex align-items-center shadow-sm p-2 mb-2 rounded"
                                         onClick={() => handleVideoSelect(video)}
-                                        style={{ cursor: 'pointer' }}
+                                        style={{ 
+                                            cursor: 'pointer',
+                                            backgroundColor: isSelected ? '#0076EA' : '#ffffff',
+                                            transition: 'background-color 0.2s ease'
+                                        }}
                                     >
                                         <img
                                             src={buildFileUrl(video.poster_url) || 'https://via.placeholder.com/80x60?text=No+Poster'}
@@ -1243,8 +1250,8 @@ const VideoDisplay = ({ currentUser }) => {
                                             style={{ width: '70px', height: '70px', objectFit: 'cover' }}
                                         />
                                         <div className="flex-grow-1 ms-3">
-                                            <h6 className="mb-1 small">{video.title}</h6>
-                                            <p className="mb-0 text-muted small"> {formatDate(video.date_recorded)}</p>
+                                            <h6 className="mb-1 small" style={{ color: isSelected ? '#ffffff' : 'inherit' }}>{video.title}</h6>
+                                            <p className="mb-0 small" style={{ color: isSelected ? '#ffffff' : '#6c757d' }}> {formatDate(video.date_recorded)}</p>
                                         </div>
                                         <div className="d-flex gap-1 ">
                                             <button
@@ -1273,7 +1280,8 @@ const VideoDisplay = ({ currentUser }) => {
 
                                         </div>
                                     </div>
-                                ))
+                                    );
+                                })
                             ) : (
                                 <div className="text-center text-muted p-4">
                                     <p className="mb-0">No videos available</p>
