@@ -411,3 +411,53 @@ small {
   display: none !important;
   scrollbar-color: #c5c6c6 transparent;
 }
+
+/* Ensure like/dislike/comment buttons stay on the right */
+@media (max-width: 768px) {
+  /* Make buttons smaller on mobile */
+  .width-850 .btn-sm {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Make icons smaller */
+  .width-850 .btn-sm svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* Ensure buttons container stays on right */
+  .width-850 > div > div[style*="margin-left: auto"] {
+    margin-left: auto !important;
+    margin-top: 0.5rem;
+  }
+
+  /* Adjust input width on mobile */
+  .input-custom-width {
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 200px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Make buttons even smaller */
+  .width-850 .btn-sm {
+    padding: 0.2rem 0.4rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* Make icons even smaller */
+  .width-850 .btn-sm svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* Ensure buttons container stays on right */
+  .width-850 > div > div[style*="margin-left: auto"] {
+    margin-left: auto !important;
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

@@ -36,7 +36,7 @@ export default function LoginForm() {
     const handleToggleChange = (value) => {
         const isLoginMode = value === 'login';
         setIsLogin(isLoginMode);
-        navigate(isLoginMode ? "/login" : "/signup");
+        navigate(isLoginMode ? "/login" : "/signup", { replace: true });
     };
 
     const handleSubmit = (e) => {
