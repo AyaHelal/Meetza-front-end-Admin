@@ -8,6 +8,14 @@
   }
 }
 
+/* 1440x900 screens - align table bottom with navbar/sidebar bottom */
+@media (width: 1440px) and (height: 900px) {
+  .user-table-container {
+    height: 580px !important;
+    max-height: 580px !important;
+  }
+}
+
 .user-table-container::-webkit-scrollbar-button {
   display: none;
 }

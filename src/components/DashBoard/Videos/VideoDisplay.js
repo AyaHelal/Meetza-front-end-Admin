@@ -37,6 +37,17 @@ const VideoDisplay = ({ currentUser }) => {
     });
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [is1440x900, setIs1440x900] = useState(false);
+
+    // Check screen size for 1440x900
+    useEffect(() => {
+        const checkScreenSize = () => {
+            setIs1440x900(window.innerWidth === 1440 && window.innerHeight === 900);
+        };
+        checkScreenSize();
+        window.addEventListener('resize', checkScreenSize);
+        return () => window.removeEventListener('resize', checkScreenSize);
+    }, []);
 
     // Fetch videos from API
     useEffect(() => {
@@ -1034,10 +1045,14 @@ const VideoDisplay = ({ currentUser }) => {
                                 <div className="d-flex align-items-center justify-content-between mb-3 ps-3 p-2 bg-light shadow-sm width-850" style={{
                                         fontSize: "14px",
                                         borderRadius: "24px",
-                                        flexWrap: "wrap",
+                                        flexWrap: is1440x900 ? "nowrap" : "wrap",
                                         gap: "0.5rem"
                                     }}>
-                                    <div className="d-flex align-items-center flex-grow-1" style={{ minWidth: "200px", flexWrap: "wrap", gap: "0.5rem" }}>
+                                    <div className="d-flex align-items-center flex-grow-1" style={{ 
+                                        minWidth: "200px", 
+                                        flexWrap: is1440x900 ? "nowrap" : "wrap", 
+                                        gap: "0.5rem" 
+                                    }}>
                                         <span>URL:</span>
                                         <input
                                             type="text"
@@ -1046,7 +1061,7 @@ const VideoDisplay = ({ currentUser }) => {
                                             readOnly
                                             style={{
                                                 overflow: "hidden",
-                                                width: "400px",
+                                                width: is1440x900 ? "280px" : "400px",
                                                 maxWidth: "100%"
                                             }}
                                         />

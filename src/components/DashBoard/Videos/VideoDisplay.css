@@ -17,6 +17,33 @@
   }
 }
 
+/* 1440x900 screens - keep URL, copy, like, dislike on same line */
+@media (width: 1440px) and (height: 900px) {
+  /* Override inline flexWrap style - target the container directly */
+  .width-850.bg-light.shadow-sm {
+    flex-wrap: nowrap !important;
+  }
+  
+  /* Adjust input width to fit on same line */
+  .width-850.bg-light.shadow-sm .input-custom-width {
+    width: 280px !important;
+    max-width: 280px !important;
+    min-width: 150px !important;
+  }
+  
+  /* Ensure URL container doesn't wrap */
+  .width-850.bg-light.shadow-sm > .d-flex.flex-grow-1 {
+    flex-wrap: nowrap !important;
+    min-width: 0 !important;
+  }
+  
+  /* Ensure input width in inline style is overridden */
+  .width-850.bg-light.shadow-sm .input-custom-width[style*="width"] {
+    width: 280px !important;
+    max-width: 280px !important;
+  }
+}
+
 .comment_scrollbar_height::-webkit-scrollbar-button {
   display: none;
 }
