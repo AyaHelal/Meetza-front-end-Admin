@@ -213,8 +213,7 @@ export default function SignUpForm() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: 0.3 }}
                     >
-
-                        <SocialLoginButtons />
+                        <SocialLoginButtons role="Administrator" redirectUrl={`${window.location.origin}/dashboard`}/>
                     </motion.div>
                 </form>
             </div>

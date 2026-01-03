@@ -1,12 +1,20 @@
 import axios from "axios";
 
-const API_BASE = process.env.REACT_APP_API_BASE || "https://meetza-backend.vercel.app/api";
+const API_BASE = process.env.REACT_APP_API_BASE;
+
+// Debug: Log the API base URL (remove in production if needed)
+if (!API_BASE) {
+    console.warn("⚠️ REACT_APP_API_BASE is not set in .env file!");
+} else {
+    console.log("✅ API Base URL:", API_BASE);
+}
 
 export const api = axios.create({
     baseURL: API_BASE,
     headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        "ngrok-skip-browser-warning": "true", // Required for ngrok free tier
     },
 });
 
@@ -15,22 +23,27 @@ api.interceptors.request.use((config) => {
         const token = localStorage.getItem("authToken");
         const locale = localStorage.getItem("locale") || navigator.language?.slice(0, 2) || "en";
 
+        // Ensure ngrok header is always present
+        config.headers = config.headers || {};
+        config.headers["ngrok-skip-browser-warning"] = "true";
+
         // If data is FormData and Content-Type is not explicitly set, remove default JSON Content-Type
         // to let axios set it automatically with boundary
         if (config.data instanceof FormData) {
-            if (config.headers && config.headers['Content-Type'] === 'application/json') {
+            if (config.headers['Content-Type'] === 'application/json') {
                 delete config.headers['Content-Type'];
             }
         }
 
         if (token) {
-            config.headers = config.headers || {};
             config.headers.Authorization = `Bearer ${token}`;
         }
         if (locale) {
-            config.headers = config.headers || {};
             config.headers["X-localization"] = locale;
         }
+
+        // Debug: Log the full request URL
+        console.log("🌐 API Request:", config.method?.toUpperCase(), config.baseURL + config.url);
     } catch (_) {
         // ignore
     }
@@ -59,16 +72,20 @@ api.interceptors.response.use(
         }
         // Log other errors for debugging
         if (error.response) {
-            console.error("API Error:", {
+            console.error("❌ API Error:", {
                 status: error.response.status,
                 statusText: error.response.statusText,
                 data: error.response.data,
-                url: error.config?.url,
+                url: error.config?.baseURL + error.config?.url,
+                headers: error.config?.headers,
             });
         } else if (error.request) {
-            console.error("Network Error:", error.request);
+            console.error("❌ Network Error - No response received:", {
+                url: error.config?.baseURL + error.config?.url,
+                message: error.message,
+            });
         } else {
-            console.error("Error:", error.message);
+            console.error("❌ Request Setup Error:", error.message);
         }
         return Promise.reject(error);
     }
