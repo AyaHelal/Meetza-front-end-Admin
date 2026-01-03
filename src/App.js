@@ -12,10 +12,45 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import PageLoader from './components/PageLoader/PageLoader';
 import { useState, useEffect } from "react";
 
-// Protected route component
+// Protected route component - only allows Super_Admin and Administrator roles
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('authToken');
-  return token ? children : <Navigate to="/login" replace />;
+  const userStr = localStorage.getItem('user');
+  
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Check user role - only allow Super_Admin and Administrator
+  if (userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      const userRole = user.role || localStorage.getItem('userRole') || '';
+      const normalizedRole = userRole.toLowerCase();
+      
+      // Block members from accessing dashboard
+      if (normalizedRole === 'member') {
+        // Clear auth data and redirect to login with error message
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('userRole');
+        return <Navigate to="/login?error=access_denied" replace />;
+      }
+      
+      // Allow Super_Admin, Administrator, and Super Admin (case variations)
+      const allowedRoles = ['super_admin', 'administrator', 'super admin'];
+      if (!allowedRoles.includes(normalizedRole)) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('userRole');
+        return <Navigate to="/login?error=access_denied" replace />;
+      }
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+    }
+  }
+
+  return children;
 }
 
 function AnimatedRoutes() {
@@ -33,14 +68,43 @@ function AnimatedRoutes() {
     if (token && user) {
       try {
         const userData = JSON.parse(decodeURIComponent(user));
+        const userRole = userData.role || '';
+        const normalizedRole = userRole.toLowerCase();
+        
         localStorage.setItem('authToken', token);
         localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('userRole', userRole);
+        if (userData.name) {
+          localStorage.setItem('userName', userData.name);
+        }
+        
         // Clean up URL
         navigate(location.pathname, { replace: true });
-        // Navigate to dashboard
-        navigate('/dashboard');
+        
+        // Check role - only allow Super_Admin and Administrator to access dashboard
+        if (normalizedRole === 'member') {
+          // Clear auth data and redirect to login with error
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          localStorage.removeItem('userRole');
+          navigate('/login?error=member_access_denied', { replace: true });
+          return;
+        }
+        
+        // Allow Super_Admin, Administrator, and Super Admin
+        const allowedRoles = ['super_admin', 'administrator', 'super admin'];
+        if (allowedRoles.includes(normalizedRole)) {
+          navigate('/dashboard', { replace: true });
+        } else {
+          // Unknown role - deny access
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          localStorage.removeItem('userRole');
+          navigate('/login?error=access_denied', { replace: true });
+        }
       } catch (error) {
         console.error('Error parsing social login data:', error);
+        navigate('/login?error=parse_error', { replace: true });
       }
     }
   }, [location.search, navigate]);
@@ -49,13 +113,34 @@ function AnimatedRoutes() {
     // Check for remember me token on app load
     const rememberMe = localStorage.getItem('rememberMe') === 'true';
     const token = localStorage.getItem('authToken');
+    const userStr = localStorage.getItem('user');
 
     if (rememberMe && token && location.pathname === '/login') {
-      // Auto-redirect to dashboard if remember me is enabled and token exists
-      // Delay slightly to allow state to settle
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 100);
+      // Check user role before auto-redirecting
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          const userRole = user.role || localStorage.getItem('userRole') || '';
+          const normalizedRole = userRole.toLowerCase();
+          
+          // Only auto-redirect if user has admin role
+          const allowedRoles = ['super_admin', 'administrator', 'super admin'];
+          if (allowedRoles.includes(normalizedRole)) {
+            // Delay slightly to allow state to settle
+            setTimeout(() => {
+              window.location.href = '/dashboard';
+            }, 100);
+          } else {
+            // Clear invalid credentials
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('rememberMe');
+          }
+        } catch (error) {
+          console.error('Error parsing user data for auto-login:', error);
+        }
+      }
     }
 
     setAutoLoginAttempted(true);

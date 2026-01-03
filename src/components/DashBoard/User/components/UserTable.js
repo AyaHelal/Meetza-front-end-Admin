@@ -55,7 +55,7 @@ export const UserTable = ({
         </tbody>
       </table>
 
-      <style jsx>{`
+      <style>{`
   
     .table-header-sticky th {
       position: sticky;

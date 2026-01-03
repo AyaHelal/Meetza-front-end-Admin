@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Envelope, Password, Eye, EyeSlash } from "phosphor-react";
 import { motion } from "framer-motion";
-import axios from "axios";
+import api from "../../utils/api";
 import { FormInput, ToggleButton, LogoSection } from "../../components";
 import SocialLoginButtons from "../../components/common/SocialLoginButtons";
 import { useFormValidation, usePasswordVisibility } from "../../hooks";
@@ -13,6 +13,7 @@ import "./LoginForm.css";
 export default function LoginForm() {
     const [isLogin, setIsLogin] = useState(true);
     const navigate = useNavigate();
+    const location = useLocation();
     const [isLoading, setIsLoading] = useState(false);
     const [selectedRole, setSelectedRole] = useState('Super_Admin');
     const [apiError, setApiError] = useState("");
@@ -43,6 +44,37 @@ export default function LoginForm() {
         e.preventDefault();
         handleFormSubmission();
     };
+
+    // Check for error messages from URL params (e.g., member access denied)
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const errorParam = searchParams.get('error');
+        
+        if (errorParam) {
+            let errorMessage = '';
+            
+            if (errorParam === 'member_access_denied') {
+                errorMessage = 'Access denied: Members cannot access the admin dashboard. Please use the member portal instead.';
+            } else if (errorParam === 'access_denied') {
+                errorMessage = 'Access denied: You do not have permission to access the admin dashboard.';
+            } else if (errorParam === 'parse_error') {
+                errorMessage = 'An error occurred during authentication. Please try again.';
+            }
+            
+            if (errorMessage) {
+                // Set error message
+                setApiError(errorMessage);
+                
+                // Clean up URL after a delay to ensure error is visible
+                setTimeout(() => {
+                    const newSearchParams = new URLSearchParams(location.search);
+                    newSearchParams.delete('error');
+                    const newSearch = newSearchParams.toString();
+                    navigate(`${location.pathname}${newSearch ? '?' + newSearch : ''}`, { replace: true });
+                }, 500);
+            }
+        }
+    }, [location.search, location.pathname, navigate]);
 
     // Render reCAPTCHA when showCaptcha changes
     useEffect(() => {
@@ -133,7 +165,7 @@ export default function LoginForm() {
                 ...(captchaToken && { recaptchaToken: captchaToken })
             };
 
-            const response = await axios.post('https://meetza-backend.vercel.app/api/auth/login', requestData);
+            const response = await api.post('/auth/login', requestData);
 
             if (response?.data?.data?.token) {
                 localStorage.setItem('authToken', response?.data?.data?.token);
@@ -292,7 +324,7 @@ export default function LoginForm() {
 
 
                         <div className="mt-2">
-                            <SocialLoginButtons role={formData.role}/>
+                            <SocialLoginButtons role={selectedRole} redirectUrl={`${window.location.origin}/dashboard`}/>
                         </div>
                     </form>
                 </div>
