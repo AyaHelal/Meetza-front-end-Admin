@@ -7,25 +7,31 @@
   padding-top: 28%;
 }
 
+.forgot-password-container1 {
+  justify-content: center;
+  align-items: center;
+margin-top: 5rem;
+}
+
 /* Medium laptops (1025px - 1440px) - Reduce padding to prevent scroll */
 @media (min-width: 1025px) and (max-width: 1440px) {
   .p-8 {
     padding-top: 3% !important;
     margin-top: 3.5rem !important; /* Add space between logo and Welcome Back */
   }
-  
+
   /* Remove ALL padding and spacing on image container like large screens */
   .container-fluid {
     padding-right: 0 !important;
     padding-left: 0.75rem !important;
   }
-  
+
   .container-fluid .row {
     margin-right: 0 !important;
     margin-left: 0 !important;
     --bs-gutter-x: 0 !important;
   }
-  
+
   .container-fluid .row .col-lg-6:last-child,
   .container-fluid .row .col-lg-6.d-none.d-lg-flex,
   .container-fluid .row .col-lg-6.d-none.d-lg-flex.justify-content-center,
@@ -428,6 +434,7 @@ input[type="password"]::-webkit-contacts-auto-fill-button {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    justify-content: center;
   }
 
   .container-fluid .row {
@@ -466,6 +473,11 @@ input[type="password"]::-webkit-contacts-auto-fill-button {
     min-height: 100vh;
     display: flex;
     align-items: center;
+  }
+
+  .forgot-password-container{
+    margin-top: 10rem;
+
   }
 
   /* Center the form column vertically on mobile */
@@ -719,4 +731,5 @@ input[type="password"]::-webkit-contacts-auto-fill-button {
   h2 {
     font-size: 20px !important;
   }
+
 }
