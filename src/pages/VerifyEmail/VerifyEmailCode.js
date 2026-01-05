@@ -110,6 +110,7 @@ export default function VerifyEmailCode() {
     };
 
     return (
+        <div className="forgot-password-container1">
         <motion.div
             className="align-items-center text-center"
             initial={{ opacity: 0, x: 100 }}
@@ -173,5 +174,6 @@ export default function VerifyEmailCode() {
                 </button>
             </div>
         </motion.div>
+        </div>
     );
 }

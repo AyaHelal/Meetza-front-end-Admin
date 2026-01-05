@@ -15,7 +15,7 @@ export default function LoginForm() {
     const navigate = useNavigate();
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedRole, setSelectedRole] = useState('Super_Admin');
+    const [selectedRole, setSelectedRole] = useState('');
     const [apiError, setApiError] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
     const [showCaptcha, setShowCaptcha] = useState(false);
@@ -49,10 +49,10 @@ export default function LoginForm() {
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
         const errorParam = searchParams.get('error');
-        
+
         if (errorParam) {
             let errorMessage = '';
-            
+
             if (errorParam === 'member_access_denied') {
                 errorMessage = 'Access denied: Members cannot access the admin dashboard. Please use the member portal instead.';
             } else if (errorParam === 'access_denied') {
@@ -60,11 +60,11 @@ export default function LoginForm() {
             } else if (errorParam === 'parse_error') {
                 errorMessage = 'An error occurred during authentication. Please try again.';
             }
-            
+
             if (errorMessage) {
                 // Set error message
                 setApiError(errorMessage);
-                
+
                 // Clean up URL after a delay to ensure error is visible
                 setTimeout(() => {
                     const newSearchParams = new URLSearchParams(location.search);

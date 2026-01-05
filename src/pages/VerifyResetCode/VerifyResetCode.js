@@ -105,7 +105,7 @@ export default function VerifyResetCode() {
     };
 
     return (
-        <div className="container-fluid">
+        <div className=" forgot-password-container1 forgot-password-container" >
             <div className="row py-2">
                 <motion.div
                     className="col-md d-flex justify-content-center align-items-center"

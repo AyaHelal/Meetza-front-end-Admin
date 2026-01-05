@@ -906,7 +906,7 @@ const VideoDisplay = ({ currentUser }) => {
                                                     {/* Poster File */}
                                                     <div className="mb-3">
                                                         <label className="form-label fw-semibold" style={{ color: "#888888", fontSize: "18px" }}>
-                                                            Poster Image
+                                                            Poster Image <span style={{ color: "#FF0000" }}>*</span>
                                                         </label>
                                                         <input
                                                             type="file"
@@ -1048,10 +1048,10 @@ const VideoDisplay = ({ currentUser }) => {
                                         flexWrap: is1440x900 ? "nowrap" : "wrap",
                                         gap: "0.5rem"
                                     }}>
-                                    <div className="d-flex align-items-center flex-grow-1" style={{ 
-                                        minWidth: "200px", 
-                                        flexWrap: is1440x900 ? "nowrap" : "wrap", 
-                                        gap: "0.5rem" 
+                                    <div className="d-flex align-items-center flex-grow-1" style={{
+                                        minWidth: "200px",
+                                        flexWrap: is1440x900 ? "nowrap" : "wrap",
+                                        gap: "0.5rem"
                                     }}>
                                         <span>URL:</span>
                                         <input
@@ -1246,13 +1246,13 @@ const VideoDisplay = ({ currentUser }) => {
                                     const videoId = video._id || video.id;
                                     const currentVideoId = currentVideo?._id || currentVideo?.id;
                                     const isSelected = currentVideo && videoId === currentVideoId;
-                                    
+
                                     return (
                                     <div
                                         key={videoId}
                                         className="d-flex align-items-center shadow-sm p-2 mb-2 rounded"
                                         onClick={() => handleVideoSelect(video)}
-                                        style={{ 
+                                        style={{
                                             cursor: 'pointer',
                                             backgroundColor: isSelected ? '#0076EA' : '#ffffff',
                                             transition: 'background-color 0.2s ease'

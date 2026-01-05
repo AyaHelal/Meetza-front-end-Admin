@@ -39,6 +39,7 @@ const SocialLoginButtons = ({ role, redirectUrl }) => {
                         onClick={handleGoogleLogin}
                         style={{
                             backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            color: '#212529',
                             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                             fontSize: '1rem',
                             fontWeight: '500',
