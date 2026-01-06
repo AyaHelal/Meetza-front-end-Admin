@@ -9,7 +9,7 @@ import ModalComponent from "./ModalComponent";
 import "./UserMainComponent.css";
 
 const UserMainContent = ({ currentUser }) => {
-    const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator" || (currentUser?.role || "").toLowerCase() === "super_admin";
+    const isSuperAdmin = (currentUser?.role || "").toLowerCase() === "super_admin";
 
     const {
         users,
@@ -82,6 +82,7 @@ const UserMainContent = ({ currentUser }) => {
     };
 
     const handleSearchChange = (query) => {
+        if (!isSuperAdmin) return; // Prevent search if not super admin
         console.log("query", query);
         setSearchQuery(query);
         if (query.trim() === "") {
@@ -106,11 +107,13 @@ const UserMainContent = ({ currentUser }) => {
                             <h2 className="h5 mb-0 fw-semibold" style={{ fontSize: "24px" }}>User Management</h2>
 
                         </div>
-                        <SearchBar
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                            placeholder="Search by name..."
-                        />
+                        {isSuperAdmin && (
+                            <SearchBar
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                                placeholder="Search by name..."
+                            />
+                        )}
                     </div>
 
                     <UserTable
@@ -119,7 +122,7 @@ const UserMainContent = ({ currentUser }) => {
                         error={error}
                         onEdit={openEditModal}
                         onDelete={handleDeleteUser}
-                        isAdmin={isAdmin}
+                        isAdmin={isSuperAdmin}
                     />
                 </div>
             </div>
