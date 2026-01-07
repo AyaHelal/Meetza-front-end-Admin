@@ -30,7 +30,7 @@ export const useGroupMembershipData = (currentUser = null) => {
       try {
         // Try to get all memberships in a flat format (some APIs support this)
         // Try multiple approaches to get flat structure with IDs
-        const flatRes = await api.get("/group-membership/all"); // Some backends have /all endpoint
+        const flatRes = await api.get("/group-membership"); // Some backends have /all endpoint
         if (flatRes.data && Array.isArray(flatRes.data) && flatRes.data.length > 0) {
           const flatData = Array.isArray(flatRes.data) ? flatRes.data : flatRes.data?.data || [];
           if (flatData.length > 0 && flatData[0].id && flatData[0].group_id && flatData[0].member_id) {
