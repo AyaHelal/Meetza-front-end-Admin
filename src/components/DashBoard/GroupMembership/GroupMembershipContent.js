@@ -10,6 +10,7 @@ import { PlusCircle } from "phosphor-react";
 import Select from 'react-select';
 import "../User/UserMainComponent.css";
 import { ArrowLeft } from "phosphor-react";
+import api from "../../../utils/api";
 const GroupMembershipContent = ({ currentUser }) => {
     const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator" || (currentUser?.role || "").toLowerCase() === "super_admin";
 
@@ -71,25 +72,36 @@ const GroupMembershipContent = ({ currentUser }) => {
         }
 
         try {
-            // Find the member by email to get their user_id from member table
-            const selectedMember = users.find((m) =>
-                m.email && m.email.trim().toLowerCase() === formData.member_email.trim().toLowerCase()
-            );
+            // First, call API to get user by email
+            const email = encodeURIComponent(formData.member_email.trim());
+            const response = await api.get(`/user/email/${email}`);
+            const userData = response.data;
 
-            if (!selectedMember) {
+            if (!userData || !userData.id) {
                 toast.error("Member with this email not found. Please check the email address.");
                 return;
             }
 
-            // Use user_id from member table (required by foreign key constraint)
-            const memberId = selectedMember.user_id || selectedMember.id;
+            // Check if the user is a Member
+            if (userData.role !== "Member" && userData.role !== "member") {
+                toast.error("This user is not a Member. Only members can be added to groups.");
+                return;
+            }
+
+            // Use the id from the API response
+            const memberId = userData.id;
 
             await createMembership(formData.group_id, memberId);
             toast.success("Group membership created successfully");
             setShowForm(false);
+            setFormData({ group_id: "", member_email: "" });
         } catch (error) {
-            const msg = error?.response?.data?.message || error.message || "Failed to create group membership";
-            toast.error(msg);
+            if (error?.response?.status === 404) {
+                toast.error("Member with this email not found. Please check the email address.");
+            } else {
+                const msg = error?.response?.data?.message || error.message || "Failed to create group membership";
+                toast.error(msg);
+            }
         }
     };
 
