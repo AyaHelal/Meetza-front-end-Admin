@@ -46,7 +46,7 @@ export default function SignUpForm() {
         setApiError("");
         setIsLoading(true);
         try {
-            const response = await axios.post('https://meetza-backend.vercel.app/api/auth/register', {
+            const response = await axios.post('https://hulda-unglutted-curably.ngrok-free.dev/api/auth/register', {
                 name: formData.name,
                 password: formData.password,
                 email: formData.email,

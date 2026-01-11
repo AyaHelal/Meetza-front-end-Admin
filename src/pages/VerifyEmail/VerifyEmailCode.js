@@ -51,7 +51,7 @@ export default function VerifyEmailCode() {
     const handleResend = async () => {
         try {
             setLoading(true);
-            const res = await axios.post("https://meetza-backend.vercel.app/api/auth/forgot-password", { email });
+            const res = await axios.post("https://hulda-unglutted-curably.ngrok-free.dev/api/auth/forgot-password", { email });
             alert(res.data.message || "Verification code resent!");
         } catch (err) {
             console.error(err);
@@ -77,7 +77,7 @@ export default function VerifyEmailCode() {
             console.log("Sending verification request:", { email, code: otp });
 
             const res = await axios.post(
-                "https://meetza-backend.vercel.app/api/auth/verify",
+                "https://hulda-unglutted-curably.ngrok-free.dev/apiauth/verify",
                 { email, code: otp },
                 { headers: { "Content-Type": "application/json" } }
             );
