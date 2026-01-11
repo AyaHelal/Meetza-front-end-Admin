@@ -80,7 +80,7 @@ export default function ResetPassword() {
 
         try {
             setLoading(true);
-            const response = await axios.post("https://meetza-backend.vercel.app/api/auth/reset_password", {
+            const response = await axios.post("https://hulda-unglutted-curably.ngrok-free.dev/api/auth/reset_password", {
                 email: email,
                 new_password: formData.newPassword,
                 is_verifyed: "true"
