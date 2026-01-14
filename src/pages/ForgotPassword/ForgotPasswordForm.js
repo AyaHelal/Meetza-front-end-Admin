@@ -5,7 +5,7 @@ import { LogoSection } from "../../components";
 import '../Login/LoginForm.css';
 import { FormInput } from "../../components";
 import { Envelope } from "phosphor-react";
-import apiCommon from "../../../../utils/api";
+import apiCommon from "../../utils/api";
 
 export default function ForgotPasswordForm() {
     const [email, setEmail] = useState("");

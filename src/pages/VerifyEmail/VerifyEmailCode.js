@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { LogoSection } from "../../components";
 import "../Login/LoginForm.css";
 import { useNavigate } from "react-router-dom";
-import apiCommon from "../../../../utils/api";
+import apiCommon from "../../utils/api";
 
 export default function VerifyEmailCode() {
     const [code, setCode] = useState(["", "", "", ""]);

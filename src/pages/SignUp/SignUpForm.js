@@ -8,7 +8,7 @@ import { useFormValidation, usePasswordVisibility } from "../../hooks";
 import { signupValidationRules } from "../../utils";
 import PasswordStrengthIndicator from "../../components/common/StrongPassword";
 import SocialLoginButtons from "../../components/common/SocialLoginButtons";
-import apiCommon from "../../../../utils/api";
+import apiCommon from "../../utils/api";
 
 export default function SignUpForm() {
     const [isSignUp, setIsSignUp] = useState(true);

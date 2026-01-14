@@ -5,7 +5,7 @@ import { LogoSection } from "../../components";
 import { usePasswordVisibility } from "../../hooks";
 import { Eye, EyeSlash } from "phosphor-react";
 import '../Login/LoginForm.css';
-import apiCommon from "../../../../utils/api";
+import apiCommon from "../../utils/api";
 
 export default function ResetPassword() {
     const [formData, setFormData] = useState({
