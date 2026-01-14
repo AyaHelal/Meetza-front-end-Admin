@@ -739,7 +739,7 @@ const VideoDisplay = ({ currentUser }) => {
     return (
         <div className="flex-fill ps-0" style={{ backgroundColor: '#f5f5f5', minHeight: '100vh', padding: '20px' }}>
             <style>{`
-               .video-main-col {
+            .video-main-col {
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
@@ -766,7 +766,7 @@ const VideoDisplay = ({ currentUser }) => {
 
     transform-origin: top left;
 
-   }
+}
 
 
 @media (max-height: 800px) {

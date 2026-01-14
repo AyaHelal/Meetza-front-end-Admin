@@ -62,12 +62,11 @@ import apiCommon from "../../../../utils/api";
         try {
         const currentUser = JSON.parse(localStorage.getItem('user'));
 
-        // استخدم group_id من payload لو موجود أو خذ أول group_id من groups (fetch all groups)
         let groupId = data.group_id || (meetings.length > 0 ? meetings[0].group_id : null);
 
         if (!groupId) {
             try {
-                    const groupsRes = await apiCommon.get('/group');
+                const groupsRes = await apiCommon.get('/group');
                 const allGroups = Array.isArray(groupsRes.data) ? groupsRes.data : groupsRes.data?.data || [];
                 groupId = allGroups[0]?.id || null;
             } catch (e) {

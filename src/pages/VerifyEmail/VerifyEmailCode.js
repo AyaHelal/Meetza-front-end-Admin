@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
 import { LogoSection } from "../../components";
 import "../Login/LoginForm.css";
 import { useNavigate } from "react-router-dom";
+import apiCommon from "../../../../utils/api";
 
 export default function VerifyEmailCode() {
     const [code, setCode] = useState(["", "", "", ""]);
@@ -51,7 +51,7 @@ export default function VerifyEmailCode() {
     const handleResend = async () => {
         try {
             setLoading(true);
-            const res = await axios.post("https://hulda-unglutted-curably.ngrok-free.dev/api/auth/forgot-password", { email });
+            const res = await apiCommon.post("/auth/forgot-password", { email });
             alert(res.data.message || "Verification code resent!");
         } catch (err) {
             console.error(err);
@@ -76,8 +76,8 @@ export default function VerifyEmailCode() {
             setLoading(true);
             console.log("Sending verification request:", { email, code: otp });
 
-            const res = await axios.post(
-                "https://hulda-unglutted-curably.ngrok-free.dev/apiauth/verify",
+            const res = await apiCommon.post(
+                "/auth/verify",
                 { email, code: otp },
                 { headers: { "Content-Type": "application/json" } }
             );

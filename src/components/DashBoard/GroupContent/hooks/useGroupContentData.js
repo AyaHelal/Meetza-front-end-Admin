@@ -108,28 +108,28 @@ export default function useGroupContentData() {
 
     // Update content including group assignment
     const updateContent = async (id, updatedData) => {
-  try {
-    const oldContent = contents.find(c => c.id === id);
-    if (!oldContent) return;
+    try {
+        const oldContent = contents.find(c => c.id === id);
+        if (!oldContent) return;
 
-    const payload = {};
-    if (updatedData.content_name !== undefined) payload.content_name = updatedData.content_name;
-    if (updatedData.content_description !== undefined) payload.content_description = updatedData.content_description;
-    if (updatedData.group_id !== undefined) payload.group_id = updatedData.group_id;
+        const payload = {};
+        if (updatedData.content_name !== undefined) payload.content_name = updatedData.content_name;
+        if (updatedData.content_description !== undefined) payload.content_description = updatedData.content_description;
+        if (updatedData.group_id !== undefined) payload.group_id = updatedData.group_id;
 
-    if (Object.keys(payload).length === 0) {
-      smartToast.error("Nothing to update (group assignment cannot be changed here)");
-      return;
-    }
+        if (Object.keys(payload).length === 0) {
+        smartToast.error("Nothing to update (group assignment cannot be changed here)");
+        return;
+        }
 
     await apiCommon.put(`/group-contents/${id}`, payload);
 
     smartToast.success("Content updated successfully");
     await fetchContents();
-  } catch (err) {
-    console.error(err);
-    smartToast.error(err.response?.data?.message || "Error updating content");
-  }
+    } catch (err) {
+        console.error(err);
+        smartToast.error(err.response?.data?.message || "Error updating content");
+    }
 };
 
 

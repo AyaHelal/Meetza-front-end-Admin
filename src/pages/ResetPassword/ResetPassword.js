@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import axios from "axios";
 import { LogoSection } from "../../components";
 import { usePasswordVisibility } from "../../hooks";
 import { Eye, EyeSlash } from "phosphor-react";
 import '../Login/LoginForm.css';
+import apiCommon from "../../../../utils/api";
 
 export default function ResetPassword() {
     const [formData, setFormData] = useState({
@@ -80,7 +80,7 @@ export default function ResetPassword() {
 
         try {
             setLoading(true);
-            const response = await axios.post("https://hulda-unglutted-curably.ngrok-free.dev/api/auth/reset_password", {
+            const response = await apiCommon.post("/auth/reset_password", {
                 email: email,
                 new_password: formData.newPassword,
                 is_verifyed: "true"
