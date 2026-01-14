@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Envelope, User, Password, Eye, EyeSlash } from "phosphor-react";
 import { motion } from "framer-motion";
-import axios from "axios";
 import "../Login/LoginForm.css";
 import { FormInput, ToggleButton, LogoSection } from "../../components";
 import { useFormValidation, usePasswordVisibility } from "../../hooks";
 import { signupValidationRules } from "../../utils";
 import PasswordStrengthIndicator from "../../components/common/StrongPassword";
 import SocialLoginButtons from "../../components/common/SocialLoginButtons";
+import apiCommon from "../../utils/api";
 
 export default function SignUpForm() {
     const [isSignUp, setIsSignUp] = useState(true);
@@ -46,7 +46,7 @@ export default function SignUpForm() {
         setApiError("");
         setIsLoading(true);
         try {
-            const response = await axios.post('https://hulda-unglutted-curably.ngrok-free.dev/api/auth/register', {
+            const response = await apiCommon.post('/auth/register', {
                 name: formData.name,
                 password: formData.password,
                 email: formData.email,

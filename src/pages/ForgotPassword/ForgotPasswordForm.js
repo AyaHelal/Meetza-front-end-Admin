@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import axios from "axios";
 import { LogoSection } from "../../components";
 import '../Login/LoginForm.css';
 import { FormInput } from "../../components";
 import { Envelope } from "phosphor-react";
+import apiCommon from "../../utils/api";
 
 export default function ForgotPasswordForm() {
     const [email, setEmail] = useState("");
@@ -36,7 +36,7 @@ export default function ForgotPasswordForm() {
 
         try {
             setLoading(true);
-            const response = await axios.post("https://hulda-unglutted-curably.ngrok-free.dev/api/auth/forgot_password", {
+            const response = await apiCommon.post("/auth/forgot_password", {
                 email: email
             });
 
