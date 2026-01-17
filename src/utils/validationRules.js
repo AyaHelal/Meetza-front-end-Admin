@@ -18,7 +18,7 @@ export const nameValidation = {
     minLength: 3,
     minLengthMessage: "Name must be at least 3 characters",
     pattern: /^[a-zA-Z\s]+$/,
-    patternMessage: "Name can only contain letters, numbers, and spaces"
+    patternMessage: "Name can only contain letters, and spaces"
 };
 
 export const confirmPasswordValidation = {
