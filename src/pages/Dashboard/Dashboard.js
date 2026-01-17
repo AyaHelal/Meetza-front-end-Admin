@@ -78,12 +78,17 @@ const UserDashboard = () => {
             localStorage.removeItem('userName');
             localStorage.removeItem('userRole');
             localStorage.removeItem('remember');
+            localStorage.removeItem('rememberMe');
             sessionStorage.removeItem('authToken');
             sessionStorage.removeItem('user');
             sessionStorage.removeItem('userName');
             sessionStorage.removeItem('userRole');
         } catch (_) { /* ignore */ }
-        window.location.href = '/login';
+        // Replace current history entry and redirect to login
+        // This prevents back button from going back to dashboard
+        window.history.replaceState(null, '', '/login');
+        // Use location.replace instead of href to prevent adding to history
+        window.location.replace('/login');
     };
 
     return (
