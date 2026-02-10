@@ -18,7 +18,7 @@ export default function Meeting() {
     // modal state
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
-    const [modalData, setModalData] = useState({ title: '', datetime: '', status: 'Scheduled', group_id: '', id: null });
+    const [modalData, setModalData] = useState({ title: '', start_time: '', end_time: '', status: 'Scheduled', group_id: '', id: null });
 
     const { meetings, loading, error, addMeeting, updateMeeting, deleteMeeting, fetchMeetings, searchMeetings } = useMeetingData();
 
@@ -46,7 +46,8 @@ export default function Meeting() {
         setModalData({
             id: m?.id || null,
             title: m?.title || '',
-            datetime: m?.datetime || '',
+            start_time: m?.start_time || '',
+            end_time: m?.end_time || '',
             status: m?.status || 'Scheduled',
             group_id: m?.group_id || ''
         });
@@ -55,9 +56,8 @@ export default function Meeting() {
 
     const handleAdd = () => {
         setModalMode('create');
-        // Derive a group_id silently: prefer the first existing meeting's group_id, then the first fetched group
-        const derivedGroupId = meetings && meetings.length > 0 ? meetings[0].group_id : (groups && groups.length > 0 ? (groups[0].id || groups[0].group_id) : '');
-        setModalData({ title: '', datetime: '', status: 'Scheduled', group_id: derivedGroupId || '', id: null });
+        // Don't pre-select a group - user must choose
+        setModalData({ title: '', start_time: '', end_time: '', status: 'Scheduled', group_id: '', id: null });
         setModalOpen(true);
     };
 
@@ -78,7 +78,7 @@ export default function Meeting() {
     return (
         <main className="flex-fill">
         <UserWelcomeHeader userName={currentUser?.name || "User"} description="Welcome back! Manage your meetings efficiently." />
-        <MeetingTable meetings={meetings} loading={loading} error={error?.message} onSave={handleSave} onDelete={handleDelete} onEdit={handleEdit} onAdd={handleAdd} searchTerm={searchTerm} onSearchChange={handleSearch} addingNew={addingNew} editing={editing} currentUser={currentUser} />
+        <MeetingTable meetings={meetings} groups={groups} loading={loading} error={error?.message} onSave={handleSave} onDelete={handleDelete} onEdit={handleEdit} onAdd={handleAdd} searchTerm={searchTerm} onSearchChange={handleSearch} addingNew={addingNew} editing={editing} currentUser={currentUser} />
         {modalOpen && (
             <MeetingModal mode={modalMode} data={modalData} groups={groups} onChange={setModalData} onClose={closeModal} onSubmit={handleModalSubmit} />
         )}

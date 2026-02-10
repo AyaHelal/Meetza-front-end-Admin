@@ -12,6 +12,14 @@ const MeetingModal = ({ mode, data, groups = [], onChange, onClose, onSubmit }) 
         return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     };
 
+    const handleStartTimeChange = (e) => {
+        onChange({ ...data, start_time: e.target.value });
+    };
+
+    const handleEndTimeChange = (e) => {
+        onChange({ ...data, end_time: e.target.value });
+    };
+
     return (
         <div className="modal d-block" style={{ background: 'rgba(0,0,0,0.45)' }}>
             <div className="card p-4 mx-auto" style={{ maxWidth: 560, borderRadius: 12, marginTop: '6rem' }}>
@@ -30,13 +38,35 @@ const MeetingModal = ({ mode, data, groups = [], onChange, onClose, onSubmit }) 
                         onChange={(e) => onChange({ ...data, title: e.target.value })}
                     />
 
-                    <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Datetime</label>
+                    <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Start Time</label>
                     <input
                         type="datetime-local"
                         className="form-control mb-3 rounded-3"
-                        value={formatForInput(data.datetime)}
-                        onChange={(e) => onChange({ ...data, datetime: e.target.value })}
+                        value={formatForInput(data.start_time)}
+                        onChange={handleStartTimeChange}
                     />
+
+                    <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>End Time</label>
+                    <input
+                        type="datetime-local"
+                        className="form-control mb-3 rounded-3"
+                        value={formatForInput(data.end_time)}
+                        onChange={handleEndTimeChange}
+                    />
+
+                    <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Group</label>
+                    <select className="form-select mb-3 rounded-3" value={data.group_id || ''} onChange={(e) => onChange({ ...data, group_id: e.target.value })}>
+                        <option value="">Select a group...</option>
+                        {groups && groups.length > 0 ? (
+                            groups.map((g) => (
+                                <option key={g.id || g.group_id} value={g.id || g.group_id}>
+                                    {g.name || g.group_name}
+                                </option>
+                            ))
+                        ) : (
+                            <option disabled>No groups available</option>
+                        )}
+                    </select>
 
                     <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Status</label>
                     <select className="form-select mb-3 rounded-3" value={data.status || 'Scheduled'} onChange={(e) => onChange({ ...data, status: e.target.value })}>
@@ -45,12 +75,16 @@ const MeetingModal = ({ mode, data, groups = [], onChange, onClose, onSubmit }) 
                         <option>Cancelled</option>
                     </select>
 
-                    {/* Group is set silently by the parent (derived from existing meetings/groups). Hidden from the create UI. */}
-
                     <div className="d-flex gap-2" style={{ marginTop: 12 }}>
                         <button
                             className="btn"
-                            onClick={() => onSubmit(data)}
+                            onClick={() => {
+                                if (mode === 'create' && !data.group_id) {
+                                    alert('Please select a group');
+                                    return;
+                                }
+                                onSubmit(data);
+                            }}
                             style={{
                                 flex: 1,
                                 background: '#007bff',
