@@ -80,9 +80,11 @@ import apiCommon from "../../../../utils/api";
         }
 
         const payload = {
-            ...data,
-            datetime: formatForAPI(data.datetime),
+            title: data.title,
+            start_time: formatForAPI(data.start_time),
+            end_time: formatForAPI(data.end_time),
             group_id: groupId,
+            status: data.status,
             administrator_id: currentUser.id,
         };
 
@@ -104,7 +106,8 @@ import apiCommon from "../../../../utils/api";
 
         const payload = {
             title: data.title,
-            datetime: formatForAPI(data.datetime),
+            start_time: formatForAPI(data.start_time),
+            end_time: formatForAPI(data.end_time),
             status: data.status,
             group_id: data.group_id || originalMeeting?.group_id,
         };

@@ -99,8 +99,8 @@ const GroupMembershipContent = ({ currentUser }) => {
             if (error?.response?.status === 404) {
                 toast.error("Member with this email not found. Please check the email address.");
             } else {
-                const msg = error?.response?.data?.message || error.message || "Failed to create group membership";
-                toast.error(msg);
+            const msg = error?.response?.data?.message || error.message || "Failed to create group membership";
+            toast.error(msg);
             }
         }
     };

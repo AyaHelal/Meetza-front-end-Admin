@@ -3,7 +3,7 @@ import { PlusCircle } from "phosphor-react";
 import { SearchBar } from "../../shared/SearchBar";
 import '../../CSS/Table.css';
 
-export const MeetingTable = ({ meetings, loading, error, onSave, onDelete, onEdit, onAdd, searchTerm, onSearchChange, addingNew, editing, currentUser }) => {
+export const MeetingTable = ({ meetings, groups = [], loading, error, onSave, onDelete, onEdit, onAdd, searchTerm, onSearchChange, addingNew, editing, currentUser }) => {
     return (
         <div className="m-4 rounded-3" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
         <div className="card shadow-sm rounded-3 border-0">
@@ -23,24 +23,26 @@ export const MeetingTable = ({ meetings, loading, error, onSave, onDelete, onEdi
                         <thead className="table-header-sticky">
                 <tr>
                     <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Title</th>
-                    <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Datetime</th>
+                    <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Group</th>
+                    <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Start_Time</th>
+                    <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>End_Time</th>
                     <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '200px' }}>Status</th>
                     <th className="fw-semibold" style={{ color: "#888888" }}>Actions</th>
                 </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan="5" className="text-center py-4">Loading...</td></tr>
+                                <tr><td colSpan="6" className="text-center py-4">Loading...</td></tr>
                             ) : error ? (
-                                <tr><td colSpan="5" className="text-center py-4 text-danger">{error}</td></tr>
+                                <tr><td colSpan="6" className="text-center py-4 text-danger">{error}</td></tr>
                             ) : meetings.length === 0 && !addingNew ? (
-                                <tr><td colSpan="5" className="text-center py-4">No meetings found</td></tr>
+                                <tr><td colSpan="6" className="text-center py-4">No meetings found</td></tr>
                             ) : (
                     <>
                     {meetings.map((m) => (
-                        <MeetingRow key={m.id} meeting={m} isEditing={editing[m.id]} onSave={onSave} onEdit={onEdit} onDelete={onDelete} currentUser={currentUser} />
+                        <MeetingRow key={m.id} meeting={m} groups={groups} isEditing={editing[m.id]} onSave={onSave} onEdit={onEdit} onDelete={onDelete} currentUser={currentUser} />
                     ))}
-                    {addingNew && <MeetingRow key="new" meeting={null} isEditing={true} onSave={onSave} currentUser={currentUser} />}
+                    {addingNew && <MeetingRow key="new" meeting={null} groups={groups} isEditing={true} onSave={onSave} currentUser={currentUser} />}
                     </>
                 )}
                         </tbody>

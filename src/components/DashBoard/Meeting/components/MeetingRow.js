@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Trash, CheckCircle, PencilSimpleLine } from "phosphor-react";
 
-export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, currentUser}) => {
+export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, onDelete, currentUser}) => {
     const [data, setData] = useState({
         title: meeting?.title || "",
-        datetime: meeting?.datetime || "",
+        start_time: meeting?.start_time || "",
+        end_time: meeting?.end_time || "",
         status: meeting?.status || "Scheduled",
         group_id: meeting?.group_id || "",
     });
@@ -13,19 +14,27 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, curre
         if (meeting) {
         setData({
             title: meeting.title || "",
-            datetime: meeting.datetime || "",
+            start_time: meeting.start_time || "",
+            end_time: meeting.end_time || "",
             status: meeting.status || "Scheduled",
             group_id: meeting.group_id || "",
         });
         } else {
         setData({
             title: "",
-            datetime: "",
+            start_time: "",
+            end_time: "",
             status: "Scheduled",
             group_id: "",
         });
         }
     }, [meeting]);
+
+    const getGroupName = () => {
+        if (!meeting?.group_id) return 'No Group';
+        const group = groups.find(g => (g.id === meeting.group_id || g.group_id === meeting.group_id));
+        return group?.name || group?.group_name || 'Unknown';
+    };
 
     const formatForInput = (value) => {
         if (!value) return "";
@@ -35,7 +44,7 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, curre
     };
 
     const handleSave = () => {
-        if (!data.title || !data.datetime) return alert("Title and datetime required");
+        if (!data.title || !data.start_time || !data.end_time) return alert("Title, start time, and end time are required");
         onSave(meeting?.id, data);
     };
 
@@ -43,12 +52,13 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, curre
         if (meeting) {
         setData({
             title: meeting.title || "",
-            datetime: meeting.datetime || "",
+            start_time: meeting.start_time || "",
+            end_time: meeting.end_time || "",
             status: meeting.status || "Scheduled",
             group_id: meeting.group_id || "",
         });
         } else {
-        setData({ title: "", datetime: "", status: "Scheduled",  group_id: "" });
+        setData({ title: "", start_time: "", end_time: "", status: "Scheduled",  group_id: "" });
         }
         onEdit(meeting?.id || "new");
     };
@@ -72,9 +82,25 @@ export const MeetingRow = ({ meeting, isEditing, onSave, onEdit, onDelete, curre
 
         <td>
             {showInput ? (
-            <input type="datetime-local" value={formatForInput(data.datetime)} onChange={(e) => setData({ ...data, datetime: e.target.value })} style={inputStyle} />
+            <div style={textStyle}>{getGroupName()}</div>
             ) : (
-            <div style={textStyle}>{data.datetime ? new Date(data.datetime).toLocaleString() : "No Date"}</div>
+            <div style={textStyle}>{getGroupName()}</div>
+            )}
+        </td>
+
+        <td>
+            {showInput ? (
+            <input type="datetime-local" value={formatForInput(data.start_time)} onChange={(e) => setData({ ...data, start_time: e.target.value })} style={inputStyle} />
+            ) : (
+            <div style={textStyle}>{data.start_time ? new Date(data.start_time).toLocaleString() : "No Date"}</div>
+            )}
+        </td>
+
+        <td>
+            {showInput ? (
+            <input type="datetime-local" value={formatForInput(data.end_time)} onChange={(e) => setData({ ...data, end_time: e.target.value })} style={inputStyle} />
+            ) : (
+            <div style={textStyle}>{data.end_time ? new Date(data.end_time).toLocaleString() : "No Date"}</div>
             )}
         </td>
 
