@@ -74,9 +74,31 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
         <tr className="align-middle">
         <td>
             {showInput ? (
-            <input type="text" value={data.title} placeholder="Enter title" onChange={(e) => setData({ ...data, title: e.target.value })} style={inputStyle} onKeyPress={(e) => e.key === "Enter" && handleSave()} />
+            <input
+                type="text"
+                value={data.title}
+                placeholder="Enter title"
+                onChange={(e) => setData({ ...data, title: e.target.value })}
+                style={inputStyle}
+                onKeyPress={(e) => e.key === "Enter" && handleSave()}
+            />
             ) : (
-            <div style={textStyle}>{data.title}</div>
+            <div className="d-flex align-items-center gap-2" style={{ padding: "8px 20px" }}>
+                {meeting?.poster_url ? (
+                <img
+                    src={meeting.poster_url}
+                    alt={data.title || "Meeting poster"}
+                    style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 8,
+                    objectFit: "cover",
+                    flexShrink: 0,
+                    }}
+                />
+                ) : null}
+                <span style={textStyle}>{data.title}</span>
+            </div>
             )}
         </td>
 
@@ -116,7 +138,7 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
             )}
         </td>
 
-        <td className="d-flex gap-2">
+        <td className="d-flex gap-2 mt-3">
             {showInput ? (
             <div className="d-flex gap-2">
                 <button className="btn btn-sm" style={{ backgroundColor: "#00DC85", borderRadius: 12, color: "#fff" }} onClick={handleSave}><CheckCircle size={20} /></button>

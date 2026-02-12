@@ -18,7 +18,17 @@ export default function Meeting() {
     // modal state
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
-    const [modalData, setModalData] = useState({ title: '', start_time: '', end_time: '', status: 'Scheduled', group_id: '', id: null });
+    const [modalData, setModalData] = useState({
+        id: null,
+        title: '',
+        start_time: '',
+        end_time: '',
+        status: 'Scheduled',
+        group_id: '',
+        description: '',
+        poster_file: null,
+        files: [],
+    });
 
     const { meetings, loading, error, addMeeting, updateMeeting, deleteMeeting, fetchMeetings, searchMeetings } = useMeetingData();
 
@@ -49,7 +59,11 @@ export default function Meeting() {
             start_time: m?.start_time || '',
             end_time: m?.end_time || '',
             status: m?.status || 'Scheduled',
-            group_id: m?.group_id || ''
+            group_id: m?.group_id || '',
+            description: m?.description || '',
+            // poster_file / files are only for create or explicit change, not pre-filled on edit
+            poster_file: null,
+            files: [],
         });
         setModalOpen(true);
     };
@@ -57,7 +71,17 @@ export default function Meeting() {
     const handleAdd = () => {
         setModalMode('create');
         // Don't pre-select a group - user must choose
-        setModalData({ title: '', start_time: '', end_time: '', status: 'Scheduled', group_id: '', id: null });
+        setModalData({
+            id: null,
+            title: '',
+            start_time: '',
+            end_time: '',
+            status: 'Scheduled',
+            group_id: '',
+            description: '',
+            poster_file: null,
+            files: [],
+        });
         setModalOpen(true);
     };
 

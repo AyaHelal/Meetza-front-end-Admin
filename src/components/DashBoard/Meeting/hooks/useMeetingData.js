@@ -79,16 +79,33 @@ import apiCommon from "../../../../utils/api";
             return;
         }
 
-        const payload = {
-            title: data.title,
-            start_time: formatForAPI(data.start_time),
-            end_time: formatForAPI(data.end_time),
-            group_id: groupId,
-            status: data.status,
-            administrator_id: currentUser.id,
-        };
+        // Build multipart form data to support poster_file + resources files
+        const formData = new FormData();
+        formData.append("title", data.title);
+        formData.append("start_time", formatForAPI(data.start_time));
+        formData.append("end_time", formatForAPI(data.end_time));
+        formData.append("group_id", groupId);
+        formData.append("status", data.status);
+        // description is optional and not displayed, but sent to backend
+        if (data.description) {
+            formData.append("description", data.description);
+        }
+        // Poster image (optional)
+        if (data.poster_file instanceof File) {
+            formData.append("poster_file", data.poster_file);
+        }
+        // Resources files[] (optional, can be multiple)
+        if (Array.isArray(data.files)) {
+            data.files.forEach((file) => {
+            if (file instanceof File) {
+                formData.append("files", file);
+            }
+            });
+        }
 
-        const res = await apiCommon.post("/meeting", payload);
+        const res = await apiCommon.post("/meeting", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
         if (res.data.success) {
             smartToast.success("Meeting created successfully");
             setMeetings((prev) => [...prev, res.data.data]);

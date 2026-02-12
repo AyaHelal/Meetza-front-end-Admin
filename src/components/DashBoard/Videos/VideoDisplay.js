@@ -31,7 +31,7 @@ const VideoDisplay = ({ currentUser }) => {
         title: '',
         poster_file: null,
         video_file: null,
-        date_recorded: '',
+        duration: 0,
         group_id: '',
         description: ''
     });
@@ -563,6 +563,28 @@ const VideoDisplay = ({ currentUser }) => {
         }
     };
 
+    const getVideoDurationSeconds = (file) => {
+        return new Promise((resolve, reject) => {
+            try {
+                const url = URL.createObjectURL(file);
+                const video = document.createElement('video');
+                video.preload = 'metadata';
+                video.onloadedmetadata = () => {
+                    const duration = video.duration || 0;
+                    URL.revokeObjectURL(url);
+                    resolve(duration);
+                };
+                video.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    reject(new Error('Failed to load video metadata'));
+                };
+                video.src = url;
+            } catch (e) {
+                reject(e);
+            }
+        });
+    };
+
     const handleUploadVideo = async () => {
         // Validation
         if (!uploadFormData.title.trim()) {
@@ -577,19 +599,29 @@ const VideoDisplay = ({ currentUser }) => {
             toast.error("Please select a group");
             return;
         }
-        if (!uploadFormData.date_recorded) {
-            toast.error("Date recorded is required");
-            return;
-        }
 
         try {
             setUploading(true);
+
+            // Ensure we have a duration (in seconds) before upload
+            let durationSeconds = uploadFormData.duration || 0;
+            if (!durationSeconds && uploadFormData.video_file) {
+                try {
+                    const raw = await getVideoDurationSeconds(uploadFormData.video_file);
+                    durationSeconds = Math.round(raw || 0);
+                    setUploadFormData(prev => ({ ...prev, duration: durationSeconds }));
+                } catch (e) {
+                    console.warn('Could not determine video duration automatically:', e);
+                    durationSeconds = 0;
+                }
+            }
+
             const formData = new FormData();
             formData.append('title', uploadFormData.title);
             formData.append('video_file', uploadFormData.video_file);
-            formData.append('date_recorded', uploadFormData.date_recorded);
             formData.append('group_id', uploadFormData.group_id);
             formData.append('description', uploadFormData.description || '');
+            formData.append('duration', durationSeconds || 0);
 
             if (uploadFormData.poster_file) {
                 formData.append('poster_file', uploadFormData.poster_file);
@@ -654,7 +686,7 @@ const VideoDisplay = ({ currentUser }) => {
                 title: '',
                 poster_file: null,
                 video_file: null,
-                date_recorded: '',
+                duration: 0,
                 group_id: '',
                 description: ''
             });
@@ -801,7 +833,7 @@ const VideoDisplay = ({ currentUser }) => {
                                                     title: '',
                                                     poster_file: null,
                                                     video_file: null,
-                                                    date_recorded: '',
+                                                    duration: 0,
                                                     group_id: '',
                                                     description: ''
                                                 });
@@ -869,18 +901,21 @@ const VideoDisplay = ({ currentUser }) => {
                                                         </select>
                                                     </div>
 
-                                                    {/* Date Recorded */}
-                                                    <div className="col-lg-6 col-md-12 mb-3">
-                                                        <label className="form-label fw-semibold" style={{ color: "#888888", fontSize: "18px" }}>
-                                                            Date Recorded <span style={{ color: "#FF0000" }}>*</span>
-                                                        </label>
-                                                        <CustomDatePicker
-                                                            name="date_recorded"
-                                                            value={uploadFormData.date_recorded}
-                                                            onChange={handleUploadFormChange}
-                                                            className="custom-date-picker-input py-2"
-                                                        />
+                                                {/* Duration (auto from video) */}
+                                                <div className="col-lg-6 col-md-12 mb-3">
+                                                    <label className="form-label fw-semibold" style={{ color: "#888888", fontSize: "18px" }}>
+                                                        Duration
+                                                    </label>
+                                                    <div className="form-control rounded-4 py-2 w-75 d-flex align-items-center"
+                                                        style={{ border: "1px solid #ABABAB", fontSize: "16px", backgroundColor: "#f8f9fa" }}>
+                                                        {uploadFormData.duration
+                                                            ? `${Math.floor(uploadFormData.duration / 60)}m ${Math.round(uploadFormData.duration % 60)}s`
+                                                            : "Will be detected automatically from video"}
                                                     </div>
+                                                    <small className="text-muted d-block mt-1">
+                                                        Duration is calculated automatically from the selected video file.
+                                                    </small>
+                                                </div>
 
                                                     {/* Description - Full Width */}
                                                     <div className=" mb-3">
@@ -1025,7 +1060,14 @@ const VideoDisplay = ({ currentUser }) => {
                                 {/* Video Header */}
                                 <div className="card-header border-0 d-flex justify-content-between align-items-center p-3">
                                     <h5 className="mb-0 fw-semibold">{currentVideo.title}</h5>
-                                    <span className="badge text-dark fw-semibold">Recorded: {formatDate(currentVideo.date_recorded)}</span>
+                                    <span className="badge text-dark fw-semibold">
+                                        Duration:{" "}
+                                        {currentVideo.duration
+                                            ? `${Math.floor(currentVideo.duration / 60)}m ${Math.round(
+                                                currentVideo.duration % 60
+                                            )}s`
+                                            : "N/A"}
+                                    </span>
                                 </div>
 
                                 {/* Poster Only */}
@@ -1266,7 +1308,14 @@ const VideoDisplay = ({ currentUser }) => {
                                         />
                                         <div className="flex-grow-1 ms-3">
                                             <h6 className="mb-1 small" style={{ color: isSelected ? '#ffffff' : 'inherit' }}>{video.title}</h6>
-                                            <p className="mb-0 small" style={{ color: isSelected ? '#ffffff' : '#6c757d' }}> {formatDate(video.date_recorded)}</p>
+                                            <p className="mb-0 small" style={{ color: isSelected ? '#ffffff' : '#6c757d' }}>
+                                                Duration:{" "}
+                                                {video.duration
+                                                    ? `${Math.floor(video.duration / 60)}m ${Math.round(
+                                                        video.duration % 60
+                                                    )}s`
+                                                    : "N/A"}
+                                            </p>
                                         </div>
                                         <div className="d-flex gap-1 ">
                                             <button
@@ -1533,7 +1582,7 @@ const VideoDisplay = ({ currentUser }) => {
                                             title: '',
                                             poster_file: null,
                                             video_file: null,
-                                            date_recorded: '',
+                                            duration: 0,
                                             group_id: '',
                                             description: ''
                                         });
@@ -1592,23 +1641,30 @@ const VideoDisplay = ({ currentUser }) => {
                                         </select>
                                     </div>
 
-                                    {/* Date Recorded */}
+                                    {/* Duration (auto from video) */}
                                     <div className="mb-3">
                                         <label className="form-label fw-semibold" style={{ color: "#010101" }}>
-                                            Date Recorded <span style={{ color: "#FF0000" }}>*</span>
+                                            Duration
                                         </label>
                                         <input
-                                            type="date"
+                                            type="text"
                                             className="form-control rounded-3"
-                                            name="date_recorded"
-                                            value={uploadFormData.date_recorded}
-                                            onChange={handleUploadFormChange}
+                                            value={uploadFormData.duration
+                                                ? `${Math.floor(uploadFormData.duration / 60)}m ${Math.round(
+                                                    uploadFormData.duration % 60
+                                                )}s`
+                                                : "Will be detected automatically from video"}
+                                            readOnly
                                             style={{
                                                 border: "2px solid #E9ECEF",
                                                 padding: "0.75rem",
-                                                fontSize: "16px"
+                                                fontSize: "16px",
+                                                backgroundColor: "#f8f9fa"
                                             }}
                                         />
+                                        <small className="text-muted d-block mt-1">
+                                            Duration is calculated automatically from the selected video file.
+                                        </small>
                                     </div>
 
                                     {/* Description */}
@@ -1732,7 +1788,7 @@ const VideoDisplay = ({ currentUser }) => {
                                             title: '',
                                             poster_file: null,
                                             video_file: null,
-                                            date_recorded: '',
+                                            duration: 0,
                                             group_id: '',
                                             description: ''
                                         });
