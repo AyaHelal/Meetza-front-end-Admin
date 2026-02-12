@@ -89,28 +89,32 @@ const MeetingModal = ({ mode, data, groups = [], onChange, onClose, onSubmit }) 
                         }}
                     />
 
-                    <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Resources files (optional)</label>
-                    <input
-                        type="file"
-                        multiple
-                        className="form-control mb-3 rounded-3"
-                        onChange={(e) => {
-                            const incoming = e.target.files ? Array.from(e.target.files) : [];
-                            // Append to any existing selected files so the user can pick
-                            // multiple batches without losing previous ones.
-                            const existing = Array.isArray(data.files) ? data.files : [];
-                            onChange({ ...data, files: [...existing, ...incoming] });
-                        }}
-                    />
-                    {Array.isArray(data.files) && data.files.length > 0 && (
-                        <div className="mb-3" style={{ fontSize: 12, color: '#6c757d' }}>
-                            <strong>Selected resources:</strong>
-                            <ul style={{ marginBottom: 0, paddingLeft: '1.25rem' }}>
-                                {data.files.map((file, idx) => (
-                                    <li key={idx}>{file.name}</li>
-                                ))}
-                            </ul>
-                        </div>
+                    {mode === 'create' && (
+                        <>
+                            <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Resources files (optional)</label>
+                            <input
+                                type="file"
+                                multiple
+                                className="form-control mb-3 rounded-3"
+                                onChange={(e) => {
+                                    const incoming = e.target.files ? Array.from(e.target.files) : [];
+                                    // Append to any existing selected files so the user can pick
+                                    // multiple batches without losing previous ones.
+                                    const existing = Array.isArray(data.files) ? data.files : [];
+                                    onChange({ ...data, files: [...existing, ...incoming] });
+                                }}
+                            />
+                            {Array.isArray(data.files) && data.files.length > 0 && (
+                                <div className="mb-3" style={{ fontSize: 12, color: '#6c757d' }}>
+                                    <strong>Selected resources:</strong>
+                                    <ul style={{ marginBottom: 0, paddingLeft: '1.25rem' }}>
+                                        {data.files.map((file, idx) => (
+                                            <li key={idx}>{file.name}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </>
                     )}
 
                     <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Status <span style={{ color: "#FF0000" }}>*</span></label>

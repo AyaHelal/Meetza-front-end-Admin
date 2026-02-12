@@ -121,15 +121,37 @@ import apiCommon from "../../../../utils/api";
     try {
         const originalMeeting = meetings.find(m => m.id === id);
 
-        const payload = {
-            title: data.title,
-            start_time: formatForAPI(data.start_time),
-            end_time: formatForAPI(data.end_time),
-            status: data.status,
-            group_id: data.group_id || originalMeeting?.group_id,
-        };
+        const hasPoster = data.poster_file instanceof File;
+        const hasDescription = data.description != null;
 
-        const res = await apiCommon.put(`/meeting/${id}`, payload);
+        let res;
+        if (hasPoster || hasDescription) {
+            const formData = new FormData();
+            if (data.title != null) formData.append("title", data.title);
+            if (data.start_time != null) formData.append("start_time", formatForAPI(data.start_time));
+            if (data.end_time != null) formData.append("end_time", formatForAPI(data.end_time));
+            if (data.status != null) formData.append("status", data.status);
+            formData.append("group_id", data.group_id || originalMeeting?.group_id);
+            if (data.description != null) formData.append("description", data.description);
+
+            if (hasPoster) {
+                formData.append("poster_file", data.poster_file);
+            }
+
+            res = await apiCommon.put(`/meeting/${id}`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+        } else {
+            const payload = {
+                title: data.title,
+                start_time: formatForAPI(data.start_time),
+                end_time: formatForAPI(data.end_time),
+                status: data.status,
+                group_id: data.group_id || originalMeeting?.group_id,
+            };
+            res = await apiCommon.put(`/meeting/${id}`, payload);
+        }
+
         if (res.data.success) {
             smartToast.success("Meeting updated successfully");
             setMeetings(prev =>
