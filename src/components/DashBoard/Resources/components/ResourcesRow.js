@@ -37,7 +37,7 @@ export const ResourcesRow = ({ resource, onDelete, contentId }) => {
                 <td className="px-3">{isLink ? "Link" : file_type}</td>
                 <td className="px-4">{file_size}</td>
                 <td className="px-5">
-                {new Date(new Date(created_at).getTime() - 60 * 60 * 1000).toLocaleString(
+                {new Date(new Date(created_at).getTime() + 60 * 60 * 1000).toLocaleString(
                     "en-EG",
                     {
                     timeZone: "Africa/Cairo",
