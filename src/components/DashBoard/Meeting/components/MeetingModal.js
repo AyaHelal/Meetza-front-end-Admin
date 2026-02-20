@@ -117,6 +117,28 @@ const MeetingModal = ({ mode, data, groups = [], onChange, onClose, onSubmit }) 
                         </>
                     )}
 
+                    <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Record Meeting</label>
+                    <div className="d-flex gap-3 mb-3">
+                        <label className="d-flex align-items-center gap-2" style={{ cursor: 'pointer', fontSize: 14 }}>
+                            <input
+                                type="radio"
+                                name="recordMeeting"
+                                checked={data.recordMeeting === 'Recording' || data.record_meeting === true || data.record_meeting === 1 || data.record_meeting === '1'}
+                                onChange={() => onChange({ ...data, recordMeeting: 'Recording' })}
+                            />
+                            Recording
+                        </label>
+                        <label className="d-flex align-items-center gap-2" style={{ cursor: 'pointer', fontSize: 14 }}>
+                            <input
+                                type="radio"
+                                name="recordMeeting"
+                                checked={data.recordMeeting === 'Not Recording' || data.record_meeting === false || data.record_meeting === 0 || data.record_meeting === '0'}
+                                onChange={() => onChange({ ...data, recordMeeting: 'Not Recording' })}
+                            />
+                            Not Recording
+                        </label>
+                    </div>
+
                     <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Status <span style={{ color: "#FF0000" }}>*</span></label>
                     <select className="form-select mb-3 rounded-3" value={data.status || 'Scheduled'} onChange={(e) => onChange({ ...data, status: e.target.value })}>
                         <option>Scheduled</option>

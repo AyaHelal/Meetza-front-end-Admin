@@ -127,6 +127,12 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
         </td>
 
         <td>
+            <div style={textStyle}>
+                {meeting && (meeting.record_meeting === true || meeting.record_meeting === 1 || meeting.record_meeting === '1' || meeting.recordMeeting === 'Recording') ? 'Yes' : meeting ? 'No' : '—'}
+            </div>
+        </td>
+
+        <td>
             {showInput ? (
             <select value={data.status} onChange={(e) => setData({ ...data, status: e.target.value })} style={inputStyle}>
                 <option>Scheduled</option>
