@@ -26,6 +26,7 @@ export default function Meeting() {
         status: 'Scheduled',
         group_id: '',
         description: '',
+        recordMeeting: 'Recording',
         poster_file: null,
         files: [],
     });
@@ -61,7 +62,7 @@ export default function Meeting() {
             status: m?.status || 'Scheduled',
             group_id: m?.group_id || '',
             description: m?.description || '',
-            // poster_file / files are only for create or explicit change, not pre-filled on edit
+            recordMeeting: (m?.record_meeting === true || m?.record_meeting === 1 || m?.record_meeting === '1') ? 'Recording' : 'Not Recording',
             poster_file: null,
             files: [],
         });
@@ -79,6 +80,7 @@ export default function Meeting() {
             status: 'Scheduled',
             group_id: '',
             description: '',
+            recordMeeting: 'Recording',
             poster_file: null,
             files: [],
         });

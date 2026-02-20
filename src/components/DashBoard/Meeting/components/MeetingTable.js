@@ -26,17 +26,18 @@ export const MeetingTable = ({ meetings, groups = [], loading, error, onSave, on
                     <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Group</th>
                     <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>Start_Time</th>
                     <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '150px' }}>End_Time</th>
+                    <th className="fw-semibold px-2" style={{ color: "#888888", minWidth: '120px' }}>Recording</th>
                     <th className="fw-semibold px-4" style={{ color: "#888888", minWidth: '200px' }}>Status</th>
                     <th className="fw-semibold" style={{ color: "#888888" }}>Actions</th>
                 </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan="6" className="text-center py-4">Loading...</td></tr>
+                                <tr><td colSpan="7" className="text-center py-4">Loading...</td></tr>
                             ) : error ? (
-                                <tr><td colSpan="6" className="text-center py-4 text-danger">{error}</td></tr>
+                                <tr><td colSpan="7" className="text-center py-4 text-danger">{error}</td></tr>
                             ) : meetings.length === 0 && !addingNew ? (
-                                <tr><td colSpan="6" className="text-center py-4">No meetings found</td></tr>
+                                <tr><td colSpan="7" className="text-center py-4">No meetings found</td></tr>
                             ) : (
                     <>
                     {meetings.map((m) => (
