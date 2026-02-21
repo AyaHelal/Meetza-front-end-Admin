@@ -97,7 +97,7 @@ import apiCommon from "../../../../utils/api";
         formData.append("end_time", formatForAPI(data.end_time));
         formData.append("group_id", groupId);
         formData.append("status", data.status);
-        formData.append("record_meeting", (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0");
+        formData.append("recording", (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0");
         // description is optional and not displayed, but sent to backend
         if (data.description) {
             formData.append("description", data.description);
@@ -146,7 +146,7 @@ import apiCommon from "../../../../utils/api";
             if (data.status != null) formData.append("status", data.status);
             formData.append("group_id", data.group_id || originalMeeting?.group_id);
             if (data.description != null) formData.append("description", data.description);
-            formData.append("record_meeting", (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0");
+            formData.append("recording", (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0");
 
             if (hasPoster) {
                 formData.append("poster_file", data.poster_file);
@@ -162,7 +162,7 @@ import apiCommon from "../../../../utils/api";
                 end_time: formatForAPI(data.end_time),
                 status: data.status,
                 group_id: data.group_id || originalMeeting?.group_id,
-                record_meeting: (data.recordMeeting || data.record_meeting) === "Recording" ? 1 : 0,
+                recording: (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0",
             };
             res = await apiCommon.put(`/meeting/${id}`, payload);
         }
