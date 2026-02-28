@@ -1,8 +1,18 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LogoSection } from '../../components';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Home() {
+    const { logoutUser } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logoutUser();
+        navigate('/login');
+    };
+
     return (
         <motion.div
             className="container-fluid"
@@ -47,10 +57,7 @@ export default function Home() {
                         >
                             <button
                                 className="btn btn-outline-primary me-3"
-                                onClick={() => {
-                                    localStorage.removeItem('authToken');
-                                    window.location.href = '/login';
-                                }}
+                                onClick={handleLogout}
                             >
                                 Logout
                             </button>

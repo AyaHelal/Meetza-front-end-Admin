@@ -20,7 +20,7 @@ export const api = axios.create({
 
 api.interceptors.request.use((config) => {
     try {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
         const locale = localStorage.getItem("locale") || navigator.language?.slice(0, 2) || "en";
 
         // Ensure ngrok header is always present
@@ -57,14 +57,12 @@ api.interceptors.response.use(
         // Handle 401 Unauthorized - token expired or invalid
         if (error.response?.status === 401) {
             console.error("Authentication error:", error.response);
-            // Optionally clear token and redirect to login
             try {
                 localStorage.removeItem("authToken");
                 localStorage.removeItem("user");
-                localStorage.removeItem("userRole");
-            } catch (_) {
-                // ignore
-            }
+                sessionStorage.removeItem("authToken");
+                sessionStorage.removeItem("user");
+            } catch (_) {}
         }
         // Handle 403 Forbidden - insufficient permissions
         if (error.response?.status === 403) {

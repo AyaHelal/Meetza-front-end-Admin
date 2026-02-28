@@ -1,39 +1,30 @@
-
 import { useEffect, useState } from "react";
 import "../../Group/GroupMainComponent.css";
 import Select from "react-select";
+import { useAuth } from "../../../../context/AuthContext";
 
-
-
-const GroupContentModal = ({ mode = 'create', data = {}, onChange, onClose, onSubmit,groups = [],users=[],currentUser}) => {
+const GroupContentModal = ({ mode = 'create', data = {}, onChange, onClose, onSubmit, groups = [], users = [], currentUser: currentUserProp }) => {
+    const { user: authUser } = useAuth();
+    const currentUser = currentUserProp ?? authUser;
     const title = mode === 'create' ? 'Create Content' : 'Update Content';
 
     const [availableGroups, setAvailableGroups] = useState([]);
     const adminUsers = users.filter(
-    u => u.role === "Administrator" || u.role === "Super_Admin"
+        u => u.role === "Administrator" || u.role === "Super_Admin"
     );
 
     useEffect(() => {
+        const currentUserId = currentUser?.id;
+        const userRole = (currentUser?.role || "").toString().toLowerCase();
+        const isSuperAdmin = userRole.includes("super");
 
-    const storedUser =
-    JSON.parse(localStorage.getItem("user")) ||
-    JSON.parse(sessionStorage.getItem("user"));
-
-    const currentUserId = storedUser?.id;
-    const userRole = (storedUser?.role || "").toLowerCase();
-    const isSuperAdmin = userRole.includes("super");
-
-    const updatedGroups  = groups.filter(group => {
-    const hasNoContent = !group.group_content_id;
-
-    if (isSuperAdmin) {
-        return hasNoContent;
-    } else {
-        return group.administrator_id === currentUserId && hasNoContent;
-    }
-    });
-    setAvailableGroups(updatedGroups );
-},[groups]);
+        const updatedGroups = groups.filter(group => {
+            const hasNoContent = !group.group_content_id;
+            if (isSuperAdmin) return hasNoContent;
+            return group.administrator_id === currentUserId && hasNoContent;
+        });
+        setAvailableGroups(updatedGroups);
+    }, [groups, currentUser]);
 
     useEffect(() => {
         if (mode === 'edit' && currentUser?.role === "Super_Admin" && data.administrator_id !== currentUser.id) {

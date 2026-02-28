@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { smartToast } from "../../../../utils/toastManager";
 import apiCommon from "../../../../utils/api";
+import { useAuth } from "../../../../context/AuthContext";
 
     const formatForAPI = (inputValue) => {
     const d = new Date(inputValue);
@@ -12,6 +13,7 @@ import apiCommon from "../../../../utils/api";
     };
 
     export default function useMeetingData() {
+    const { user: currentUser } = useAuth();
     const [meetings, setMeetings] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -24,7 +26,6 @@ import apiCommon from "../../../../utils/api";
         const res = await apiCommon.get(`/meeting${urlSuffix}`);
 
         if (res.data.success) {
-            const currentUser = JSON.parse(localStorage.getItem('user'));
             const isSuperAdmin = currentUser?.role === 'Super_Admin' || currentUser?.role === 'Administrator';
 
             const filteredMeetings = res.data.data.filter(meeting => {
@@ -71,7 +72,6 @@ import apiCommon from "../../../../utils/api";
 
     const addMeeting = async (data) => {
         try {
-        const currentUser = JSON.parse(localStorage.getItem('user'));
 
         let groupId = data.group_id || (meetings.length > 0 ? meetings[0].group_id : null);
 

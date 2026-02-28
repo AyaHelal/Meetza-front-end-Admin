@@ -7,6 +7,7 @@ import { FormInput, ToggleButton, LogoSection } from "../../components";
 import SocialLoginButtons from "../../components/common/SocialLoginButtons";
 import { useFormValidation, usePasswordVisibility } from "../../hooks";
 import { loginValidationRules } from "../../utils";
+import { useAuth } from "../../context/AuthContext";
 
 import "./LoginForm.css";
 
@@ -15,8 +16,8 @@ export default function LoginForm() {
     const navigate = useNavigate();
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedRole, setSelectedRole] = useState('');
     const [apiError, setApiError] = useState("");
+    const { loginUser } = useAuth();
     const [rememberMe, setRememberMe] = useState(false);
     const [showCaptcha, setShowCaptcha] = useState(false);
     const [captchaToken, setCaptchaToken] = useState('');
@@ -160,30 +161,19 @@ export default function LoginForm() {
             const requestData = {
                 ...formData,
                 remember_me: rememberMe.toString(),
-                role: selectedRole,
                 from: "dashboard",
                 ...(captchaToken && { recaptchaToken: captchaToken })
             };
 
             const response = await api.post('/auth/login', requestData);
 
-            if (response?.data?.data?.token) {
-                localStorage.setItem('authToken', response?.data?.data?.token);
-                if (rememberMe) localStorage.setItem('rememberMe', 'true');
-                else localStorage.removeItem('rememberMe');
-
-                const userName = response?.data?.data?.user?.name || response?.data?.name;
-                const userRole = response?.data?.data?.user?.role || response?.data?.role;
-                const userPayload = response?.data?.data?.user || { name: userName, role: userRole };
-
-                localStorage.setItem('userName', userName);
-                localStorage.setItem('userRole', userRole);
-                localStorage.setItem('user', JSON.stringify(userPayload));
-
+            const token = response?.data?.data?.token || response?.data?.token;
+            const userPayload = response?.data?.data?.user || response?.data?.user;
+            if (token) {
+                loginUser(userPayload || {}, token, rememberMe);
                 setFailedAttempts(0);
                 setShowCaptcha(false);
                 setCaptchaToken('');
-
                 navigate('/dashboard');
             }
         } catch (error) {
@@ -284,42 +274,6 @@ export default function LoginForm() {
                             showPassword={showPassword}
                         />
 
-                        {/* Role Selection Radio Buttons */}
-                        <div className="mt-4 mb-3">
-                            <div className="d-flex gap-5 mt-2">
-                                <div className="form-check">
-                                    <input
-                                        className="form-check-input"
-                                        type="radio"
-                                        name="role"
-                                        id="superAdminRole"
-                                        value="Super_Admin"
-                                        checked={selectedRole === 'Super_Admin'}
-                                        onChange={(e) => setSelectedRole(e.target.value)}
-                                        style={{ cursor: "pointer" }}
-                                    />
-                                    <label className="form-check-label" htmlFor="superAdminRole" style={{ cursor: "pointer", fontSize: "12px" }}>
-                                        Super Admin
-                                    </label>
-                                </div>
-                                <div className="form-check">
-                                    <input
-                                        className="form-check-input"
-                                        type="radio"
-                                        name="role"
-                                        id="administratorRole"
-                                        value="Administrator"
-                                        checked={selectedRole === 'Administrator'}
-                                        onChange={(e) => setSelectedRole(e.target.value)}
-                                        style={{ cursor: "pointer" }}
-                                    />
-                                    <label className="form-check-label" htmlFor="administratorRole" style={{ cursor: "pointer", fontSize: "12px" }}>
-                                        Administrator
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
                         <div className="d-flex justify-content-between align-items-center mt-2">
                             <div className="form-check">
                                 <input className="form-check-input" type="checkbox" id="rememberMe" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
@@ -345,7 +299,7 @@ export default function LoginForm() {
 
 
                         <div className="mt-2">
-                            <SocialLoginButtons role={selectedRole} redirectUrl={`${window.location.origin}/dashboard`} />
+                            <SocialLoginButtons redirectUrl={`${window.location.origin}/dashboard`}/>
                         </div>
                     </form>
                 </div>

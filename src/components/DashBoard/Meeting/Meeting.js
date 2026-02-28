@@ -3,11 +3,13 @@ import { smartToast } from "../../../utils/toastManager";
 import useMeetingData from "./hooks/useMeetingData";
 import { MeetingTable } from "./components/MeetingTable";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
+import { ConfirmDeleteModal } from "../shared/ConfirmDeleteModal";
 import { useGroupData } from "../Group/hooks/useGroupData";
 import MeetingModal from "./components/MeetingModal";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function Meeting() {
-    const [currentUser, setCurrentUser] = useState({});
+    const { user: currentUser } = useAuth();
     const [searchTerm, setSearchTerm] = useState("");
     const [searchTimeout, setSearchTimeout] = useState(null);
     const [editing, setEditing] = useState({});
@@ -18,6 +20,8 @@ export default function Meeting() {
     // modal state
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [meetingToDelete, setMeetingToDelete] = useState(null);
     const [modalData, setModalData] = useState({
         id: null,
         title: '',
@@ -35,8 +39,6 @@ export default function Meeting() {
 
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem("user"));
-        if (user) setCurrentUser(user);
         fetchMeetings();
     }, []);
 
@@ -49,7 +51,24 @@ export default function Meeting() {
         } catch (err) { smartToast.error(err.response?.data?.message || "Failed to save meeting"); }
     };
 
-    const handleDelete = async (id) => await deleteMeeting(id);
+    const handleDelete = (id) => {
+        setMeetingToDelete(id);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDeleteMeeting = async () => {
+        if (!meetingToDelete) return;
+        try {
+            await deleteMeeting(meetingToDelete);
+            setShowDeleteModal(false);
+            setMeetingToDelete(null);
+            await fetchMeetings();
+        } catch (err) {
+            smartToast.error(err?.response?.data?.message || "Failed to delete meeting");
+            setShowDeleteModal(false);
+            setMeetingToDelete(null);
+        }
+    };
 
     const handleEdit = (id) => {
         const m = meetings.find(x => String(x.id) === String(id));
@@ -108,6 +127,13 @@ export default function Meeting() {
         {modalOpen && (
             <MeetingModal mode={modalMode} data={modalData} groups={groups} onChange={setModalData} onClose={closeModal} onSubmit={handleModalSubmit} />
         )}
+        <ConfirmDeleteModal
+            show={showDeleteModal}
+            onClose={() => { setShowDeleteModal(false); setMeetingToDelete(null); }}
+            onConfirm={confirmDeleteMeeting}
+            title="Delete Meeting"
+            message="Are you sure you want to delete this meeting? This action cannot be undone."
+        />
         </main>
     );
 }

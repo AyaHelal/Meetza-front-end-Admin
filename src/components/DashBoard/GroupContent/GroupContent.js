@@ -6,9 +6,10 @@ import GroupContentModal from "./components/GroupContentModal";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
 import "../User/UserMainComponent.css";
 import apiCommon from "../../../utils/api";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function GroupContent() {
-    const [currentUser, setCurrentUser] = useState(null);
+    const { user: currentUser } = useAuth();
     const [searchTerm, setSearchTerm] = useState("");
     const [editing, setEditing] = useState({});
     const [addingNew, setAddingNew] = useState(false);
@@ -25,8 +26,6 @@ export default function GroupContent() {
     } = useGroupContentData();
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem("user"));
-        if (user) setCurrentUser(user);
         fetchContents();
     }, []);
 

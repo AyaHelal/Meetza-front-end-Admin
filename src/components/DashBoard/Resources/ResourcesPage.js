@@ -1,31 +1,24 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
 import useGroupContentData from "../GroupContent/hooks/useGroupContentData";
 import useResourcesData from "./hooks/useResourcesData";
 import ResourcesTable from "./components/ResourcesTable";
 import ResourcesLinksModal from "./components/ResourcesLinksModal";
+import { ConfirmDeleteModal } from "../shared/ConfirmDeleteModal";
 import Select from "react-select";
 import { smartToast } from "../../../utils/toastManager";
+import { useAuth } from "../../../context/AuthContext";
 
 const ResourcesPage = () => {
-    const [currentUser, setCurrentUser] = useState(null);
+    const { user: currentUser } = useAuth();
     const fileInputRef = useRef(null);
     const [selectedContent, setSelectedContent] = useState(null);
     const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [resourceToDelete, setResourceToDelete] = useState(null);
 
     const { contents, fetchContents } = useGroupContentData();
     const { addResource, addLinkResource, deleteResource } = useResourcesData(fetchContents);
-
-    useEffect(() => {
-        const u = JSON.parse(localStorage.getItem('user'));
-        if (u) setCurrentUser(u);
-    }, []);
-
-    useEffect(() => {
-        // For Administrator, don't preselect - let them choose from their content
-        // Super_Admin will start with null and must select
-        // Administrator will also start with null and must select from their content
-    }, []);
 
     const onUploadClick = () => {
         // If super admin, require selecting a group content first
@@ -53,11 +46,20 @@ const ResourcesPage = () => {
         }
     };
 
-    const handleDelete = async (meetingContentId, resourceId) => {
+    const handleDelete = (meetingContentId, resourceId) => {
+        setResourceToDelete({ meetingContentId, resourceId });
+        setShowDeleteModal(true);
+    };
+
+    const confirmDeleteResource = async () => {
+        if (!resourceToDelete) return;
         try {
-        await deleteResource(meetingContentId, resourceId);
+            await deleteResource(resourceToDelete.meetingContentId, resourceToDelete.resourceId);
+            setShowDeleteModal(false);
+            setResourceToDelete(null);
         } catch (err) {
-        // handled in hook
+            setShowDeleteModal(false);
+            setResourceToDelete(null);
         }
     };
 
@@ -168,6 +170,14 @@ const ResourcesPage = () => {
         <ResourcesTable contents={contents} currentUser={currentUser} onUploadClick={onUploadClick} onLinksClick={onLinksClick} onDelete={handleDelete} selectedContentId={selectedContent} />
 
         <ResourcesLinksModal isOpen={isLinksModalOpen} onClose={() => setIsLinksModalOpen(false)} onSubmit={handleLinkSubmit} loading={false} />
+
+        <ConfirmDeleteModal
+            show={showDeleteModal}
+            onClose={() => { setShowDeleteModal(false); setResourceToDelete(null); }}
+            onConfirm={confirmDeleteResource}
+            title="Delete Resource"
+            message="Are you sure you want to delete this resource? This action cannot be undone."
+        />
         </main>
     );
 };

@@ -1,8 +1,8 @@
-import { useState, useEffect , useCallback} from "react";
+import { useState, useEffect, useCallback } from "react";
 import api from "../../../../utils/api";
 import { smartToast } from "../../../../utils/toastManager";
 
-export const usePositionData = (userId) => {
+export const usePositionData = (userId, authUser = null) => {
   const [positions, setPositions] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,8 +19,8 @@ export const usePositionData = (userId) => {
         api.get(`/position`),
       ]);
 
-      const allUsers = userRes.data || [];
-      const allPositions = posRes.data || [];
+      const allUsers = Array.isArray(userRes.data) ? userRes.data : (userRes.data?.data || []);
+      const allPositions = Array.isArray(posRes.data) ? posRes.data : (posRes.data?.data || []);
 
       const currentUser = allUsers.find((u) => u.id === userId);
 
@@ -66,8 +66,7 @@ export const usePositionData = (userId) => {
 const createPosition = async (title, selectedUser) => {
   try {
     let payload = { title };
-
-    const curr = JSON.parse(localStorage.getItem('user')) || {};
+    const curr = authUser || {};
     if (curr.role === 'Super_Admin') {
       payload.role = 'Super_Admin';
       payload.administrator_id = selectedUser;
@@ -112,8 +111,6 @@ const createPosition = async (title, selectedUser) => {
   };
 
   const deletePosition = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this position?")) return;
-
     try {
       const position = positions.find(p => p.id === id);
       if (!position) {
