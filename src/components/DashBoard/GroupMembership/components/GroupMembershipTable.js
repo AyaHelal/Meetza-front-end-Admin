@@ -56,14 +56,6 @@ export const GroupMembershipTable = ({
           )}
         </tbody>
       </table>
-      <style jsx>{`
-        tbody tr {
-          border-bottom: none !important;
-        }
-        tbody td {
-          border-bottom: none !important;
-        }
-      `}</style>
     </div>
   );
 };

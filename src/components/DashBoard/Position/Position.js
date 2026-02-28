@@ -4,39 +4,36 @@ import { smartToast } from "../../../utils/toastManager";
 import { usePositionData } from "./hooks/usePositionData";
 import { PositionTable } from "./components/PositionTable";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
+import { ConfirmDeleteModal } from "../shared/ConfirmDeleteModal";
 import "../User/UserMainComponent.css";
 import api from "../../../utils/api";
 import apiCommon from "../../../utils/api";
 import PositionModal from "./components/PositionModal";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function Position() {
-  const [currentUser, setCurrentUser] = useState({});
+  const { user: currentUser } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [modalData, setModalData] = useState({ title: '', selectedUser: null, showUserSelect: false, id: null });
-
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user) setCurrentUser({ id: user.id, name: user.name || user.fullName || 'User', role: user.role || '' });
-  }, []);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [positionToDelete, setPositionToDelete] = useState(null);
 
   const userId = currentUser?.id;
-  const { positions, users, loading, error, fetchData, searchPositions, deletePosition } = usePositionData(userId);
+  const { positions, users, loading, error, fetchData, searchPositions, deletePosition } = usePositionData(userId, currentUser);
 
   useEffect(() => { if (userId) fetchData(); }, [userId, fetchData]);
 
   const handleModalSubmit = async (data) => {
     try {
-      const current = JSON.parse(localStorage.getItem('user')) || {};
+      const current = currentUser || {};
       let payload = { title: data.title };
 
-      // If Super_Admin creating/updating, allow selecting administrator
       if (current.role === 'Super_Admin') {
         payload.administrator_id = data.selectedUser || null;
         payload.role = 'Super_Admin';
       } else {
-        // Administrator: only set title, assign administrator_id to current user
         payload.administrator_id = current.id;
         payload.role = 'Administrator';
       }
@@ -80,8 +77,16 @@ export default function Position() {
     if (query.trim().length > 2) searchPositions(query).catch(() => smartToast.error("Failed to search positions"));
   };
 
-  const handleDelete = async (id) => {
-    const result = await deletePosition(id);
+  const handleDelete = (id) => {
+    setPositionToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeletePosition = async () => {
+    if (!positionToDelete) return;
+    const result = await deletePosition(positionToDelete);
+    setShowDeleteModal(false);
+    setPositionToDelete(null);
     if (!result.success) smartToast.error(result.message || "Failed to delete position");
   };
 
@@ -112,6 +117,14 @@ export default function Position() {
           onSubmit={handleModalSubmit}
         />
       )}
+
+      <ConfirmDeleteModal
+        show={showDeleteModal}
+        onClose={() => { setShowDeleteModal(false); setPositionToDelete(null); }}
+        onConfirm={confirmDeletePosition}
+        title="Delete Position"
+        message="Are you sure you want to delete this position? This action cannot be undone."
+      />
     </main>
   );
 }

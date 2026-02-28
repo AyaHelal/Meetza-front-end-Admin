@@ -5,6 +5,7 @@ import { useUserData } from "./hooks/useUserData";
 import { UserHeader } from "./components/UserHeader";
 import { UserTable } from "./components/UserTable";
 import { SearchBar } from "../shared/SearchBar";
+import { ConfirmDeleteModal } from "../shared/ConfirmDeleteModal";
 import ModalComponent from "./ModalComponent";
 import "./UserMainComponent.css";
 
@@ -25,8 +26,10 @@ const UserMainContent = ({ currentUser }) => {
     const [showModal, setShowModal] = useState(false);
     const [modalMode, setModalMode] = useState("create");
     const [selectedUser, setSelectedUser] = useState(null);
-    const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "member" });
+    const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "member", photo: null });
     const [searchQuery, setSearchQuery] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
 
 
 
@@ -53,8 +56,12 @@ const UserMainContent = ({ currentUser }) => {
     };
 
     const handleUpdateUser = async () => {
+        if (!formData.name?.trim()) {
+            toast.error("Name is required");
+            return;
+        }
         try {
-            await updateUser(selectedUser.id, formData.name, formData.email, formData.password, formData.role);
+            await updateUser(selectedUser.id, formData.name, formData.photo);
             setShowModal(false);
             toast.success("User updated successfully");
         } catch (error) {
@@ -63,14 +70,21 @@ const UserMainContent = ({ currentUser }) => {
         }
     };
 
-    const handleDeleteUser = async (id) => {
+    const handleDeleteUser = (id) => {
         if (id === currentUser?.id) {
             toast.error("Cannot delete your own account");
             return;
         }
-        if (!window.confirm("Are you sure you want to delete this user?")) return;
+        setUserToDelete(id);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDeleteUser = async () => {
+        if (!userToDelete) return;
         try {
-            const res = await deleteUser(id);
+            const res = await deleteUser(userToDelete);
+            setShowDeleteModal(false);
+            setUserToDelete(null);
             if (res.success) {
                 toast.success("User deleted successfully");
             } else {
@@ -78,6 +92,8 @@ const UserMainContent = ({ currentUser }) => {
             }
         } catch (error) {
             toast.error("Error deleting user");
+            setShowDeleteModal(false);
+            setUserToDelete(null);
         }
     };
 
@@ -136,6 +152,14 @@ const UserMainContent = ({ currentUser }) => {
                     onClose={() => setShowModal(false)}
                 />
             )}
+
+            <ConfirmDeleteModal
+                show={showDeleteModal}
+                onClose={() => { setShowDeleteModal(false); setUserToDelete(null); }}
+                onConfirm={confirmDeleteUser}
+                title="Delete User"
+                message="Are you sure you want to delete this user? This action cannot be undone."
+            />
         </main>
     );
 };

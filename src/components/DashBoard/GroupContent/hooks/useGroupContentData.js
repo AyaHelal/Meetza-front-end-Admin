@@ -2,15 +2,15 @@ import { useState, useEffect } from "react";
 import { smartToast } from "../../../../utils/toastManager";
 import apiCommon from "../../../../utils/api";
 import { useGroupData } from "../../Group/hooks/useGroupData";
+import { useAuth } from "../../../../context/AuthContext";
 
 export default function useGroupContentData() {
+    const { user: currentUser } = useAuth();
     const [contents, setContents] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [currentUser, setCurrentUser] = useState(null);
-    const {  fetchData: refetchGroups } = useGroupData();
+    const { fetchData: refetchGroups } = useGroupData();
 
-    // Fetch all contents with their assigned groups
     const fetchContents = async () => {
         try {
             setLoading(true);
@@ -22,9 +22,7 @@ export default function useGroupContentData() {
                 return;
             }
 
-            const user = JSON.parse(localStorage.getItem("user"));
-            setCurrentUser(user);
-
+            const user = currentUser;
             const isSuperAdmin = user?.role === "Super_Admin";
             const isAdministrator = user?.role === "Administrator";
 
@@ -173,7 +171,7 @@ export default function useGroupContentData() {
                 return;
             }
 
-            const user = JSON.parse(localStorage.getItem("user"));
+            const user = currentUser;
             const isSuperAdmin = user?.role === "Super_Admin" || user?.role === "Administrator";
 
             const filteredContents = isSuperAdmin

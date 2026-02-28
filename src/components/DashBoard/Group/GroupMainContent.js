@@ -8,6 +8,7 @@ import { GroupTable } from "./components/GroupTable";
 import { SearchBar } from "../shared/SearchBar";
 import GroupModalComponent from "./GroupModalComponent";
 import GroupDetails from "./GroupDetails";
+import { ConfirmDeleteModal } from "../shared/ConfirmDeleteModal";
 import { PlusCircle, ArrowLeft } from "phosphor-react";
 import Select from 'react-select';
 import "./GroupMainComponent.css";
@@ -64,6 +65,8 @@ const GroupMainContent = ({ currentUser }) => {
     const [showGroupDetails, setShowGroupDetails] = useState(false);
     const [groupDetailsData] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [groupToDelete, setGroupToDelete] = useState(null);
 
     const openCreateForm = () => {
         setModalMode("create");
@@ -179,10 +182,17 @@ const GroupMainContent = ({ currentUser }) => {
 
 
 
-    const handleDeleteGroup = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this group?")) return;
+    const handleDeleteGroup = (id) => {
+        setGroupToDelete(id);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDeleteGroup = async () => {
+        if (!groupToDelete) return;
         try {
-            const res = await deleteGroup(id);
+            const res = await deleteGroup(groupToDelete);
+            setShowDeleteModal(false);
+            setGroupToDelete(null);
             if (res.success) {
                 toast.success("Group deleted successfully");
             } else {
@@ -190,6 +200,8 @@ const GroupMainContent = ({ currentUser }) => {
             }
         } catch (error) {
             toast.error("Error deleting group");
+            setShowDeleteModal(false);
+            setGroupToDelete(null);
         }
     };
 
@@ -494,6 +506,14 @@ const GroupMainContent = ({ currentUser }) => {
                     onClose={() => setShowGroupDetails(false)}
                 />
             )}
+
+            <ConfirmDeleteModal
+                show={showDeleteModal}
+                onClose={() => { setShowDeleteModal(false); setGroupToDelete(null); }}
+                onConfirm={confirmDeleteGroup}
+                title="Delete Group"
+                message="Are you sure you want to delete this group? This action cannot be undone."
+            />
         </main>
     );
 };

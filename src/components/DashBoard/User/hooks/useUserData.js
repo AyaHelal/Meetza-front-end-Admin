@@ -58,22 +58,22 @@ export const useUserData = () => {
         }
     };
 
-    // ✏️ Update existing user
-    const updateUser = async (id, name, email, password, role) => {
+    // ✏️ Update existing user (name and photo only)
+    const updateUser = async (id, name, photo = null) => {
         try {
-            const payload = {
-                name,
-                email,
-                role: role === "administrator" ? "Administrator" : "Member",
-            };
-            if (password) {
-                payload.password = password;
+            if (photo && photo instanceof File) {
+                const formData = new FormData();
+                formData.append("name", name || "");
+                formData.append("user_photo", photo);
+                const res = await api.patch(`/user/${id}`, formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+                await fetchData();
+                return res.data;
             }
-
-            const res = await api.patch(`/user/${id}`, payload);
-            const updatedUser = res.data;
+            const res = await api.patch(`/user/${id}`, { name: name || "" });
             await fetchData();
-            return updatedUser;
+            return res.data;
         } catch (e) {
             console.error("Update error:", e);
             throw e;

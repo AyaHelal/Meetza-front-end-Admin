@@ -120,10 +120,7 @@ export const GroupMembershipRow = ({
                           className="btn btn-sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (window.confirm(`Remove ${member.member_name || member.member_email} from ${membership.group_name || 'this group'}?`)) {
-                              onDelete(member.composite_id || `${membership.group_id}_${member.member_id}`);
-                            }
-
+                            onDelete(member.composite_id || `${membership.group_id}_${member.member_id}`);
                           }}
                           style={{
                             backgroundColor: "transparent",

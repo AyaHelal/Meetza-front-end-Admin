@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
     User,
     UserList,
@@ -19,34 +19,13 @@ import GroupMainContent from "../../components/DashBoard/Group/GroupMainContent"
 import GroupMembershipContent from "../../components/DashBoard/GroupMembership/GroupMembershipContent";
 import VideoDisplay from "../../components/DashBoard/Videos/VideoDisplay";
 import ResourcesPage from "../../components/DashBoard/Resources/ResourcesPage";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const UserDashboard = () => {
-    // ---------- STATE ----------
-    const [currentUser, setCurrentUser] = useState({});
+    const { user: currentUser, logoutUser } = useAuth();
+    const navigate = useNavigate();
     const [activeMenu, setActiveMenu] = useState("user");
-
-    // Modals and user actions are now handled inside UserMainContent
-
-    // ---------- INIT ----------
-    useEffect(() => {
-        try {
-            const storedUserJson = localStorage.getItem("user");
-            const storedUserName = localStorage.getItem("userName");
-            if (storedUserJson) {
-                const parsed = JSON.parse(storedUserJson);
-                if (parsed && (parsed.name || parsed.fullName)) {
-                    setCurrentUser((prev) => ({ ...prev, name: parsed.name || parsed.fullName }));
-                }
-                if (parsed && parsed.role) {
-                    setCurrentUser((prev) => ({ ...prev, role: parsed.role }));
-                }
-            } else if (storedUserName) {
-                setCurrentUser((prev) => ({ ...prev, name: storedUserName }));
-            }
-        } catch (e) {
-            // ignore parsing errors
-        }
-    }, []);
 
     // ---------- MENU ----------
     const menuItems = [
@@ -72,18 +51,8 @@ const UserDashboard = () => {
     };
 
     const handleLogout = () => {
-        try {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userRole');
-            localStorage.removeItem('remember');
-            sessionStorage.removeItem('authToken');
-            sessionStorage.removeItem('user');
-            sessionStorage.removeItem('userName');
-            sessionStorage.removeItem('userRole');
-        } catch (_) { /* ignore */ }
-        window.location.href = '/login';
+        logoutUser();
+        navigate('/login', { replace: true });
     };
 
     return (

@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import api from "../../../../utils/api";
+import { useAuth } from "../../../../context/AuthContext";
 
 export const useGroupData = () => {
+  const { user } = useAuth();
   const [groups, setGroups] = useState([]);
   const [positions, setPositions] = useState([]);
   const [users, setUsers] = useState([]);
   const [contents, setContents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-
 
   const fetchData = useCallback(async () => {
     try {
@@ -18,16 +18,12 @@ export const useGroupData = () => {
       const res = await api.get("/group");
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
 
-      // Get current user to filter groups based on role
-      const user = JSON.parse(localStorage.getItem("user"));
       const isSuperAdmin = user?.role === "Super_Admin";
       const isAdministrator = user?.role === "Administrator";
 
       let filteredGroups = payload;
 
-      // Filter groups based on user role
       if (isAdministrator && !isSuperAdmin) {
-        // Administrator can only see groups they created (where admin_id matches their user ID)
         filteredGroups = payload.filter(g =>
           g.admin_id === user?.id ||
           g.adminId === user?.id ||
@@ -58,7 +54,7 @@ export const useGroupData = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user?.id, user?.role]);
 
   const fetchPositions = useCallback(async () => {
     try {
@@ -174,16 +170,12 @@ export const useGroupData = () => {
       const res = await api.get(`/group?name=${query}`);
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
 
-      // Get current user to filter groups based on role
-      const user = JSON.parse(localStorage.getItem("user"));
       const isSuperAdmin = user?.role === "Super_Admin";
       const isAdministrator = user?.role === "Administrator";
 
       let filteredGroups = payload;
 
-      // Filter groups based on user role
       if (isAdministrator && !isSuperAdmin) {
-        // Administrator can only see groups they created (where admin_id matches their user ID)
         filteredGroups = payload.filter(g =>
           g.admin_id === user?.id ||
           g.adminId === user?.id ||

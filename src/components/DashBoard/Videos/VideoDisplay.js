@@ -11,7 +11,11 @@ import { MagnifyingGlass, X, ArrowLeft } from 'phosphor-react';
 import { UploadSimple } from 'phosphor-react';
 import CustomDatePicker from './CustomDatePicker';
 import './VideoDisplay.css';
-const VideoDisplay = ({ currentUser }) => {
+import { useAuth } from '../../../context/AuthContext';
+
+const VideoDisplay = ({ currentUser: currentUserProp }) => {
+    const { user: authUser } = useAuth();
+    const currentUser = currentUserProp ?? authUser;
     const [videos, setVideos] = useState([]);
     const [currentVideo, setCurrentVideo] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -22,7 +26,7 @@ const VideoDisplay = ({ currentUser }) => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const searchContainerRef = useRef(null);
     const [showEditModal, setShowEditModal] = useState(false);
-    const [editFormData, setEditFormData] = useState({ title: '', poster_url: '', id: null });
+    const [editFormData, setEditFormData] = useState({ title: '', poster_file: null, id: null });
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [videoToDelete, setVideoToDelete] = useState(null);
@@ -61,16 +65,12 @@ const VideoDisplay = ({ currentUser }) => {
             const res = await api.get('/group');
             const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
 
-            // Get current user to filter groups based on role
-            const user = JSON.parse(localStorage.getItem("user"));
+            const user = authUser || currentUser;
             const isSuperAdmin = user?.role === "Super_Admin";
             const isAdministrator = user?.role === "Administrator";
 
             let filteredGroups = payload;
-
-            // Filter groups based on user role
             if (isAdministrator && !isSuperAdmin) {
-                // Administrator can only see groups they created (where admin_id matches their user ID)
                 filteredGroups = payload.filter(g =>
                     g.admin_id === user?.id ||
                     g.adminId === user?.id ||
@@ -254,6 +254,32 @@ const VideoDisplay = ({ currentUser }) => {
             return path;
         }
     };
+
+    const durationFromApiToSeconds = (duration) => {
+        if (duration == null || duration === '') return 0;
+        const num = Number(duration);
+        if (!isNaN(num) && num >= 0) return Math.round(num);
+        if (typeof duration === 'string') {
+            const parts = duration.trim().split(':').map(Number);
+            if (parts.length >= 2 && parts.every((p) => !isNaN(p))) {
+                const [h = 0, m = 0, s = 0] = parts;
+                return Math.round((h || 0) * 3600 + (m || 0) * 60 + (s || 0));
+            }
+        }
+        return 0;
+    };
+
+    const formatDuration = (duration) => {
+        const totalSec = durationFromApiToSeconds(duration);
+        if (totalSec <= 0) return '0m 0s';
+        const h = Math.floor(totalSec / 3600);
+        const m = Math.floor((totalSec % 3600) / 60);
+        const s = totalSec % 60;
+        if (h > 0) return `${h}h ${m}m ${s}s`;
+        if (m > 0) return `${m}m ${s}s`;
+        return `${s}s`;
+    };
+
     // log constructed URLs when currentVideo changes (helpful for debugging)
     useEffect(() => {
         if (!currentVideo) return;
@@ -348,7 +374,7 @@ const VideoDisplay = ({ currentUser }) => {
 
         setEditFormData({
             title: video.title || '',
-            poster_url: video.poster_url || '',
+            poster_file: null,
             id: videoId
         });
         setShowEditModal(true);
@@ -365,80 +391,34 @@ const VideoDisplay = ({ currentUser }) => {
             return;
         }
 
+        const videoId = editFormData.id;
+        const hasPosterFile = editFormData.poster_file && editFormData.poster_file instanceof File;
+
         try {
-            const videoId = editFormData.id;
-            const payload = {
-                title: editFormData.title,
-                poster_url: editFormData.poster_url
-            };
+            const formData = new FormData();
+            formData.append('title', editFormData.title.trim());
+            if (hasPosterFile) formData.append('poster_file', editFormData.poster_file);
 
-            console.log('Updating video with ID:', videoId);
-            console.log('Payload:', payload);
-            console.log('Full URL will be:', `/video/${videoId}`);
-            console.log('Base URL:', api.defaults.baseURL);
-            console.log('Full endpoint:', `${api.defaults.baseURL}/video/${videoId}`);
+            const response = await api.post(`/video/${videoId}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
 
-            // Try to get the video first to verify the ID
-            try {
-                const checkResponse = await api.get(`/video/${videoId}`);
-                console.log('Video exists, ID is valid:', checkResponse.data);
-            } catch (checkErr) {
-                console.error('Video check failed:', checkErr);
-                console.error('Check error response:', checkErr.response);
-            }
-
-            // Try POST first, then PATCH, then PUT with different endpoint variations
-            let response;
-            try {
-                response = await api.post(`/video/${videoId}`, payload);
-                console.log('POST /video/{id} succeeded');
-            } catch (postErr) {
-                console.log('POST /video/{id} failed, trying PATCH...');
-                try {
-                    response = await api.patch(`/video/${videoId}`, payload);
-                    console.log('PATCH /video/{id} succeeded');
-                } catch (patchErr) {
-                    console.log('PATCH /video/{id} failed, trying alternatives...');
-                    // Try POST on /videos (plural)
-                    try {
-                        response = await api.post(`/videos/${videoId}`, payload);
-                        console.log('POST /videos/{id} succeeded');
-                    } catch (videosPostErr) {
-                        // Try PATCH on /videos (plural)
-                        try {
-                            response = await api.patch(`/videos/${videoId}`, payload);
-                            console.log('PATCH /videos/{id} succeeded');
-                        } catch (videosPatchErr) {
-                            // Try PUT on /videos (plural)
-                            try {
-                                response = await api.put(`/videos/${videoId}`, payload);
-                                console.log('PUT /videos/{id} succeeded');
-                            } catch (putErr) {
-                                // If all fail, throw the original POST error
-                                throw postErr;
-                            }
-                        }
-                    }
-                }
-            }
-            console.log('Update response:', response);
+            const newPosterUrl = response?.data?.data?.poster_url;
 
             toast.success("Video updated successfully");
 
-            // Update video in the list
-            const updatedVideos = videos.map(v =>
-                (v._id === videoId || v.id === videoId)
-                    ? { ...v, title: editFormData.title, poster_url: editFormData.poster_url }
+            const updatedVideos = videos.map((v) =>
+                v._id === videoId || v.id === videoId
+                    ? { ...v, title: editFormData.title.trim(), ...(newPosterUrl && { poster_url: newPosterUrl }) }
                     : v
             );
             setVideos(updatedVideos);
 
-            // Update current video if it's the one being edited
             if (currentVideo && (currentVideo._id === videoId || currentVideo.id === videoId)) {
                 setCurrentVideo({
                     ...currentVideo,
-                    title: editFormData.title,
-                    poster_url: editFormData.poster_url
+                    title: editFormData.title.trim(),
+                    ...(newPosterUrl && { poster_url: newPosterUrl }),
                 });
             }
 
@@ -561,6 +541,20 @@ const VideoDisplay = ({ currentUser }) => {
 
             setUploadFormData(prev => ({ ...prev, [name]: file }));
         }
+    };
+
+    const handleEditPosterFileChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) {
+            setEditFormData((prev) => ({ ...prev, poster_file: null }));
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            toast.error("Poster image is too large (max 10MB).");
+            e.target.value = "";
+            return;
+        }
+        setEditFormData((prev) => ({ ...prev, poster_file: file }));
     };
 
     const getVideoDurationSeconds = (file) => {
@@ -908,9 +902,7 @@ const VideoDisplay = ({ currentUser }) => {
                                                     </label>
                                                     <div className="form-control rounded-4 py-2 w-75 d-flex align-items-center"
                                                         style={{ border: "1px solid #ABABAB", fontSize: "16px", backgroundColor: "#f8f9fa" }}>
-                                                        {uploadFormData.duration
-                                                            ? `${Math.floor(uploadFormData.duration / 60)}m ${Math.round(uploadFormData.duration % 60)}s`
-                                                            : "Will be detected automatically from video"}
+                                                        {uploadFormData.duration ? formatDuration(uploadFormData.duration) : "Will be detected automatically from video"}
                                                     </div>
                                                     <small className="text-muted d-block mt-1">
                                                         Duration is calculated automatically from the selected video file.
@@ -1062,11 +1054,7 @@ const VideoDisplay = ({ currentUser }) => {
                                     <h5 className="mb-0 fw-semibold">{currentVideo.title}</h5>
                                     <span className="badge text-dark fw-semibold">
                                         Duration:{" "}
-                                        {currentVideo.duration
-                                            ? `${Math.floor(currentVideo.duration / 60)}m ${Math.round(
-                                                currentVideo.duration % 60
-                                            )}s`
-                                            : "N/A"}
+                                        {formatDuration(currentVideo.duration)}
                                     </span>
                                 </div>
 
@@ -1310,11 +1298,7 @@ const VideoDisplay = ({ currentUser }) => {
                                             <h6 className="mb-1 small" style={{ color: isSelected ? '#ffffff' : 'inherit' }}>{video.title}</h6>
                                             <p className="mb-0 small" style={{ color: isSelected ? '#ffffff' : '#6c757d' }}>
                                                 Duration:{" "}
-                                                {video.duration
-                                                    ? `${Math.floor(video.duration / 60)}m ${Math.round(
-                                                        video.duration % 60
-                                                    )}s`
-                                                    : "N/A"}
+                                                {formatDuration(video.duration)}
                                             </p>
                                         </div>
                                         <div className="d-flex gap-1 ">
@@ -1513,23 +1497,23 @@ const VideoDisplay = ({ currentUser }) => {
                                         />
                                     </div>
 
-                                    {/* Poster URL */}
+                                    {/* Poster: ملف صورة مثل Create */}
                                     <div className="mb-3">
                                         <label className="form-label fw-semibold" style={{ color: "#010101" }}>
-                                            Poster URL
+                                            Poster (image)
                                         </label>
                                         <input
-                                            type="text"
+                                            type="file"
+                                            accept="image/*"
                                             className="form-control rounded-3"
-                                            value={editFormData.poster_url || ''}
-                                            onChange={(e) => setEditFormData({ ...editFormData, poster_url: e.target.value })}
-                                            placeholder="Enter poster URL"
-                                            style={{
-                                                border: "2px solid #E9ECEF",
-                                                padding: "0.75rem",
-                                                fontSize: "16px"
-                                            }}
+                                            onChange={handleEditPosterFileChange}
+                                            style={{ border: "2px solid #E9ECEF", padding: "0.75rem", fontSize: "16px" }}
                                         />
+                                        {editFormData.poster_file && (
+                                            <span className="small text-muted d-block mt-1">
+                                                Selected: {editFormData.poster_file.name}
+                                            </span>
+                                        )}
                                     </div>
                                 </form>
                             </div>
@@ -1649,11 +1633,7 @@ const VideoDisplay = ({ currentUser }) => {
                                         <input
                                             type="text"
                                             className="form-control rounded-3"
-                                            value={uploadFormData.duration
-                                                ? `${Math.floor(uploadFormData.duration / 60)}m ${Math.round(
-                                                    uploadFormData.duration % 60
-                                                )}s`
-                                                : "Will be detected automatically from video"}
+                                            value={uploadFormData.duration ? formatDuration(uploadFormData.duration) : "Will be detected automatically from video"}
                                             readOnly
                                             style={{
                                                 border: "2px solid #E9ECEF",

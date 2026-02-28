@@ -6,6 +6,7 @@ import { useGroupMembershipData } from "./hooks/useGroupMembershipData";
 import { GroupMembershipHeader } from "./components/GroupMembershipHeader";
 import { GroupMembershipTable } from "./components/GroupMembershipTable";
 import { SearchBar } from "../shared/SearchBar";
+import { ConfirmDeleteModal } from "../shared/ConfirmDeleteModal";
 import { PlusCircle } from "phosphor-react";
 import Select from 'react-select';
 import "../User/UserMainComponent.css";
@@ -29,6 +30,8 @@ const GroupMembershipContent = ({ currentUser }) => {
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({ group_id: "", member_email: "" });
     const [searchQuery, setSearchQuery] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [membershipToDelete, setMembershipToDelete] = useState(null);
 
     console.log("GroupMembershipContent - currentUser:", currentUser);
     console.log("GroupMembershipContent - currentUser.id:", currentUser?.id);
@@ -66,49 +69,52 @@ const GroupMembershipContent = ({ currentUser }) => {
     };
 
     const handleCreateMembership = async () => {
-        if (!formData.group_id || !formData.member_email) {
+        if (!formData.group_id || !formData.member_email?.trim()) {
             toast.error("Please select a group and enter a member email");
             return;
         }
 
         try {
-            // First, call API to get user by email
-            const email = encodeURIComponent(formData.member_email.trim());
-            const response = await api.get(`/user/email/${email}`);
-            const userData = response.data;
+            const email = formData.member_email.trim();
+            const response = await api.get(`/user/email/${encodeURIComponent(email)}`);
+            const raw = response?.data;
+            const userData = raw?.data ?? raw;
 
-            if (!userData || !userData.id) {
-                toast.error("Member with this email not found. Please check the email address.");
+            if (!userData?.id) {
+                toast.error("User with this email not found. Please check the email address.");
                 return;
             }
 
-            // Check if the user is a Member
-            if (userData.role !== "Member" && userData.role !== "member") {
-                toast.error("This user is not a Member. Only members can be added to groups.");
+            if ((userData.role || "").toLowerCase() !== "member") {
+                toast.error("This user is not a Member. Only users with role Member can be added to groups.");
                 return;
             }
 
-            // Use the id from the API response
-            const memberId = userData.id;
-
-            await createMembership(formData.group_id, memberId);
+            await createMembership(formData.group_id, userData.id);
             toast.success("Group membership created successfully");
             setShowForm(false);
             setFormData({ group_id: "", member_email: "" });
         } catch (error) {
             if (error?.response?.status === 404) {
-                toast.error("Member with this email not found. Please check the email address.");
+                toast.error("User with this email not found. Please check the email address.");
             } else {
-            const msg = error?.response?.data?.message || error.message || "Failed to create group membership";
-            toast.error(msg);
+                const msg = error?.response?.data?.message || error.message || "Failed to create group membership";
+                toast.error(msg);
             }
         }
     };
 
-    const handleDeleteMembership = async (id) => {
-        // Note: Confirm dialog is already shown in the row component
+    const handleDeleteMembership = (id) => {
+        setMembershipToDelete(id);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDeleteMembership = async () => {
+        if (!membershipToDelete) return;
         try {
-            const res = await deleteMembership(id);
+            const res = await deleteMembership(membershipToDelete);
+            setShowDeleteModal(false);
+            setMembershipToDelete(null);
             if (res.success) {
                 toast.success("Group membership deleted successfully");
             } else {
@@ -118,6 +124,8 @@ const GroupMembershipContent = ({ currentUser }) => {
             console.error("Delete error:", error);
             const errorMsg = error?.response?.data?.message || error.message || "Error deleting membership";
             toast.error(errorMsg);
+            setShowDeleteModal(false);
+            setMembershipToDelete(null);
         }
     };
 
@@ -299,6 +307,14 @@ const GroupMembershipContent = ({ currentUser }) => {
                     )}
                 </div>
             </div>
+
+            <ConfirmDeleteModal
+                show={showDeleteModal}
+                onClose={() => { setShowDeleteModal(false); setMembershipToDelete(null); }}
+                onConfirm={confirmDeleteMembership}
+                title="Delete Group Membership"
+                message="Are you sure you want to remove this member from the group? This action cannot be undone."
+            />
         </main>
     );
 };
