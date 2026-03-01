@@ -21,7 +21,7 @@ export default function LoginForm() {
     const [rememberMe, setRememberMe] = useState(false);
     const [showCaptcha, setShowCaptcha] = useState(false);
     const [captchaToken, setCaptchaToken] = useState('');
-    const [failedAttempts, setFailedAttempts] = useState(0);
+    const [remainingAttempts, setRemainingAttempts] = useState(undefined);
 
     const { formData, errors, touched, handleChange: originalHandleChange, validateForm } = useFormValidation(
         { email: "", password: "" },
@@ -93,32 +93,21 @@ export default function LoginForm() {
         }
     }, [showCaptcha]);
 
-    // reCAPTCHA callbacks
+    // reCAPTCHA callbacks (backend may require captcha via 429 + requiresCaptcha)
     window.onCaptchaVerified = (token) => {
         setCaptchaToken(token);
         setApiError("");
-        setShowCaptcha(false);
-        setFailedAttempts(0);
     };
 
     window.onCaptchaExpired = () => {
         setCaptchaToken('');
         setApiError("CAPTCHA expired. Please complete it again.");
-        setShowCaptcha(true);
     };
 
-    // Reset CAPTCHA token when hidden
+    // Reset CAPTCHA token when captcha is hidden
     useEffect(() => {
         if (!showCaptcha) setCaptchaToken('');
     }, [showCaptcha]);
-
-    // Show CAPTCHA after 3 failed attempts
-    useEffect(() => {
-        if (!captchaToken && failedAttempts >= 3 && !showCaptcha) {
-            setShowCaptcha(true);
-            console.log('🔄 Showing CAPTCHA after failed attempts');
-        }
-    }, [captchaToken, failedAttempts, showCaptcha]);
 
     // Auto-refresh CAPTCHA after 5 seconds
     useEffect(() => {
@@ -148,43 +137,47 @@ export default function LoginForm() {
     const handleFormSubmission = async () => {
         if (!validateForm()) return;
 
-        if (failedAttempts >= 3 && !captchaToken) {
-            setShowCaptcha(true);
-            setApiError("Please complete the CAPTCHA to continue.");
-            return;
-        }
-
         setApiError("");
         setIsLoading(true);
+        setRemainingAttempts(undefined);
+
+        const requestData = {
+            ...formData,
+            remember_me: rememberMe.toString(),
+            from: "dashboard",
+            ...(captchaToken && { recaptchaToken: captchaToken })
+        };
 
         try {
-            const requestData = {
-                ...formData,
-                remember_me: rememberMe.toString(),
-                from: "dashboard",
-                ...(captchaToken && { recaptchaToken: captchaToken })
-            };
-
             const response = await api.post('/auth/login', requestData);
+            const data = response?.data?.data ?? response?.data;
+            const token = data?.token;
+            const userPayload = data?.user;
 
-            const token = response?.data?.data?.token || response?.data?.token;
-            const userPayload = response?.data?.data?.user || response?.data?.user;
             if (token) {
                 loginUser(userPayload || {}, token, rememberMe);
-                setFailedAttempts(0);
                 setShowCaptcha(false);
                 setCaptchaToken('');
+                setRemainingAttempts(undefined);
                 navigate('/dashboard');
+            } else {
+                const msg = response?.data?.message ?? response?.data?.data?.message ?? "Login failed.";
+                setApiError(msg);
+                const remaining = response?.data?.remaining ?? response?.data?.data?.remaining;
+                if (remaining !== undefined) setRemainingAttempts(remaining);
             }
         } catch (error) {
-            const attempts = failedAttempts + 1;
-            setFailedAttempts(attempts);
+            const res = error.response;
+            const data = res?.data || {};
+            const msg = data?.message ?? data?.data?.message ?? error.message ?? "Login failed. Please try again.";
 
-            if (attempts >= 3) setShowCaptcha(true);
-
-            if (error.response?.data?.message) setApiError(error.response.data.message);
-            else if (error.message) setApiError(error.message);
-            else setApiError("Login failed. Please try again.");
+            if (res?.status === 429 && data?.requiresCaptcha) {
+                setShowCaptcha(true);
+                setApiError(msg);
+            } else {
+                setApiError(msg);
+            }
+            if (data?.remaining !== undefined) setRemainingAttempts(data.remaining);
         } finally {
             setIsLoading(false);
         }
@@ -226,12 +219,10 @@ export default function LoginForm() {
                             </motion.div>
                         )}
 
-                        {/* Failed Attempts Counter */}
-                        {failedAttempts > 0 && (
+                        {remainingAttempts !== undefined && (
                             <div className="mb-3 text-center">
                                 <small className="text-warning">
-                                    Failed attempts: {failedAttempts}/3
-                                    {failedAttempts >= 3 && " - reCAPTCHA required"}
+                                    {remainingAttempts === 0 ? "No attempts remaining" : `${remainingAttempts} attempt(s) remaining`}
                                 </small>
                             </div>
                         )}
