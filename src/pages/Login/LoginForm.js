@@ -144,6 +144,17 @@ export default function LoginForm() {
                 setApiError(msg);
             } else {
                 setApiError(msg);
+                // لو الباك رجع إن الـ CAPTCHA فشلت → نمسح التوكن ونعرض الـ reCAPTCHA تاني عشان يحل من جديد
+                const isCaptchaError = res?.status === 400 || res?.status === 500;
+                const msgLower = (msg || "").toLowerCase();
+                if (isCaptchaError && (msgLower.includes("captcha") || msgLower.includes("recaptcha"))) {
+                    setCaptchaToken("");
+                    setShowCaptcha(true);
+                    setCaptchaRequiredByBackend(true);
+                    if (typeof window.grecaptcha?.reset === "function") {
+                        try { window.grecaptcha.reset(); } catch (e) { /* ignore */ }
+                    }
+                }
             }
             if (data?.remaining !== undefined) setRemainingAttempts(data.remaining);
         } finally {
