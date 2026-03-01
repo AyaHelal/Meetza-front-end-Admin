@@ -111,7 +111,7 @@ export default function LoginForm() {
             ...formData,
             remember_me: rememberMe.toString(),
             from: "dashboard",
-            ...(recaptchaTokenToSend && { recaptchaToken: recaptchaTokenToSend })
+            ...(recaptchaTokenToSend && { captchaToken: recaptchaTokenToSend })
         };
 
         try {
