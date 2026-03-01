@@ -98,11 +98,16 @@ export default function LoginForm() {
     const submitLogin = async (recaptchaTokenToSend = null) => {
         if (!validateForm()) return;
 
+        const tokenToSend = recaptchaTokenToSend ?? captchaToken;
+        const mustSolveCaptcha = captchaRequiredByBackend && !tokenToSend;
+        if (mustSolveCaptcha) {
+            setApiError("Please complete the reCAPTCHA.");
+            return;
+        }
+
         setApiError("");
         setIsLoading(true);
         setRemainingAttempts(undefined);
-
-        const tokenToSend = recaptchaTokenToSend ?? captchaToken;
         const shouldSendCaptcha = (recaptchaTokenToSend != null) || (captchaRequiredByBackend && tokenToSend);
 
         const requestData = {
@@ -149,7 +154,6 @@ export default function LoginForm() {
         }
     };
 
-    // عند الحصول على الـ token من غوغل (بعد ما الباك طلب captcha بـ 429): نبعته ونعمل login
     window.onCaptchaVerified = (token) => {
         setCaptchaToken(token);
         setApiError("");
@@ -271,7 +275,7 @@ export default function LoginForm() {
                             <motion.div id="recaptcha-container" className="g-recaptcha mt-3 mb-3 d-flex justify-content-center" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} />
                         )}
 
-                        <motion.button type="submit" className="btn btn-primary w-100 py-3 mt-3 mb-3 rounded-4 d-inline-flex align-items-center justify-content-center" whileHover={!isLoading ? { scale: 1.02 } : {}} whileTap={!isLoading ? { scale: 0.98 } : {}} disabled={isLoading}>
+                        <motion.button type="submit" className="btn btn-primary w-100 py-3 mt-3 mb-3 rounded-4 d-inline-flex align-items-center justify-content-center" whileHover={!isLoading && !(captchaRequiredByBackend && !captchaToken) ? { scale: 1.02 } : {}} whileTap={!isLoading && !(captchaRequiredByBackend && !captchaToken) ? { scale: 0.98 } : {}} disabled={isLoading || (captchaRequiredByBackend && !captchaToken)}>
                             {isLoading ? (
                                 <>
                                     <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
