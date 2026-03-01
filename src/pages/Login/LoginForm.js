@@ -103,13 +103,13 @@ export default function LoginForm() {
         setRemainingAttempts(undefined);
 
         const tokenToSend = recaptchaTokenToSend ?? captchaToken;
-        const shouldSendCaptcha = captchaRequiredByBackend && tokenToSend;
+        const shouldSendCaptcha = (recaptchaTokenToSend != null) || (captchaRequiredByBackend && tokenToSend);
 
         const requestData = {
             ...formData,
             remember_me: rememberMe.toString(),
             from: "dashboard",
-            ...(shouldSendCaptcha && { recaptchaToken: tokenToSend })
+            ...(shouldSendCaptcha && tokenToSend && { recaptchaToken: tokenToSend })
         };
 
         try {
@@ -157,30 +157,12 @@ export default function LoginForm() {
         submitLogin(token);
     };
 
-    window.onCaptchaExpired = () => {
-        setCaptchaToken('');
-        setApiError("CAPTCHA expired. Please complete it again.");
-    };
+    window.onCaptchaExpired = () => setCaptchaToken('');
 
     // Reset CAPTCHA token when captcha is hidden
     useEffect(() => {
         if (!showCaptcha) setCaptchaToken('');
     }, [showCaptcha]);
-
-    // Auto-refresh CAPTCHA after 5 seconds
-    useEffect(() => {
-        let timeoutId;
-        if (showCaptcha && captchaToken) {
-            timeoutId = setTimeout(() => {
-                setCaptchaToken('');
-                setApiError("CAPTCHA expired. Please complete it again.");
-                if (window.grecaptcha) {
-                    try { window.grecaptcha.reset(); } catch (error) { console.error(error); }
-                }
-            }, 5000);
-        }
-        return () => { if (timeoutId) clearTimeout(timeoutId); };
-    }, [showCaptcha, captchaToken]);
 
     // Cleanup reCAPTCHA on unmount
     useEffect(() => {
