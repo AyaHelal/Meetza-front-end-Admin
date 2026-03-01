@@ -94,13 +94,11 @@ export default function LoginForm() {
         }
     }, [showCaptcha]);
 
-    // Submit login. Send recaptchaToken only when backend asked for it (429 + requiresCaptcha).
+    // Submit login. When backend asked for captcha (429), we only send token from callback — لا نعتمد على state.
     const submitLogin = async (recaptchaTokenToSend = null) => {
         if (!validateForm()) return;
 
-        const tokenToSend = recaptchaTokenToSend ?? captchaToken;
-        const mustSolveCaptcha = captchaRequiredByBackend && !tokenToSend;
-        if (mustSolveCaptcha) {
+        if (captchaRequiredByBackend && !recaptchaTokenToSend) {
             setApiError("Please complete the reCAPTCHA.");
             return;
         }
@@ -108,13 +106,12 @@ export default function LoginForm() {
         setApiError("");
         setIsLoading(true);
         setRemainingAttempts(undefined);
-        const shouldSendCaptcha = (recaptchaTokenToSend != null) || (captchaRequiredByBackend && tokenToSend);
 
         const requestData = {
             ...formData,
             remember_me: rememberMe.toString(),
             from: "dashboard",
-            ...(shouldSendCaptcha && tokenToSend && { recaptchaToken: tokenToSend })
+            ...(recaptchaTokenToSend && { recaptchaToken: recaptchaTokenToSend })
         };
 
         try {
@@ -155,9 +152,9 @@ export default function LoginForm() {
     };
 
     window.onCaptchaVerified = (token) => {
-        setCaptchaToken(token);
         setApiError("");
         setRemainingAttempts(undefined);
+        setCaptchaToken(token);
         submitLogin(token);
     };
 
@@ -183,7 +180,8 @@ export default function LoginForm() {
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            handleFormSubmission();
+            if (captchaRequiredByBackend) return;
+            submitLogin();
         }
     };
 
