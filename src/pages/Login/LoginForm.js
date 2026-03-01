@@ -22,6 +22,7 @@ export default function LoginForm() {
     const [showCaptcha, setShowCaptcha] = useState(false);
     const [captchaToken, setCaptchaToken] = useState('');
     const [remainingAttempts, setRemainingAttempts] = useState(undefined);
+    const [captchaRequiredByBackend, setCaptchaRequiredByBackend] = useState(false);
 
     const { formData, errors, touched, handleChange: originalHandleChange, validateForm } = useFormValidation(
         { email: "", password: "" },
@@ -93,10 +94,67 @@ export default function LoginForm() {
         }
     }, [showCaptcha]);
 
-    // reCAPTCHA callbacks (backend may require captcha via 429 + requiresCaptcha)
+    // Submit login. Send recaptchaToken only when backend asked for it (429 + requiresCaptcha).
+    const submitLogin = async (recaptchaTokenToSend = null) => {
+        if (!validateForm()) return;
+
+        setApiError("");
+        setIsLoading(true);
+        setRemainingAttempts(undefined);
+
+        const tokenToSend = recaptchaTokenToSend ?? captchaToken;
+        const shouldSendCaptcha = captchaRequiredByBackend && tokenToSend;
+
+        const requestData = {
+            ...formData,
+            remember_me: rememberMe.toString(),
+            from: "dashboard",
+            ...(shouldSendCaptcha && { recaptchaToken: tokenToSend })
+        };
+
+        try {
+            const response = await api.post('/auth/login', requestData);
+            const data = response?.data?.data ?? response?.data;
+            const token = data?.token;
+            const userPayload = data?.user;
+
+            if (token) {
+                loginUser(userPayload || {}, token, rememberMe);
+                setShowCaptcha(false);
+                setCaptchaToken('');
+                setCaptchaRequiredByBackend(false);
+                setRemainingAttempts(undefined);
+                navigate('/dashboard');
+            } else {
+                const msg = response?.data?.message ?? response?.data?.data?.message ?? "Login failed.";
+                setApiError(msg);
+                const remaining = response?.data?.remaining ?? response?.data?.data?.remaining;
+                if (remaining !== undefined) setRemainingAttempts(remaining);
+            }
+        } catch (error) {
+            const res = error.response;
+            const data = res?.data || {};
+            const msg = data?.message ?? data?.data?.message ?? error.message ?? "Login failed. Please try again.";
+
+            if (res?.status === 429 && data?.requiresCaptcha) {
+                setCaptchaRequiredByBackend(true);
+                setShowCaptcha(true);
+                setApiError(msg);
+            } else {
+                setApiError(msg);
+            }
+            if (data?.remaining !== undefined) setRemainingAttempts(data.remaining);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // عند الحصول على الـ token من غوغل (بعد ما الباك طلب captcha بـ 429): نبعته ونعمل login
     window.onCaptchaVerified = (token) => {
         setCaptchaToken(token);
         setApiError("");
+        setRemainingAttempts(undefined);
+        submitLogin(token);
     };
 
     window.onCaptchaExpired = () => {
@@ -134,54 +192,7 @@ export default function LoginForm() {
         };
     }, []);
 
-    const handleFormSubmission = async () => {
-        if (!validateForm()) return;
-
-        setApiError("");
-        setIsLoading(true);
-        setRemainingAttempts(undefined);
-
-        const requestData = {
-            ...formData,
-            remember_me: rememberMe.toString(),
-            from: "dashboard",
-            ...(captchaToken && { recaptchaToken: captchaToken })
-        };
-
-        try {
-            const response = await api.post('/auth/login', requestData);
-            const data = response?.data?.data ?? response?.data;
-            const token = data?.token;
-            const userPayload = data?.user;
-
-            if (token) {
-                loginUser(userPayload || {}, token, rememberMe);
-                setShowCaptcha(false);
-                setCaptchaToken('');
-                setRemainingAttempts(undefined);
-                navigate('/dashboard');
-            } else {
-                const msg = response?.data?.message ?? response?.data?.data?.message ?? "Login failed.";
-                setApiError(msg);
-                const remaining = response?.data?.remaining ?? response?.data?.data?.remaining;
-                if (remaining !== undefined) setRemainingAttempts(remaining);
-            }
-        } catch (error) {
-            const res = error.response;
-            const data = res?.data || {};
-            const msg = data?.message ?? data?.data?.message ?? error.message ?? "Login failed. Please try again.";
-
-            if (res?.status === 429 && data?.requiresCaptcha) {
-                setShowCaptcha(true);
-                setApiError(msg);
-            } else {
-                setApiError(msg);
-            }
-            if (data?.remaining !== undefined) setRemainingAttempts(data.remaining);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const handleFormSubmission = () => submitLogin();
 
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
