@@ -255,18 +255,45 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
         }
     };
 
+    /**
+     * Normalize duration from API to seconds.
+     * API may return: number (seconds), string number "120", "HH:MM:SS", or ISO date string (MySQL TIME as Date).
+     */
     const durationFromApiToSeconds = (duration) => {
         if (duration == null || duration === '') return 0;
         const num = Number(duration);
         if (!isNaN(num) && num >= 0) return Math.round(num);
         if (typeof duration === 'string') {
-            const parts = duration.trim().split(':').map(Number);
+            const s = duration.trim();
+            const parts = s.split(':').map(Number);
             if (parts.length >= 2 && parts.every((p) => !isNaN(p))) {
-                const [h = 0, m = 0, s = 0] = parts;
-                return Math.round((h || 0) * 3600 + (m || 0) * 60 + (s || 0));
+                if (parts.length === 2) {
+                    const [min, sec] = parts;
+                    return Math.round((min || 0) * 60 + (sec || 0));
+                }
+                const [h = 0, m = 0, sec = 0] = parts;
+                return Math.round((h || 0) * 3600 + (m || 0) * 60 + (sec || 0));
             }
+            const isoMatch = s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+            if (isoMatch) {
+                const [, , , , h, m, sec] = isoMatch.map(Number);
+                return Math.round((h || 0) * 3600 + (m || 0) * 60 + (sec || 0));
+            }
+            const numFromStr = Number(s);
+            if (!isNaN(numFromStr) && numFromStr >= 0) return Math.round(numFromStr);
+        }
+        if (typeof duration === 'object' && typeof duration.getHours === 'function') {
+            const d = duration;
+            return Math.round(d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds());
         }
         return 0;
+    };
+
+    /** Get duration from a video object (API may use duration, duration_seconds, etc.) */
+    const getVideoDuration = (video) => {
+        if (!video) return 0;
+        const raw = video.duration ?? video.duration_seconds ?? video.durationSeconds;
+        return durationFromApiToSeconds(raw);
     };
 
     const formatDuration = (duration) => {
@@ -1054,7 +1081,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                     <h5 className="mb-0 fw-semibold">{currentVideo.title}</h5>
                                     <span className="badge text-dark fw-semibold">
                                         Duration:{" "}
-                                        {formatDuration(currentVideo.duration)}
+                                        {formatDuration(getVideoDuration(currentVideo))}
                                     </span>
                                 </div>
 
@@ -1298,7 +1325,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                             <h6 className="mb-1 small" style={{ color: isSelected ? '#ffffff' : 'inherit' }}>{video.title}</h6>
                                             <p className="mb-0 small" style={{ color: isSelected ? '#ffffff' : '#6c757d' }}>
                                                 Duration:{" "}
-                                                {formatDuration(video.duration)}
+                                                {formatDuration(getVideoDuration(video))}
                                             </p>
                                         </div>
                                         <div className="d-flex gap-1 ">
@@ -1497,7 +1524,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                         />
                                     </div>
 
-                                    {/* Poster: ملف صورة مثل Create */}
+
                                     <div className="mb-3">
                                         <label className="form-label fw-semibold" style={{ color: "#010101" }}>
                                             Poster (image)
