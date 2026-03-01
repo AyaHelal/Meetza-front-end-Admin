@@ -195,6 +195,27 @@ export default function LoginForm() {
         { value: 'signup', label: 'Sign Up' }
     ];
 
+    // Handle browser back button to redirect to landing page
+    useEffect(() => {
+        const landingUrl = 'https://meetza-front-end.vercel.app/landing';
+
+        // Push landing page entry to history before current login page
+        // This makes back button go to landing instead of dashboard
+        window.history.pushState({ page: 'landing' }, '', window.location.href);
+
+        const handlePopState = (event) => {
+            // When back button is clicked, redirect to landing page
+            // Use replace to prevent adding to history
+            window.location.replace(landingUrl);
+        };
+
+        window.addEventListener('popstate', handlePopState);
+
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, []);
+
     return (
         <motion.div className="align-items-center text-center" initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
             <LogoSection />
