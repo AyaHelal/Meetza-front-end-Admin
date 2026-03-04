@@ -37,12 +37,12 @@ import { useAuth } from "../../../../context/AuthContext";
                 const list = filteredMeetings || [];
                 return list.map(m => {
                     const existing = prev.find(p => p.id === m.id);
-                    const recordMeeting = (m.record_meeting !== undefined && m.record_meeting !== null)
-                        ? m.record_meeting
-                        : (existing && (existing.record_meeting !== undefined && existing.record_meeting !== null))
-                            ? existing.record_meeting
-                            : undefined;
-                    return { ...m, record_meeting: recordMeeting };
+                    // Backend returns "recording" (1/0); normalize to record_meeting for form/display
+                    const raw = m.recording ?? m.record_meeting ?? (existing?.record_meeting ?? existing?.recording);
+                    const recordMeeting = (raw !== undefined && raw !== null)
+                        ? raw
+                        : undefined;
+                    return { ...m, record_meeting: recordMeeting, recording: m.recording ?? recordMeeting };
                 });
             });
         } else {

@@ -81,7 +81,10 @@ export default function Meeting() {
             status: m?.status || 'Scheduled',
             group_id: m?.group_id || '',
             description: m?.description || '',
-            recordMeeting: (m?.record_meeting === true || m?.record_meeting === 1 || m?.record_meeting === '1') ? 'Recording' : 'Not Recording',
+            recordMeeting: (() => {
+                const r = m?.recording ?? m?.record_meeting;
+                return (r === true || r === 1 || r === '1') ? 'Recording' : 'Not Recording';
+            })(),
             poster_file: null,
             files: [],
         });
