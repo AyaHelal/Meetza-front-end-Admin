@@ -128,7 +128,11 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
 
         <td>
             <div style={textStyle}>
-                {meeting && (meeting.record_meeting === true || meeting.record_meeting === 1 || meeting.record_meeting === '1' || meeting.recordMeeting === 'Recording') ? 'Yes' : meeting ? 'No' : '—'}
+                {meeting && (() => {
+                    const r = meeting.recording ?? meeting.record_meeting ?? meeting.recordMeeting;
+                    const isRecording = r === true || r === 1 || r === '1' || String(r).trim() === '1' || r === 'Recording';
+                    return isRecording ? 'Yes' : 'No';
+                })()}
             </div>
         </td>
 
