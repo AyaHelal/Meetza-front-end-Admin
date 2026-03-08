@@ -33,11 +33,6 @@ const GroupMembershipContent = ({ currentUser }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [membershipToDelete, setMembershipToDelete] = useState(null);
 
-    console.log("GroupMembershipContent - currentUser:", currentUser);
-    console.log("GroupMembershipContent - currentUser.id:", currentUser?.id);
-    console.log("GroupMembershipContent - currentUser keys:", Object.keys(currentUser || {}));
-    console.log("GroupMembershipContent - groups from hook:", groups);
-
     // Filter groups based on user role (same logic as useGroupData.js)
     const isSuperAdmin = (currentUser?.role || "").toLowerCase() === "super_admin";
     const isAdministrator = (currentUser?.role || "").toLowerCase() === "administrator";

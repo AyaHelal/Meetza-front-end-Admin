@@ -13,9 +13,7 @@ export const useUserData = () => {
             setError(null);
 
             const res = await api.get("/user");
-            console.log("📥 User API Response:", res.data);
             const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
-            console.log("📦 Processed Payload:", payload);
 
             const normalized = payload.map((u) => ({
                 id: u.id,

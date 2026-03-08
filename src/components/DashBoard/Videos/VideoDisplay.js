@@ -119,21 +119,16 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
             setLoading(true);
             setError(null);
             const response = await api.get('/video');
-            console.log('API /video response:', response.data);
 
             // Handle both response structures: array directly or nested in data property
             const videosArray = Array.isArray(response.data)
                 ? response.data
                 : (Array.isArray(response.data?.data) ? response.data.data : []);
 
-            console.log('Parsed videos array:', videosArray);
-            console.log('First video structure:', videosArray[0]);
-
             if (videosArray && videosArray.length > 0) {
                 setVideos(videosArray);
                 setCurrentVideo(videosArray[0]);
             } else {
-                console.warn('No videos found in response');
                 setVideos([]);
                 setCurrentVideo(null);
             }
@@ -188,7 +183,6 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
         try {
             // Don't set loading state for search - it should happen in background
             const response = await api.get(`/video?title=${encodeURIComponent(query)}`);
-            console.log('API /video search response:', response.data);
 
             const videoData = Array.isArray(response.data)
                 ? response.data
@@ -307,34 +301,23 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
         return `${s}s`;
     };
 
-    // log constructed URLs when currentVideo changes (helpful for debugging)
     useEffect(() => {
         if (!currentVideo) return;
-        const posterFull = buildFileUrl(currentVideo.poster_url);
-        const videoFull = buildFileUrl(currentVideo.video_url);
-        console.log('CurrentVideo poster full URL:', posterFull);
-        console.log('CurrentVideo video full URL:', videoFull);
     }, [currentVideo]);
 
     // Fetch comments for a specific video
     const fetchCommentsByVideoId = async (videoId) => {
         try {
             const response = await api.get(`/comment/video/${videoId}`);
-            console.log(`Full API response for video ${videoId}:`, response);
-            console.log(`Response data:`, response.data);
-            console.log(`Response status:`, response.status);
 
             // Try different possible response structures
             let commentsList = [];
             if (Array.isArray(response.data)) {
                 commentsList = response.data;
-                console.log('Comments is direct array');
             } else if (response.data?.data && Array.isArray(response.data.data)) {
                 commentsList = response.data.data;
-                console.log('Comments in response.data.data');
             } else if (response.data?.comments && Array.isArray(response.data.comments)) {
                 commentsList = response.data.comments;
-                console.log('Comments in response.data.comments');
             }
 
             // Get comment count from API or fallback to length
@@ -344,9 +327,6 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
             } else {
                 commentCount = commentsList.length;
             }
-
-            console.log('Final commentsList:', commentsList);
-            console.log('Comment count:', commentCount);
 
             // Only update if this is still the current video
             setCurrentVideo(prev => {
@@ -364,7 +344,6 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
         } catch (err) {
             // Handle 404 as no comments found (not an error)
             if (err.response?.status === 404) {
-                console.log(`No comments found for video ${videoId}`);
                 setCurrentVideo(prev => {
                     if (!prev || (prev._id !== videoId && prev.id !== videoId)) return prev;
                     if (JSON.stringify(prev.comments) === JSON.stringify([]) && prev.commentCount === 0) return prev;
@@ -393,11 +372,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
 
 
     const handleEditVideo = (video) => {
-        console.log('Editing video:', video);
-        console.log('Video ID (_id):', video._id);
-        console.log('Video ID (id):', video.id);
         const videoId = video._id || video.id;
-        console.log('Using video ID:', videoId);
 
         setEditFormData({
             title: video.title || '',
@@ -660,7 +635,6 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                             (progressEvent.loaded * 100) / progressEvent.total
                         );
                         setUploadProgress(percentCompleted);
-                        console.log(`Upload progress: ${percentCompleted}%`);
                     }
                 },
             };
@@ -669,16 +643,11 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
             // Then fallback to /video if that doesn't work
             try {
                 await api.post('/video/create', formData, uploadConfig);
-                console.log('POST /video/create succeeded');
             } catch (createErr) {
-                console.log('POST /video/create failed:', createErr.response?.status || createErr.message);
-
                 // If it's a 404, try /video as fallback
                 if (createErr.response?.status === 404) {
-                    console.log('Trying /video as fallback...');
                     try {
                         await api.post('/video', formData, uploadConfig);
-                        console.log('POST /video succeeded');
                     } catch (videoErr) {
                         console.error('All upload attempts failed.');
                         console.error('/video/create error:', {
@@ -1088,7 +1057,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                 {/* Poster Only */}
                                 <div className="position-relative rounded-3 "  >
                                     <video
-                                        src={buildFileUrl(currentVideo.video_url)}
+                                        src={buildFileUrl(currentVideo.video_url) || undefined}
                                         controls
                                         className="w-100 px-3"
                                         style={{ height: '450px', objectFit: 'cover', borderRadius: '24px', }}
@@ -1166,7 +1135,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                         currentVideo.comments.map((comment) => (
                                             <div key={comment._id || comment.id} className="px-3 d-flex align-items-start mb-3 pb-3 ">
                                                 <img
-                                                    src={comment.Member_photo || `https://ui-avatars.com/api/?name=${comment.Member_photo || 'User'}&background=random`}
+                                                    src={(comment.Member_photo && comment.Member_photo.trim()) ? comment.Member_photo : `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.member_name || 'User')}&background=random`}
                                                     alt={comment.Member_photo || 'User'}
                                                     className="rounded-circle me-3"
                                                     style={{ width: '50px', height: '50px' }}
@@ -1316,7 +1285,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                         }}
                                     >
                                         <img
-                                            src={buildFileUrl(video.poster_url) || 'https://via.placeholder.com/80x60?text=No+Poster'}
+                                            src={buildFileUrl(video.poster_url) || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'60\'%3E%3Crect fill=\'%23e0e0e0\' width=\'80\' height=\'60\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23999\' font-size=\'10\' font-family=\'sans-serif\'%3ENo poster%3C/text%3E%3C/svg%3E'}
                                             alt={video.title}
                                             className="rounded"
                                             style={{ width: '70px', height: '70px', objectFit: 'cover' }}

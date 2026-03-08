@@ -99,7 +99,6 @@ const UserMainContent = ({ currentUser }) => {
 
     const handleSearchChange = (query) => {
         if (!isSuperAdmin) return; // Prevent search if not super admin
-        console.log("query", query);
         setSearchQuery(query);
         if (query.trim() === "") {
             fetchData();

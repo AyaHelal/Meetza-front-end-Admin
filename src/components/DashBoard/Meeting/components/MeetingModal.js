@@ -5,7 +5,6 @@ import { smartToast } from "../../../../utils/toastManager";
 
 const MeetingModal = ({ mode, data, groups = [], onChange, onClose, onSubmit }) => {
     const title = mode === 'create' ? 'Create Meeting' : 'Update Meeting';
-    console.log('MeetingModal - groups received:', groups);
     const formatForInput = (value) => {
         if (!value) return '';
         const d = new Date(value);

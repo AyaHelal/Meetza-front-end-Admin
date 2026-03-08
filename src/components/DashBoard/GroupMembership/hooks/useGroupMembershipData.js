@@ -20,9 +20,6 @@ export const useGroupMembershipData = (currentUser = null) => {
       const res = await api.get("/group-membership");
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
 
-      console.log("Full API response:", res.data);
-      console.log("Payload:", payload);
-
       // Try to fetch flat structure with IDs by calling a different endpoint format
       // or try with different query parameters
       const membershipIdMap = new Map();
@@ -39,7 +36,6 @@ export const useGroupMembershipData = (currentUser = null) => {
               const key = `${membership.group_id}_${membership.member_id || membership.memberId}`;
               membershipIdMap.set(key, membership.id || membership.membership_id);
             });
-            console.log("Fetched flat structure with IDs, map:", membershipIdMap);
           }
         }
       } catch (e1) {
@@ -54,10 +50,8 @@ export const useGroupMembershipData = (currentUser = null) => {
               const key = `${membership.group_id}_${membership.member_id || membership.memberId}`;
               membershipIdMap.set(key, membership.id || membership.membership_id);
             });
-            console.log("Fetched flat structure with IDs (format param), map:", membershipIdMap);
           }
         } catch (e2) {
-          console.log("Could not fetch flat structure - API might not support it:", e2.message);
         }
       }
 
@@ -78,18 +72,11 @@ export const useGroupMembershipData = (currentUser = null) => {
 
         // Already in the correct format - one group per item with members array
         groupedMemberships = payload.map((group) => {
-          // Log to see what's in the members array
-          console.log("Group:", group.group_name, "Members structure:", group.members);
-
           return {
             id: group.group_id, // Use group_id as the ID for the row
             group_id: group.group_id,
             group_name: group.group_name || null,
             members: (group.members || []).map((member, index) => {
-              // Log the full member object to see all available fields
-              console.log(`Full Member ${index} object:`, JSON.stringify(member, null, 2));
-              console.log(`Member ${index} keys:`, Object.keys(member || {}));
-
               // Try to extract membership ID from various possible fields
               let membershipId = member.id
                 || member.membership_id
@@ -104,19 +91,15 @@ export const useGroupMembershipData = (currentUser = null) => {
               if (!membershipId && membershipIdMap.size > 0) {
                 const key = `${group.group_id}_${member.member_id}`;
                 membershipId = membershipIdMap.get(key);
-                console.log(`Looking up membership ID for key ${key}:`, membershipId);
               }
 
               // Store the membership ID in the ref for later use
               if (membershipId) {
                 const key = `${group.group_id}_${member.member_id}`;
                 membershipIdMapRef.current.set(key, membershipId);
-                console.log(`Stored membership ID ${membershipId} for key ${key}`);
               } else {
                 console.warn(`No membership ID found for member ${member.member_id} in group ${group.group_id}`);
               }
-
-              console.log(`Member ${index}:`, member, "Extracted Membership ID:", membershipId);
 
               return {
                 id: membershipId || null, // Store actual membership ID from database
@@ -163,8 +146,6 @@ export const useGroupMembershipData = (currentUser = null) => {
         groupedMemberships = Object.values(groupMap);
       }
 
-      console.log("Grouped memberships:", groupedMemberships);
-
       // Build membership ID map from the grouped memberships we just created
       // This will help us look up IDs when needed for deletion
       const idMap = new Map();
@@ -173,12 +154,10 @@ export const useGroupMembershipData = (currentUser = null) => {
           if (member.id) {
             const key = `${group.group_id}_${member.member_id}`;
             idMap.set(key, member.id);
-            console.log(`Added to ID map: ${key} -> ${member.id}`);
           }
         });
       });
       membershipIdMapRef.current = idMap;
-      console.log("Final membership ID map:", Array.from(idMap.entries()));
 
       setMemberships(groupedMemberships);
     } catch (err) {
@@ -243,8 +222,6 @@ export const useGroupMembershipData = (currentUser = null) => {
       });
 
       const newMembership = res.data;
-      console.log("Created membership response:", newMembership);
-      console.log("Membership ID from create:", newMembership?.id || newMembership?.data?.id || newMembership?.membership_id);
 
       // Refresh data after creation (this will get the latest data including any IDs)
       await fetchData();
@@ -283,15 +260,6 @@ export const useGroupMembershipData = (currentUser = null) => {
       // Check if we have the actual membership database ID
       let membershipId = foundMember.id || foundMember.membership_id;
 
-      console.log("Deleting membership:", {
-        id,
-        groupId,
-        memberId,
-        membershipId,
-        composite_id: foundMember.composite_id,
-        memberObject: foundMember
-      });
-
       // Since the API doesn't return membership IDs, we need to delete using group_id and member_id
       // Try different delete approaches
       let deleteResponse = null;
@@ -305,21 +273,16 @@ export const useGroupMembershipData = (currentUser = null) => {
         // Try delete with membership ID first
         try {
           deleteResponse = await api.delete(`/group-membership/${membershipId}`);
-          console.log("Delete with membership ID:", membershipId);
 
           if (deleteResponse.status >= 200 && deleteResponse.status < 300) {
             deleteSuccess = true;
-            console.log("Delete successful with membership ID:", membershipId);
           }
         } catch (error1) {
-          console.log("Delete with membership ID failed, trying with group_id and member_id:", error1.response?.status);
         }
       }
 
       // If membership ID delete didn't work, try deleting with group_id and member_id
       if (!deleteSuccess) {
-        console.log("Attempting delete using group_id and member_id since membership ID is not available...");
-
         // Try DELETE with request body containing group_id and member_id
         try {
           deleteResponse = await api.delete(`/group-membership`, {
@@ -328,23 +291,17 @@ export const useGroupMembershipData = (currentUser = null) => {
               member_id: memberId,
             },
           });
-          console.log("Delete with request body - response:", deleteResponse);
 
           if (deleteResponse.status >= 200 && deleteResponse.status < 300) {
             deleteSuccess = true;
-            console.log("Delete successful with request body (group_id + member_id)");
           }
         } catch (error2) {
-          console.log("Delete with request body failed, trying query params:", error2.response?.status);
-
           // Try DELETE with query parameters
           try {
             deleteResponse = await api.delete(`/group-membership?group_id=${groupId}&member_id=${memberId}`);
-            console.log("Delete with query params - response:", deleteResponse);
 
             if (deleteResponse.status >= 200 && deleteResponse.status < 300) {
               deleteSuccess = true;
-              console.log("Delete successful with query params");
             }
           } catch (error3) {
             console.error("All delete methods failed. Backend requires membership ID but API doesn't provide it.");
@@ -362,8 +319,6 @@ export const useGroupMembershipData = (currentUser = null) => {
         await new Promise(resolve => setTimeout(resolve, 300));
 
         // Refresh data after deletion - fetch fresh data
-        console.log("Refreshing data after deletion...");
-
         // Fetch fresh data from API
         try {
           setLoading(true);
@@ -426,10 +381,6 @@ export const useGroupMembershipData = (currentUser = null) => {
 
           if (stillExists) {
             console.warn("Warning: Member still exists after deletion in fresh data");
-            console.log("Expected to delete:", { groupId, memberId, compositeId: id });
-            console.log("Current memberships:", groupedMemberships);
-          } else {
-            console.log("Deletion verified: Member successfully removed");
           }
 
           setLoading(false);
@@ -477,8 +428,6 @@ export const useGroupMembershipData = (currentUser = null) => {
       } catch (patchError) {
         // If PATCH with ID doesn't work, try deleting old and creating new
         if (patchError.response?.status === 404 || patchError.response?.status === 400) {
-          console.log("PATCH by ID failed, trying delete + create approach");
-
           // Delete the old membership
           if (oldGroupId && oldMemberId) {
             try {

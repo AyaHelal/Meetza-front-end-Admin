@@ -87,7 +87,6 @@ export default function useGroupContentData() {
                 return;
             }
 
-            console.log('[addContent] Creating content with data:', contentData);
             const response = await apiCommon.post(`/group-contents`, contentData);
 
             if (response.data.success) {

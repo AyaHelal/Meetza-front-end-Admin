@@ -13,10 +13,6 @@ export default function VerifyEmailCode() {
 
     const email = localStorage.getItem("userEmail");
 
-    // Debug: Check what's in localStorage
-    console.log("Email from localStorage:", email);
-    console.log("All localStorage items:", { ...localStorage });
-
     // === handle inputs ===
     const handleChange = (index, value) => {
         const digit = value.replace(/[^0-9]/g, "").slice(0, 1);
@@ -74,16 +70,12 @@ export default function VerifyEmailCode() {
 
         try {
             setLoading(true);
-            console.log("Sending verification request:", { email, code: otp });
 
             const res = await apiCommon.post(
                 "/auth/verify",
                 { email, code: otp },
                 { headers: { "Content-Type": "application/json" } }
             );
-
-
-            console.log("Backend response:", res.data);
 
             if (res.data.success) {
                 alert("Email verified successfully!");

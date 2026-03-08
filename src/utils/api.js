@@ -2,11 +2,8 @@ import axios from "axios";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 
-// Debug: Log the API base URL (remove in production if needed)
 if (!API_BASE) {
     console.warn("⚠️ REACT_APP_API_BASE is not set in .env file!");
-} else {
-    console.log("✅ API Base URL:", API_BASE);
 }
 
 export const api = axios.create({
@@ -42,8 +39,6 @@ api.interceptors.request.use((config) => {
             config.headers["X-localization"] = locale;
         }
 
-        // Debug: Log the full request URL
-        console.log("🌐 API Request:", config.method?.toUpperCase(), config.baseURL + config.url);
     } catch (_) {
         // ignore
     }
