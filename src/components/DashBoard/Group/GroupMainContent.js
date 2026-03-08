@@ -144,29 +144,17 @@ const GroupMainContent = ({ currentUser }) => {
     }
 
     const groupId = selectedGroup.id;
-    console.log("Selected Group ID:", groupId);
-    console.log("Form Data:", formData);
-    console.log("Selected Group:", selectedGroup);
 
     const payload = {
             group_name: formData.name,
             position_id: selectedGroup.position_id
         };
-        console.log("Payload sent:", payload);
 
         try {
             // ensure we send explicit null when the user cleared the group content
             const contentIdToSend = formData.group_content_id === undefined ? undefined : formData.group_content_id === null ? null : formData.group_content_id;
-            console.log("Content ID to send:", contentIdToSend);
-            console.log("Calling updateGroup with:", {
-                id: groupId,
-                group_name: formData.name,
-                position_id: selectedGroup.position_id,
-                group_content_id: contentIdToSend
-            });
 
             const res = await updateGroup(groupId, formData.name, selectedGroup.position_id, contentIdToSend, formData.description ?? undefined, formData.group_photo ?? undefined);
-        console.log("Response from backend:", res);
         setShowEditModal(false);
         toast.success("Group updated successfully");
         fetchData();

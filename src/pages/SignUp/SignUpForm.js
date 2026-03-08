@@ -52,7 +52,6 @@ export default function SignUpForm() {
                 email: formData.email,
                 role: 'Administrator'
             });
-            console.log(response);
             localStorage.setItem("userEmail", formData.email);
             navigate('/verify-email');
         } catch (error) {

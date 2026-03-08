@@ -94,8 +94,6 @@ export const useGroupData = () => {
       if (content_description !== undefined && content_description !== '') payload.group_content_description = content_description;
       if (description !== undefined && description !== '') payload.description = description;
 
-      console.log('[createGroup] Payload being sent:', payload);
-
       let res;
       if (group_photo) {
         const form = new FormData();
