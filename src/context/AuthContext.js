@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // On app startup: read token, set user from JWT. Remove legacy cache keys (userRole, userName, rememberMe) so role comes from token only.
+    // On app startup: read token, set user purely from JWT.
     useEffect(() => {
         try {
             let storedToken = localStorage.getItem("authToken");
@@ -51,20 +51,18 @@ export const AuthProvider = ({ children }) => {
 
                 const userFromToken = extractUserFromToken();
                 if (userFromToken && (userFromToken.id || userFromToken.email)) {
-                    let storedUser = null;
-                    try {
-                        const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
-                        if (raw) storedUser = JSON.parse(raw);
-                    } catch (_) {}
-                    setUser({ ...storedUser, ...userFromToken });
+                    // Admin app: ALL user identity (id/email/role) comes from token only.
+                    setUser(userFromToken);
                     setToken(storedToken);
-                    // Delete legacy cache keys so id/email/role come from token only
-                    try {
-                        localStorage.removeItem("userRole");
-                        localStorage.removeItem("userName");
-                        sessionStorage.removeItem("userRole");
-                    } catch (_) {}
                 }
+
+                // Clean up legacy keys that tried to cache role/name separately
+                try {
+                    localStorage.removeItem("userRole");
+                    localStorage.removeItem("userName");
+                    sessionStorage.removeItem("userRole");
+                } catch (_) {}
+
                 setIsRemembered(rememberedInLocal);
             } else {
                 clearAuthStorage();
@@ -77,41 +75,35 @@ export const AuthProvider = ({ children }) => {
         setInitializing(false);
     }, []);
 
-    const storageSafeUser = (userData) => {
-        if (!userData) return null;
-        const photo = userData.user_photo ?? userData.photo ?? userData.avatarUrl ?? userData.avatar_url ?? null;
-        const safe = { name: userData.name ?? null, photo, user_photo: photo };
-        return Object.values(safe).some(v => v != null) ? safe : null;
-    };
-
-    const loginUser = (userData, userToken, rememberMe = false) => {
+    /**
+     * Login: store ONLY the token (authToken) + remember flag.
+     * All user fields (id/email/role) are read from the JWT, not from userData or storage.
+     */
+    const loginUser = (_userData, userToken, rememberMe = false) => {
         try {
-            const toStore = storageSafeUser(userData);
             if (rememberMe) {
-                if (toStore) localStorage.setItem("user", JSON.stringify(toStore));
-                else localStorage.removeItem("user");
                 localStorage.setItem("authToken", userToken);
                 localStorage.setItem("remember", "true");
                 localStorage.setItem("loginTime", String(Date.now()));
-                sessionStorage.removeItem("user");
                 sessionStorage.removeItem("authToken");
+                sessionStorage.removeItem("user");
                 setIsRemembered(true);
             } else {
-                if (toStore) sessionStorage.setItem("user", JSON.stringify(toStore));
-                else sessionStorage.removeItem("user");
                 sessionStorage.setItem("authToken", userToken);
-                localStorage.removeItem("user");
                 localStorage.removeItem("authToken");
+                localStorage.removeItem("user");
                 localStorage.removeItem("remember");
                 localStorage.removeItem("loginTime");
                 setIsRemembered(false);
             }
+
             setToken(userToken);
+
             const userFromToken = extractUserFromToken();
             if (userFromToken && (userFromToken.id || userFromToken.email)) {
-                setUser({ ...userData, ...userFromToken });
+                setUser(userFromToken);
             } else {
-                setUser(userData || null);
+                setUser(null);
             }
         } catch (error) {
             console.error("❌ Failed to save user/token:", error);
