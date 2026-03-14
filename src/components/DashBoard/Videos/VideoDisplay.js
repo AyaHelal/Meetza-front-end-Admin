@@ -30,6 +30,11 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [videoToDelete, setVideoToDelete] = useState(null);
+
+    // For comment deletion confirmation modal
+    const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
+    const [commentToDelete, setCommentToDelete] = useState({ videoId: null, commentId: null });
+
     const [groups, setGroups] = useState([]);
     const [uploadFormData, setUploadFormData] = useState({
         title: '',
@@ -311,20 +316,47 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
             const response = await api.get(`/comment/video/${videoId}`);
 
             // Try different possible response structures
+            // 1) API returns { success: true, data: { commentCount, comments: [...] }}
+            // 2) API returns { comments: [...] } or { data: [...] }
+            // 3) API returns array directly
             let commentsList = [];
+            let commentCount = 0;
+
             if (Array.isArray(response.data)) {
+                // Direct array
                 commentsList = response.data;
-            } else if (response.data?.data && Array.isArray(response.data.data)) {
-                commentsList = response.data.data;
+                commentCount = commentsList.length;
+            } else if (response.data?.data) {
+                // Common wrapper
+                const wrapper = response.data.data;
+                if (Array.isArray(wrapper)) {
+                    commentsList = wrapper;
+                    commentCount = commentsList.length;
+                } else if (wrapper?.comments && Array.isArray(wrapper.comments)) {
+                    commentsList = wrapper.comments;
+                    commentCount = typeof wrapper.commentCount === 'number' ? wrapper.commentCount : commentsList.length;
+                } else {
+                    // Fallback: treat wrapper itself as comments list if possible
+                    if (Array.isArray(wrapper)) {
+                        commentsList = wrapper;
+                        commentCount = commentsList.length;
+                    }
+                }
             } else if (response.data?.comments && Array.isArray(response.data.comments)) {
                 commentsList = response.data.comments;
+                commentCount = typeof response.data.commentCount === 'number' ? response.data.commentCount : commentsList.length;
+            } else {
+                // Fallback: try to use commentCount/ comments at top level
+                if (typeof response.data?.commentCount === 'number') {
+                    commentCount = response.data.commentCount;
+                }
+                if (Array.isArray(response.data?.comments)) {
+                    commentsList = response.data.comments;
+                }
             }
 
-            // Get comment count from API or fallback to length
-            let commentCount = 0;
-            if (typeof response.data.commentCount === 'number') {
-                commentCount = response.data.commentCount;
-            } else {
+            // Ensure we have a count even if API doesn't provide it
+            if (commentCount === 0 && Array.isArray(commentsList)) {
                 commentCount = commentsList.length;
             }
 
@@ -500,8 +532,14 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
         }
     };
 
-    const handleDeleteComment = async (videoId, commentId) => {
-        if (!window.confirm("Are you sure you want to delete this comment?")) return;
+    const handleDeleteComment = (videoId, commentId) => {
+        setCommentToDelete({ videoId, commentId });
+        setShowDeleteCommentModal(true);
+    };
+
+    const confirmDeleteComment = async () => {
+        const { videoId, commentId } = commentToDelete;
+        if (!videoId || !commentId) return;
 
         try {
             await api.delete(`comment/${commentId}`);
@@ -512,6 +550,9 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
             console.error("Error deleting comment:", err);
             const errorMsg = err.response?.data?.message || "Failed to delete comment";
             toast.error(errorMsg);
+        } finally {
+            setShowDeleteCommentModal(false);
+            setCommentToDelete({ videoId: null, commentId: null });
         }
     };
 
@@ -1428,6 +1469,84 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                     type="button"
                                     className="btn rounded-3"
                                     onClick={confirmDeleteVideo}
+                                    style={{
+                                        backgroundColor: "#FF0000",
+                                        color: "#FFFFFF",
+                                        border: "none",
+                                        padding: "10px 24px",
+                                        fontSize: "16px",
+                                        fontWeight: "600",
+                                        marginLeft: "12px"
+                                    }}
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Comment Confirmation Modal */}
+            {showDeleteCommentModal && (
+                <div
+                    className="modal show d-block"
+                    style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+                    onClick={() => {
+                        setShowDeleteCommentModal(false);
+                        setCommentToDelete({ videoId: null, commentId: null });
+                    }}
+                >
+                    <div
+                        className="modal-dialog modal-dialog-centered"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="modal-content rounded-4 border-0" style={{ boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
+                            <div className="modal-header border-0 pb-0">
+                                <h5 className="modal-title fw-bold" style={{ fontSize: "24px", color: "#010101" }}>
+                                    Delete Comment
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => {
+                                        setShowDeleteCommentModal(false);
+                                        setCommentToDelete({ videoId: null, commentId: null });
+                                    }}
+                                    aria-label="Close"
+                                    style={{ fontSize: "14px" }}
+                                ></button>
+                            </div>
+
+                            <div className="modal-body pt-3">
+                                <p style={{ fontSize: "16px", color: "#010101" }}>
+                                    Are you sure you want to delete this comment? This action cannot be undone.
+                                </p>
+                            </div>
+
+                            <div className="modal-footer border-0 pt-0">
+                                <button
+                                    type="button"
+                                    className="btn rounded-3"
+                                    onClick={() => {
+                                        setShowDeleteCommentModal(false);
+                                        setCommentToDelete({ videoId: null, commentId: null });
+                                    }}
+                                    style={{
+                                        backgroundColor: "#F4F6F8",
+                                        color: "#010101",
+                                        border: "none",
+                                        padding: "10px 24px",
+                                        fontSize: "16px",
+                                        fontWeight: "600"
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn rounded-3"
+                                    onClick={confirmDeleteComment}
                                     style={{
                                         backgroundColor: "#FF0000",
                                         color: "#FFFFFF",
