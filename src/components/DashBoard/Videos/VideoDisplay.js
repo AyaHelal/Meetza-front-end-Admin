@@ -72,9 +72,9 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
 
     return (
         <div className="flex-fill ps-0 video-page-root">
-            <div className="d-flex   ">
+            <div className="d-flex video-layout-wrap">
                 {/* Main Video Section */}
-                <div className=" ps-0 ms-0 video-main-col responsive-aside responsive-a align-items-start" >
+                <div className="ps-0 ms-0 video-main-col responsive-aside responsive-a align-items-start">
                     {showUploadModal ? (
                         <>
                             <div className="card border-0 mt-4 width-850 video-upload-card">
@@ -280,7 +280,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                             </div>
                             {/* Video Info */}
                             <div className="card-body my-3">
-                                <div className="d-flex align-items-center justify-content-between mb-3 ps-3 p-2 bg-light shadow-sm width-850 video-info-bar">
+                                <div className="d-flex align-items-center justify-content-between mb-3 ps-3 p-2 bg-light shadow-sm width-850 video-info-bar video-info-bar-wrap">
                                     <div className="d-flex align-items-center flex-grow-1 video-info-url-wrap">
                                         <span>URL:</span>
                                         <input

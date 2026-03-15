@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     User,
     UserList,
@@ -7,8 +7,10 @@ import {
     VideoCamera,
     File,
     SignOut,
+    List,
 } from "phosphor-react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./Dashboard.css";
 import UserMainContent from "../../components/DashBoard/User/UserMainContent";
 import Position from "../../components/DashBoard/Position/Position";
 import GroupContent from "../../components/DashBoard/GroupContent/GroupContent.js";
@@ -26,6 +28,34 @@ const UserDashboard = () => {
     const { user: currentUser, logoutUser } = useAuth();
     const navigate = useNavigate();
     const [activeMenu, setActiveMenu] = useState("user");
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    // Close sidebar when route/content changes (e.g. on mobile after menu click)
+    const handleMenuClick = (id) => {
+        setActiveMenu(id);
+        setSidebarOpen(false);
+    };
+
+    // Close sidebar on escape key
+    useEffect(() => {
+        const onEscape = (e) => {
+            if (e.key === "Escape") setSidebarOpen(false);
+        };
+        window.addEventListener("keydown", onEscape);
+        return () => window.removeEventListener("keydown", onEscape);
+    }, []);
+
+    // Prevent body scroll when mobile menu is open
+    useEffect(() => {
+        if (sidebarOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [sidebarOpen]);
 
     // ---------- MENU ----------
     const menuItems = [
@@ -41,10 +71,6 @@ const UserDashboard = () => {
         // { id: "comments", icon: ChatCircleDots, label: "Comments" },
     ];
 
-    const handleMenuClick = (id) => {
-        setActiveMenu(id);
-    };
-
     const getMenuLabel = (id) => {
         const item = menuItems.find((m) => m.id === id);
         return item ? item.label : "";
@@ -56,68 +82,65 @@ const UserDashboard = () => {
     };
 
     return (
-        <div className="d-flex min-vh-100 bg-light">
-            <style>{`
-                .responsive-aside {
-                    height: 936px;
-                }
-                @media (max-height: 1024px) {
-                    .responsive-aside {
-                        height: calc(100vh - 80px);
-                    }
-                }
-            `}</style>
-            {/* SIDEBAR */}
-            <aside
-                className="bg-white rounded-3 p-2 m-4 mt-5 responsive-aside d-flex flex-column"
-                style={{ width: 230, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
+        <div className="dashboard-root">
+            {/* Mobile menu toggle */}
+            <button
+                type="button"
+                className="dashboard-menu-toggle"
+                onClick={() => setSidebarOpen((o) => !o)}
+                aria-label={sidebarOpen ? "Close menu" : "Open menu"}
+                aria-expanded={sidebarOpen}
             >
-                <div className="px-2 pb-5">
+                <List size={24} weight="bold" />
+            </button>
+
+            {/* Overlay when sidebar is open on small screens */}
+            <div
+                className={`dashboard-overlay ${sidebarOpen ? "is-open" : ""}`}
+                onClick={() => setSidebarOpen(false)}
+                onKeyDown={(e) => e.key === "Enter" && setSidebarOpen(false)}
+                role="button"
+                tabIndex={0}
+                aria-label="Close menu"
+            />
+
+            {/* SIDEBAR */}
+            <aside className={`dashboard-sidebar ${sidebarOpen ? "is-open" : ""}`}>
+                <div className="dashboard-sidebar-logo">
                     <img src="/assets/MeetzaLogo.png" alt="Meetza Logo" />
                 </div>
 
-                <nav className="px-2 flex-grow-1">
+                <nav className="dashboard-sidebar-nav">
                     {menuItems.map((item) => {
                         const Icon = item.icon;
                         return (
                             <button
                                 key={item.id}
+                                type="button"
                                 onClick={() => handleMenuClick(item.id)}
-                                className={`btn w-100 text-start d-flex align-items-center gap-2 mb-3 ${activeMenu === item.id ? "text-white" : "text-secondary"
-                                    }`}
-                                style={{
-                                    borderRadius: 8,
-                                    backgroundColor: activeMenu === item.id ? "#00DC85" : "white",
-                                }}
+                                className={`dashboard-sidebar-btn ${activeMenu === item.id ? "active" : ""}`}
                             >
-                                <Icon size={24} />
-                                <span className="fw-medium" style={{ fontSize: "14px" }}>
-                                    {item.label}
-                                </span>
+                                <Icon size={24} aria-hidden />
+                                <span className="fw-medium">{item.label}</span>
                             </button>
                         );
                     })}
                 </nav>
 
-                <div className="d-flex flex-row gap-2 px-1 pb-md-4 pb-lg-2">
-                    {/* <button className="btn btn-light d-flex align-items-center rounded-5"
-                        style={{ width: "fit-content", backgroundColor: "#F4F6F8" }}>
-                        <Bell size={24} />
-                    </button>
-                    <button className="btn btn-light d-flex align-items-center rounded-5"
-                        style={{ width: "fit-content", backgroundColor: "#F4F6F8" }}>
-                        <Gear size={24} />
-                    </button> */}
-                    <button className="btn btn-light d-flex align-items-center rounded-5"
-                        style={{ width: "fit-content", backgroundColor: "#F4F6F8" }}
-                        onClick={handleLogout}>
-                        <SignOut size={24} style={{ color: "#EB4335" }} />
+                <div className="dashboard-sidebar-footer">
+                    <button
+                        type="button"
+                        className="btn d-flex align-items-center rounded-5"
+                        onClick={handleLogout}
+                        aria-label="Log out"
+                    >
+                        <SignOut size={24} className="dashboard-sidebar-logout" />
                     </button>
                 </div>
             </aside>
 
             {/* MAIN AREA */}
-            <div className="flex-fill">
+            <main className="dashboard-main">
                 {activeMenu === "user" && (
                     <UserMainContent currentUser={currentUser} />
                 )}
@@ -157,7 +180,7 @@ const UserDashboard = () => {
                     closeOnClick
                     pauseOnHover
                 />
-            </div>
+            </main>
         </div>
     );
 };

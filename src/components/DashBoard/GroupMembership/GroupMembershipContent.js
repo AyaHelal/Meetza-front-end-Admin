@@ -171,31 +171,25 @@ const GroupMembershipContent = ({ currentUser }) => {
                 <div className="card shadow-sm m-4 rounded-3 border-0" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
                     {!showForm ? (
                         <>
-                            <div className="card-body p-3 mb-4 d-flex justify-content-between align-items-center">
-                                <h2 className="h5 mb-0 fw-semibold" style={{ fontSize: "24px" }}>Group Membership Management</h2>
-                                <div className="d-flex gap-3 align-items-center">
+                            <div className="card-body p-3 mb-4 position-header">
+                                <h2 className="h5 mb-0 fw-semibold position-header-title" style={{ fontSize: "24px" }}>Group Membership Management</h2>
+                                <div className="position-header-actions">
                                     <button
-                                        className="btn rounded-4 d-flex align-items-center gap-2"
+                                        type="button"
+                                        className="btn rounded-4 d-flex align-items-center gap-2 position-header-btn"
                                         onClick={openCreateForm}
-                                        style={{
-                                            background: "linear-gradient(to right, #0076EA, #00DC85)",
-                                            color: "white",
-                                            fontSize: "16px",
-                                            paddingTop: "0.75rem",
-                                            paddingBottom: "0.75rem",
-                                            paddingLeft: "1.5rem",
-                                            paddingRight: "1.5rem",
-                                            border: "none",
-                                        }}
                                     >
                                         <PlusCircle size={20} weight="bold" />
                                         <span className="fw-semibold">Create Membership</span>
                                     </button>
-                                    <SearchBar
-                                        value={searchQuery}
-                                        onChange={handleSearchChange}
-                                        placeholder="Search by group ID..."
-                                    />
+                                    <div className="position-header-search">
+                                        <SearchBar
+                                            value={searchQuery}
+                                            onChange={handleSearchChange}
+                                            placeholder="Search by group..."
+                                            className="w-100"
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
@@ -217,6 +211,7 @@ const GroupMembershipContent = ({ currentUser }) => {
                             <div className="card-body p-4">
                                 <div className="d-flex align-items-center gap-3 mb-4">
                                     <button
+                                        type="button"
                                         className="btn btn-sm d-flex align-items-center gap-2 p-2"
                                         onClick={() => setShowForm(false)}
                                         style={{
@@ -227,22 +222,20 @@ const GroupMembershipContent = ({ currentUser }) => {
                                         }}
                                     >
                                         <ArrowLeft size={24} />
-
                                     </button>
-                                    <h2 className="h5 mb-0 fw-semibold" style={{ fontSize: "24px" }}>
+                                    <h2 className="h5 mb-0 fw-semibold create-membership-form__title" style={{ fontSize: "24px" }}>
                                         Create New Group Membership
                                     </h2>
                                 </div>
 
                                 <div className="row justify-content-center">
                                     <div className="col-lg-7">
-                                        <div className="bg-white ps-5 border-0 p-4 align-items-center justify-content-center" style={{ border: "2px solid #E9ECEF", paddingLeft: "3.7rem !important" }}>
-
+                                        <div className="create-membership-form bg-white border-0 p-4" style={{ border: "2px solid #E9ECEF" }}>
                                             <div className="mb-4">
-                                                <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                <label className="form-label fw-semibold create-membership-form__label">
                                                     Group <span style={{ color: "#FF0000" }}>*</span>
                                                 </label>
-                                                <div style={{ width: '70%' }}>
+                                                <div className="create-membership-form__field">
                                                     <Select
                                                         options={visibleGroups.map(g => ({ value: g.id, label: g.name || g.group_name || `Group ${g.id}` }))}
                                                         value={formData.group_id ? { value: formData.group_id, label: groups.find(g => g.id === formData.group_id)?.name || groups.find(g => g.id === formData.group_id)?.group_name || `Group ${formData.group_id}` } : null}
@@ -256,34 +249,27 @@ const GroupMembershipContent = ({ currentUser }) => {
                                             </div>
 
                                             <div className="mb-4">
-                                                <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                <label className="form-label fw-semibold create-membership-form__label">
                                                     Member Email <span style={{ color: "#FF0000" }}>*</span>
                                                 </label>
                                                 <input
                                                     type="email"
-                                                    className="form-control rounded-3"
+                                                    className="form-control rounded-3 create-membership-form__input"
                                                     name="member_email"
                                                     value={formData.member_email}
                                                     onChange={handleFormChange}
                                                     placeholder="Enter member email address"
-                                                    style={{
-                                                        border: "2px solid #E9ECEF",
-                                                        fontSize: "16px",
-                                                        width: "70%",
-                                                    }}
+                                                    style={{ border: "2px solid #E9ECEF", fontSize: "16px" }}
                                                 />
                                             </div>
 
-                                            <div className=" align-items-center
-                                            justify-content-center">
-
+                                            <div className="create-membership-form__actions">
                                                 <button
                                                     type="button"
-                                                    className="btn rounded-3  px-4 py-2"
+                                                    className="btn rounded-3 px-4 py-2 create-membership-form__submit"
                                                     onClick={handleCreateMembership}
                                                     style={{
-                                                        background: " #0076EA",
-                                                        marginLeft: "6rem",
+                                                        background: "#0076EA",
                                                         color: "white",
                                                         border: "none",
                                                         fontSize: "16px",

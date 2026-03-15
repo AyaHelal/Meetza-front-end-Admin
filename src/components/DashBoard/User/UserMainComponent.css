@@ -6,3 +6,88 @@
   color: #000000 !important;
   background-color: #FFFFFF !important;
 }
+
+/* SearchBar wrapper: responsive width (used by Position, User, etc.) */
+.search-bar-wrap {
+  width: 100%;
+  max-width: 260px;
+}
+
+/* Create Membership inline form: base + responsive */
+.create-membership-form {
+  border-radius: 12px;
+}
+
+.create-membership-form__label {
+  color: #010101;
+  font-size: 16px;
+}
+
+.create-membership-form__input,
+.create-membership-form__field {
+  width: 70%;
+  max-width: 100%;
+}
+
+.create-membership-form__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.create-membership-form__submit {
+  margin-left: 6rem;
+}
+
+.create-membership-form__field > div {
+  width: 100%;
+}
+
+@media (max-width: 992px) {
+  .create-membership-form {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+
+  .create-membership-form__input,
+  .create-membership-form__field {
+    width: 100% !important;
+  }
+
+  .create-membership-form__submit {
+    margin-left: 0;
+  }
+
+  .create-membership-form__actions {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .create-membership-form {
+    padding: 1rem !important;
+  }
+
+  .create-membership-form__title {
+    font-size: 1.25rem !important;
+  }
+
+  .create-membership-form__input,
+  .create-membership-form__field {
+    width: 100% !important;
+  }
+
+  .create-membership-form__input {
+    padding: 0.65rem 0.75rem;
+    font-size: 16px;
+  }
+
+  .create-membership-form__actions {
+    justify-content: stretch;
+  }
+
+  .create-membership-form__submit {
+    margin-left: 0;
+    width: 100%;
+  }
+}

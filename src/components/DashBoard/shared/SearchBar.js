@@ -1,10 +1,10 @@
 import { MagnifyingGlass } from "phosphor-react";
 
-export const SearchBar = ({ value, onChange, placeholder = "Search by position name..." }) => (
-  <div className="position-relative" style={{ width: 260 }}>
+export const SearchBar = ({ value, onChange, placeholder = "Search by position name...", className = "" }) => (
+  <div className={`position-relative search-bar-wrap ${className}`}>
     <input
       type="text"
-      className="form-control rounded-4 ps-5 search-input"
+      className="form-control rounded-4 pe-5 search-input"
       placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -13,15 +13,16 @@ export const SearchBar = ({ value, onChange, placeholder = "Search by position n
         border: "2px solid #E9ECEF",
         paddingTop: "0.75rem",
         paddingBottom: "0.75rem",
+        paddingLeft: "1rem",
         backgroundColor: "#FFFFFF",
       }}
     />
     <MagnifyingGlass
       size={20}
       weight="bold"
-      className="position-absolute"
+      className="position-absolute search-bar-icon"
       style={{
-        left: 15,
+        right: 15,
         top: "50%",
         transform: "translateY(-50%)",
         color: "#000000",

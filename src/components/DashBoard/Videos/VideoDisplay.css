@@ -913,3 +913,168 @@ small {
 .video-icon-delete-span {
   color: #ff0000;
 }
+
+/* ========== Mobile responsive: videos page ========== */
+@media (max-width: 768px) {
+  .video-page-root {
+    padding: 12px 8px;
+    min-height: auto;
+  }
+
+  .video-layout-wrap {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .video-main-col {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .responsive-a {
+    transform: none !important;
+  }
+
+  .width-850,
+  .video-current-card,
+  .video-upload-card,
+  .video-info-bar,
+  .video-comments-card,
+  .video-empty-state {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .video-current-card .card-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .video-current-card .card-header .badge {
+    font-size: 0.75rem;
+  }
+
+  .video-player-el {
+    height: auto;
+    min-height: 200px;
+    max-height: 50vh;
+    width: 100%;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  .video-info-bar-wrap {
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .video-info-bar-wrap .video-info-url-wrap {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .video-info-bar-wrap .input-custom-width {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .video-info-bar-wrap .video-info-actions {
+    margin-left: 0;
+    margin-top: 0;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .video-comments-card {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .video-comments-list {
+    max-height: 200px;
+  }
+
+  .video-sidebar-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: 50vh !important;
+  }
+
+  .video-sidebar-card--upload-open {
+    height: auto !important;
+    max-height: 85vh !important;
+  }
+
+  .video-sidebar-card:not(.video-sidebar-card--upload-open) {
+    height: auto !important;
+    max-height: 50vh !important;
+  }
+
+  .video-sidebar-card--upload-open .videos-sidebar-scroll,
+  .video-sidebar-card:not(.video-sidebar-card--upload-open) .videos-sidebar-scroll {
+    max-height: 40vh !important;
+  }
+
+  .video-upload-cta-wrap {
+    width: 100% !important;
+  }
+
+  .video-upload-card .video-upload-form-container,
+  .video-upload-form-inner {
+    width: 100%;
+  }
+
+  .video-upload-form .w-75,
+  .video-upload-form input.w-75,
+  .video-upload-form select.w-75,
+  .video-upload-form textarea.w-75 {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .video-sidebar-item {
+    min-height: 60px;
+  }
+
+  .video-sidebar-thumb {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+  }
+
+  .video-sidebar-item-title {
+    word-break: break-word;
+  }
+
+  .video-upload-card-body {
+    padding-left: 1rem !important;
+  }
+
+  .h-820 {
+    height: auto !important;
+    min-height: 400px;
+  }
+}
+
+@media (max-width: 576px) {
+  .video-page-root {
+    padding: 8px 6px;
+  }
+
+  .video-current-card .card-header {
+    font-size: 0.9rem;
+  }
+
+  .video-info-bar-wrap .video-info-actions .btn {
+    padding: 0.35rem 0.5rem !important;
+  }
+
+  .video-comments-list {
+    max-height: 180px;
+  }
+}

@@ -1,6 +1,8 @@
 import React from "react";
 import GroupRow from "./GroupRow";
-import '../../CSS/Table.css';
+import { GroupRowCard } from "./GroupRowCard";
+import "../../CSS/Table.css";
+
 export const GroupTable = ({
   groups,
   positions,
@@ -16,54 +18,81 @@ export const GroupTable = ({
   contents = [],
 }) => {
   return (
-    <div className="table-responsive  user-table-container rounded-3">
-      { !GroupRow && console.error('GroupRow component is undefined. Check export/import in GroupRow.js') }
-      <table className="table table-borderless">
-        <thead className="table-header-sticky">
-          <tr className="mx-5">
-            <th style={{ color: "#888888" }} className="fw-semibold px-4">Name</th>
-            <th style={{ color: "#888888" }} className="fw-semibold">Position</th>
-            <th style={{ color: "#888888" }} className="fw-semibold">Admin</th>
-            <th style={{ color: "#888888" }} className="fw-semibold">Group Content</th>
-            <th style={{ color: "#888888" }} className="fw-semibold">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr style={{ borderBottom: "none" }}>
-              <td colSpan="5" className="text-center py-4 text-muted" style={{ borderBottom: "none" }}>
-                Loading...
-              </td>
+    <>
+      {/* Desktop: table */}
+      <div className="group-table-desktop table-responsive user-table-container rounded-3">
+        <table className="table table-borderless">
+          <thead className="table-header-sticky">
+            <tr>
+              <th className="fw-semibold px-4 group-th">Name</th>
+              <th className="fw-semibold group-th">Position</th>
+              <th className="fw-semibold group-th">Admin</th>
+              <th className="fw-semibold group-th">Group Content</th>
+              <th className="fw-semibold group-th">Actions</th>
             </tr>
-          ) : error ? (
-            <tr style={{ borderBottom: "none" }}>
-              <td colSpan="5" className="text-center py-4 text-danger" style={{ borderBottom: "none" }}>
-                {error}
-              </td>
-            </tr>
-          ) : groups.length === 0 ? (
-            <tr style={{ borderBottom: "none" }}>
-              <td colSpan="5" className="text-center py-4 text-muted" style={{ borderBottom: "none" }}>
-                No groups found
-              </td>
-            </tr>
-          ) : (
-            groups.map((group) => (
-              <GroupRow
-                key={group.id}
-                group={group}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                getPositionName={getPositionName}
-                getAdminName={getAdminName}
-                isAdmin={isAdmin}
-                currentUser={currentUser}
-                contents={contents}
-              />
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="text-center py-4 text-muted">
+                  Loading...
+                </td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan={5} className="text-center py-4 text-danger">
+                  {error}
+                </td>
+              </tr>
+            ) : groups.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="text-center py-4 text-muted">
+                  No groups found
+                </td>
+              </tr>
+            ) : (
+              groups.map((group) => (
+                <GroupRow
+                  key={group.id}
+                  group={group}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  getPositionName={getPositionName}
+                  getAdminName={getAdminName}
+                  isAdmin={isAdmin}
+                  currentUser={currentUser}
+                  contents={contents}
+                />
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile: cards */}
+      <div className="group-table-mobile user-cards-container">
+        {loading ? (
+          <div className="user-card user-card-placeholder text-center py-4 text-muted">Loading...</div>
+        ) : error ? (
+          <div className="user-card user-card-placeholder text-center py-4 text-danger">{error}</div>
+        ) : groups.length === 0 ? (
+          <div className="user-card user-card-placeholder text-center py-4 text-muted">No groups found</div>
+        ) : (
+          groups.map((group) => (
+            <GroupRowCard
+              key={group.id}
+              group={group}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              getPositionName={getPositionName}
+              getAdminName={getAdminName}
+              isAdmin={isAdmin}
+              currentUser={currentUser}
+              contents={contents}
+            />
+          ))
+        )}
+      </div>
+    </>
   );
 };
