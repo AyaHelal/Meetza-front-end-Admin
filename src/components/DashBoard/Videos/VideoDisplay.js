@@ -1,6 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { ThumbsDown, HeartStraight, ChatTeardropDots, PencilSimpleLine, Trash, MagnifyingGlass, ArrowLeft, UploadSimple } from 'phosphor-react';
+import { ThumbsDown, HeartStraight, ChatTeardropDots, PencilSimpleLine, Trash, MagnifyingGlass, ArrowLeft, UploadSimple, FileText } from 'phosphor-react';
 import './VideoDisplay.css';
 import { useVideoDisplay } from './hooks/useVideoDisplay';
 
@@ -42,6 +42,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
         handleEditPosterFileChange,
         handleUploadVideo,
         resetUploadForm,
+        handleSummarizeVideo,
         setShowEditModal,
         setShowDeleteModal,
         setVideoToDelete,
@@ -429,6 +430,19 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                                 </p>
                                             </div>
                                             <div className="d-flex gap-1">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm p-0 rounded-5"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleSummarizeVideo(video);
+                                                    }}
+                                                    title="Generate summary"
+                                                >
+                                                    <span className="video-icon-edit-span">
+                                                        <FileText size={20} />
+                                                    </span>
+                                                </button>
                                                 <button
                                                     type="button"
                                                     className="btn btn-sm p-0 rounded-5"
