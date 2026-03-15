@@ -1,6 +1,8 @@
 import React from "react";
 import { GroupMembershipRow } from "./GroupMembershipRow";
-import '../../CSS/Table.css';
+import { GroupMembershipRowCard } from "./GroupMembershipRowCard";
+import "../../CSS/Table.css";
+
 export const GroupMembershipTable = ({
   memberships,
   groups,
@@ -14,49 +16,75 @@ export const GroupMembershipTable = ({
   isAdmin,
 }) => {
   return (
-    <div className="table-responsive user-table-container rounded-3">
-      <table className="table table-borderless">
-        <thead className="table-header-sticky">
-          <tr className="mx-5">
-            <th style={{ color: "#888888", width: "30%" }} className="fw-semibold px-4">Group</th>
-            <th style={{ color: "#888888" }} className="fw-semibold">Membership Info</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
+    <>
+      {/* Desktop: table */}
+      <div className="membership-table-desktop table-responsive user-table-container rounded-3">
+        <table className="table table-borderless">
+          <thead className="table-header-sticky">
             <tr>
-              <td colSpan="2" className="text-center py-4 text-muted">
-                Loading...
-              </td>
+              <th className="fw-semibold px-4 membership-th">Group</th>
+              <th className="fw-semibold membership-th">Membership Info</th>
             </tr>
-          ) : error ? (
-            <tr>
-              <td colSpan="2" className="text-center py-4 text-danger">
-                {error}
-              </td>
-            </tr>
-          ) : memberships.length === 0 ? (
-            <tr>
-              <td colSpan="2" className="text-center py-4 text-muted">
-                No memberships found
-              </td>
-            </tr>
-          ) : (
-            memberships.map((membership) => (
-              <GroupMembershipRow
-                key={membership.id}
-                membership={membership}
-                onDelete={onDelete}
-                getGroupName={getGroupName}
-                getMemberName={getMemberName}
-                getMemberEmail={getMemberEmail}
-                isAdmin={isAdmin}
-              />
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan={2} className="text-center py-4 text-muted">
+                  Loading...
+                </td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan={2} className="text-center py-4 text-danger">
+                  {error}
+                </td>
+              </tr>
+            ) : memberships.length === 0 ? (
+              <tr>
+                <td colSpan={2} className="text-center py-4 text-muted">
+                  No memberships found
+                </td>
+              </tr>
+            ) : (
+              memberships.map((membership) => (
+                <GroupMembershipRow
+                  key={membership.id}
+                  membership={membership}
+                  onDelete={onDelete}
+                  getGroupName={getGroupName}
+                  getMemberName={getMemberName}
+                  getMemberEmail={getMemberEmail}
+                  isAdmin={isAdmin}
+                />
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile: cards */}
+      <div className="membership-table-mobile user-cards-container">
+        {loading ? (
+          <div className="user-card user-card-placeholder text-center py-4 text-muted">Loading...</div>
+        ) : error ? (
+          <div className="user-card user-card-placeholder text-center py-4 text-danger">{error}</div>
+        ) : memberships.length === 0 ? (
+          <div className="user-card user-card-placeholder text-center py-4 text-muted">No memberships found</div>
+        ) : (
+          memberships.map((membership) => (
+            <GroupMembershipRowCard
+              key={membership.id}
+              membership={membership}
+              onDelete={onDelete}
+              getGroupName={getGroupName}
+              getMemberName={getMemberName}
+              getMemberEmail={getMemberEmail}
+              isAdmin={isAdmin}
+            />
+          ))
+        )}
+      </div>
+    </>
   );
 };
 

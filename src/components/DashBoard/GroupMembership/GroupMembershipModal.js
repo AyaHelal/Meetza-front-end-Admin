@@ -13,8 +13,8 @@ const GroupMembershipModal = ({ currentUser, mode, formData, setFormData, groups
     });
 
     return (
-        <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }} onClick={onClose}>
-            <div className="modal-dialog modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
+        <div className="modal show d-block dashboard-form-modal" style={{ backgroundColor: "rgba(0,0,0,0.5)" }} onClick={onClose}>
+            <div className="modal-dialog modal-dialog-centered dashboard-form-modal__dialog" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-content rounded-4 border-0" style={{ boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
                     <div className="modal-header border-0 pb-0">
                         <h5 className="modal-title fw-bold" style={{ fontSize: "24px", color: "#010101" }}>
@@ -24,13 +24,13 @@ const GroupMembershipModal = ({ currentUser, mode, formData, setFormData, groups
                         </button>
                     </div>
 
-                    <div className="modal-body pt-3" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: 10 }}>
-                        <form>
+                    <div className="modal-body pt-3 dashboard-form-modal__body" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: 10 }}>
+                        <form className="dashboard-form-modal__form">
                             <div className="mb-3">
                                 <label className="form-label fw-semibold" style={{ color: "#010101" }}>
                                     Group <span style={{ color: "#FF0000" }}>*</span>
                                 </label>
-                                <div>
+                                <div className="dashboard-form-modal__select-wrap">
                                     <Select
                                         options={visibleGroups.filter(g => currentUser.role.toLowerCase() === 'super_admin' || g.adminId === currentUser.id).map(g => ({ value: g.id, label: g.name || g.group_name || `Group ${g.id}` }))}
                                         value={formData.group_id ? { value: formData.group_id, label: groups.find(g => g.id === formData.group_id)?.name || groups.find(g => g.id === formData.group_id)?.group_name || `Group ${formData.group_id}` } : null}

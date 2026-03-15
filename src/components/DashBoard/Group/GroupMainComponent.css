@@ -157,6 +157,97 @@
   backdrop-filter: blur(4px);
 }
 
+/* Create Group inline form: base + responsive */
+.create-group-form {
+  border-radius: 12px;
+}
+
+.create-group-form__label {
+  color: #010101;
+  font-size: 16px;
+}
+
+.create-group-form__input,
+.create-group-form__field {
+  width: 70%;
+  max-width: 100%;
+}
+
+.create-group-form__textarea {
+  resize: vertical;
+}
+
+.create-group-form__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.create-group-form__submit {
+  margin-left: 6rem;
+}
+
+/* React-Select inside create group form */
+.create-group-form__field > div {
+  width: 100%;
+}
+
+/* Tablet: Create Group form */
+@media (max-width: 992px) {
+  .create-group-form {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+
+  .create-group-form__input,
+  .create-group-form__field {
+    width: 100% !important;
+  }
+
+  .create-group-form__submit {
+    margin-left: 0;
+  }
+
+  .create-group-form__actions {
+    justify-content: center;
+  }
+}
+
+/* Mobile: Create Group form */
+@media (max-width: 768px) {
+  .form-scroll-container {
+    padding: 1rem !important;
+  }
+
+  .create-group-form {
+    padding: 1rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .create-group-form .d-flex.align-items-center.gap-3.mb-4 h2 {
+    font-size: 1.25rem !important;
+  }
+
+  .create-group-form__input,
+  .create-group-form__field {
+    width: 100% !important;
+  }
+
+  .create-group-form__textarea {
+    min-height: 80px !important;
+  }
+
+  .create-group-form__actions {
+    justify-content: stretch;
+  }
+
+  .create-group-form__submit {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
 /* Responsive table */
 @media (max-width: 768px) {
   .table-responsive {

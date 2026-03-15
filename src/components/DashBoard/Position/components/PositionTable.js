@@ -1,7 +1,11 @@
 import { PositionRow } from "./PositionRow";
+import { PositionRowCard } from "./PositionRowCard";
 import { SearchBar } from "../../shared/SearchBar";
 import { PlusCircle } from "phosphor-react";
 import '../../CSS/Table.css';
+
+const colCount = (currentUser) => (currentUser?.role === 'Super_Admin' ? 3 : 2);
+
 export const PositionTable = ({
   currentUser,
   positions,
@@ -17,92 +21,96 @@ export const PositionTable = ({
   addingNew,
   users = [],
 }) => {
+  const cols = colCount(currentUser);
+
   return (
-    <div className="m-4 rounded-3" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+    <div className="m-4 rounded-3 position-management-card">
       <div className="card shadow-sm rounded-3 border-0">
-        <div className="d-flex justify-content-between align-items-center p-4">
-          <h2 className="h4 m-0 fw-semibold" style={{ color: "#010101" }}>Position Management</h2>
-          <div className="d-flex gap-3 align-items-center">
+        <div className="position-header p-4">
+          <h2 className="position-header-title h4 m-0 fw-semibold">Position Management</h2>
+          <div className="position-header-actions">
             <button
-              className="btn rounded-4 d-flex align-items-center gap-2"
+              type="button"
+              className="btn rounded-4 d-flex align-items-center gap-2 position-header-btn"
               onClick={onAdd}
               disabled={addingNew}
-              style={{
-                background: "linear-gradient(to right, #0076EA, #00DC85)",
-                color: "white",
-                fontSize: "16px",
-                paddingTop: "0.75rem",
-                paddingBottom: "0.75rem",
-                paddingLeft: "1.5rem",
-                paddingRight: "1.5rem",
-                border: "none",
-              }}
             >
               <PlusCircle size={20} weight="bold" />
               <span className="fw-semibold">Create Position</span>
             </button>
-            <SearchBar
-              value={searchTerm}
-              onChange={onSearchChange}
-              placeholder="Search positions..."
-            />
+            <div className="position-header-search">
+              <SearchBar
+                value={searchTerm}
+                onChange={onSearchChange}
+                placeholder="Search positions..."
+                className="w-100"
+              />
+            </div>
           </div>
         </div>
-        <div className="table-responsive user-table-container rounded-3">
+
+        {/* Desktop: table */}
+        <div className="position-table-desktop table-responsive user-table-container rounded-3">
           <table className="table table-borderless">
             <thead className="table-header-sticky">
               <tr>
                 {currentUser?.role === 'Super_Admin' && (
-                  <th className="fw-semibold px-4" style={{ color: "#888888" }}>
-                    User
-                  </th>
+                  <th className="fw-semibold px-4 position-th">User</th>
                 )}
-                <th className="fw-semibold px-4" style={{ color: "#888888" }}>
-                  Position
-                </th>
-                <th className="fw-semibold px-4" style={{ color: "#888888" }}>
-                  Actions
-                </th>
+                <th className="fw-semibold px-4 position-th">Position</th>
+                <th className="fw-semibold px-4 position-th">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={currentUser?.role === 'Super_Admin' ? 3 : 2} className="text-center py-4 text-muted">
-                    Loading...
-                  </td>
+                  <td colSpan={cols} className="text-center py-4 text-muted">Loading...</td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={currentUser?.role === 'Super_Admin' ? 3 : 2} className="text-center py-4 text-danger">
-                    {error}
-                  </td>
+                  <td colSpan={cols} className="text-center py-4 text-danger">{error}</td>
                 </tr>
               ) : positions.length === 0 && !addingNew ? (
                 <tr>
-                  <td colSpan={currentUser?.role === 'Super_Admin' ? 3 : 2} className="text-center py-4 text-muted">
-                    No positions found
-                  </td>
+                  <td colSpan={cols} className="text-center py-4 text-muted">No positions found</td>
                 </tr>
               ) : (
-                <>
-                  {positions.map((pos) => (
-                    <PositionRow
-                      key={pos.id}
-                      user={currentUser}
-                      position={pos}
-                      onSave={onSave}
-                      onEdit={onEdit}
-                      onDelete={onDelete}
-                      isEditing={false}
-                      users={users}
-                    />
-                  ))}
-
-                </>
+                positions.map((pos) => (
+                  <PositionRow
+                    key={pos.id}
+                    user={currentUser}
+                    position={pos}
+                    onSave={onSave}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    isEditing={false}
+                    users={users}
+                  />
+                ))
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile: cards */}
+        <div className="position-table-mobile user-cards-container">
+          {loading ? (
+            <div className="user-card user-card-placeholder text-center py-4 text-muted">Loading...</div>
+          ) : error ? (
+            <div className="user-card user-card-placeholder text-center py-4 text-danger">{error}</div>
+          ) : positions.length === 0 && !addingNew ? (
+            <div className="user-card user-card-placeholder text-center py-4 text-muted">No positions found</div>
+          ) : (
+            positions.map((pos) => (
+              <PositionRowCard
+                key={pos.id}
+                user={currentUser}
+                position={pos}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

@@ -21,12 +21,12 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
 
     return (
         <div
-            className="modal show d-block"
+            className="modal show d-block dashboard-form-modal"
             style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
             onClick={onClose}
         >
             <div
-                className="modal-dialog modal-dialog-centered"
+                className="modal-dialog modal-dialog-centered dashboard-form-modal__dialog"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="modal-content rounded-4 border-0" style={{ boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
@@ -44,8 +44,8 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
                         </button>
                     </div>
 
-                    <div className="modal-body pt-3" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: 10 }}>
-                        <form>
+                    <div className="modal-body pt-3 dashboard-form-modal__body" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: 10 }}>
+                        <form className="dashboard-form-modal__form">
                             {mode === 'create' ? (
                                 <>
                                     {/* Group Name */}
@@ -73,7 +73,7 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
                                         <label className="form-label fw-semibold" style={{ color: "#010101" }}>
                                             Position <span style={{ color: "#FF0000" }}>*</span>
                                         </label>
-                                        <div>
+                                        <div className="dashboard-form-modal__select-wrap">
                                             <Select
                                                 options={positions.map(p => ({ value: p.id, label: p.name || p.position_name || p.title || `Position ${p.id}` }))}
                                                 value={formData.position_id ? { value: formData.position_id, label: positions.find(p => p.id === formData.position_id)?.name || positions.find(p => p.id === formData.position_id)?.title || `Position ${formData.position_id}` } : null}
@@ -115,7 +115,7 @@ const GroupModalComponent = ({ mode, formData, setFormData, onSave, onClose, pos
                                             Group Content
                                         </label>
                                         <div className="d-flex align-items-center gap-2">
-                                            <div style={{ flex: 1 }}>
+                                            <div className="dashboard-form-modal__select-wrap" style={{ flex: 1 }}>
                                                 <Select
                                                     options={contentOptions}
                                                     value={selectedContent}

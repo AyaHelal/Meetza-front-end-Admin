@@ -231,30 +231,26 @@ const GroupMainContent = ({ currentUser }) => {
                 <div className="card shadow-sm m-4  rounded-3 border-0" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
                     {!showForm ? (
                         <>
-                            <div className="card-body p-3 mb-4 d-flex justify-content-between align-items-center">
-                                <h2 className="h5 mb-0 fw-semibold" style={{ fontSize: "24px" }}>Group Management</h2>
-                                <div className="d-flex gap-3 align-items-center">
+                            <div className="card-body p-3 mb-4 position-header">
+                                <h2 className="h5 mb-0 fw-semibold position-header-title" style={{ fontSize: "24px" }}>Group Management</h2>
+                                <div className="position-header-actions">
                                     <button
-                                        className="btn rounded-4 d-flex align-items-center gap-2"
+                                        type="button"
+                                        className="btn rounded-4 d-flex align-items-center gap-2 position-header-btn"
                                         onClick={openCreateForm}
                                         disabled={showForm}
-                                        style={{
-                                            background: "linear-gradient(to right, #0076EA, #00DC85)",
-                                            color: "white",
-                                            fontSize: "16px",
-                                            padding: "0.75rem 1.5rem",
-                                            border: "none",
-                                        }}
                                     >
                                         <PlusCircle size={20} weight="bold" />
                                         <span className="fw-semibold">Create Group</span>
                                     </button>
-                                    <SearchBar
-                                        className="ss"
-                                        value={searchQuery}
-                                        onChange={handleSearchChange}
-                                        placeholder="Search by name..."
-                                    />
+                                    <div className="position-header-search">
+                                        <SearchBar
+                                            value={searchQuery}
+                                            onChange={handleSearchChange}
+                                            placeholder="Search by name..."
+                                            className="w-100"
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
@@ -296,32 +292,27 @@ const GroupMainContent = ({ currentUser }) => {
 
                                 <div className="row justify-content-center">
                                     <div className="col-lg-7">
-                                        <div className="bg-white ps-5 border-0 p-4 align-items-center justify-content-center " style={{ border: "2px solid #E9ECEF" }}>
+                                        <div className="create-group-form bg-white border-0 p-4" style={{ border: "2px solid #E9ECEF" }}>
                                             <div className="mb-4">
-                                                <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                <label className="form-label fw-semibold create-group-form__label">
                                                     Group Name <span style={{ color: "#FF0000" }}>*</span>
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    className="form-control rounded-3"
+                                                    className="form-control rounded-3 create-group-form__input"
                                                     name="group_name"
                                                     value={formData.group_name || ''}
                                                     onChange={handleContentChange}
                                                     placeholder="Enter group name"
-                                                    style={{
-                                                        border: "2px solid #E9ECEF",
-                                                        fontSize: "16px",
-                                                        width: "70%",
-                                                    }}
+                                                    style={{ border: "2px solid #E9ECEF", fontSize: "16px" }}
                                                 />
                                             </div>
 
                                             <div className="mb-4">
-                                                <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                <label className="form-label fw-semibold create-group-form__label">
                                                     Position <span style={{ color: "#FF0000" }}>*</span>
                                                 </label>
-                                                <div style={{ width: '70%' }} className="rounded-3">
-
+                                                <div className="create-group-form__field rounded-3">
                                                     <Select
                                                         className="rounded-3"
                                                         options={positionOptions}
@@ -335,31 +326,27 @@ const GroupMainContent = ({ currentUser }) => {
                                             </div>
 
                                             <div className="mb-4">
-                                                <div style={{ minWidth: 200 }} className="mb-4">
-                                                    <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                <div className="mb-4 create-group-form__field">
+                                                    <label className="form-label fw-semibold create-group-form__label">
                                                         Year <span style={{ color: "#FF0000" }}>*</span>
                                                     </label>
                                                     <input
                                                         type="number"
-                                                        className="form-control rounded-3"
+                                                        className="form-control rounded-3 create-group-form__input"
                                                         name="year"
                                                         min={1}
                                                         value={formData.year || ''}
                                                         onChange={handleContentChange}
                                                         placeholder="Enter year"
-                                                        style={{
-                                                            border: "2px solid #E9ECEF",
-                                                            fontSize: "16px",
-                                                            width: "70%",
-                                                        }}
+                                                        style={{ border: "2px solid #E9ECEF", fontSize: "16px" }}
                                                     />
                                                 </div>
 
-                                                <div style={{ minWidth: 200 }}>
-                                                    <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                <div className="create-group-form__field">
+                                                    <label className="form-label fw-semibold create-group-form__label">
                                                         Semester <span style={{ color: "#FF0000" }}>*</span>
                                                     </label>
-                                                    <div style={{ width: '70%' }}>
+                                                    <div className="create-group-form__field rounded-3">
                                                         <Select
                                                             options={[{ value: 'Fall', label: 'Fall' }, { value: 'Spring', label: 'Spring' }, { value: 'Summer', label: 'Summer' }]}
                                                             value={formData.semester ? { value: formData.semester, label: formData.semester } : null}
@@ -373,67 +360,53 @@ const GroupMainContent = ({ currentUser }) => {
                                             </div>
 
                                             <div className="mb-4">
-                                                <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                <label className="form-label fw-semibold create-group-form__label">
                                                     Content Name <span style={{ color: "#FF0000" }}>*</span>
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    className="form-control rounded-3"
+                                                    className="form-control rounded-3 create-group-form__input"
                                                     name="group_content_name"
                                                     value={formData.group_content_name || ''}
                                                     onChange={handleContentChange}
                                                     placeholder="Enter content name"
-                                                    style={{
-                                                        border: "2px solid #E9ECEF",
-                                                        fontSize: "16px",
-                                                        width: "70%",
-                                                    }}
+                                                    style={{ border: "2px solid #E9ECEF", fontSize: "16px" }}
                                                 />
                                             </div>
 
                                             <div className="mb-4">
-                                                <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                <label className="form-label fw-semibold create-group-form__label">
                                                     Content Description
                                                 </label>
                                                 <textarea
-                                                    className="form-control rounded-3"
+                                                    className="form-control rounded-3 create-group-form__input create-group-form__textarea"
                                                     name="content_description"
                                                     value={formData.content_description || ''}
                                                     onChange={handleContentChange}
                                                     placeholder="Enter content description (optional)"
-                                                    style={{
-                                                        border: "2px solid #E9ECEF",
-                                                        fontSize: "16px",
-                                                        width: "70%",
-                                                        minHeight: 90,
-                                                    }}
+                                                    style={{ border: "2px solid #E9ECEF", fontSize: "16px", minHeight: 90 }}
                                                 />
                                             </div>
 
                                             <div className="mb-4">
-                                                <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                <label className="form-label fw-semibold create-group-form__label">
                                                     Description
                                                 </label>
                                                 <textarea
-                                                    className="form-control rounded-3"
+                                                    className="form-control rounded-3 create-group-form__input create-group-form__textarea"
                                                     name="description"
                                                     value={formData.description || ''}
                                                     onChange={handleContentChange}
                                                     placeholder="Enter group description (optional)"
-                                                    style={{
-                                                        border: "2px solid #E9ECEF",
-                                                        fontSize: "16px",
-                                                        width: "70%",
-                                                        minHeight: 90,
-                                                    }}
+                                                    style={{ border: "2px solid #E9ECEF", fontSize: "16px", minHeight: 90 }}
                                                 />
                                             </div>
 
                                             <div className="mb-4">
-                                                <label className="form-label fw-semibold" style={{ color: "#010101", fontSize: "16px" }}>
+                                                <label className="form-label fw-semibold create-group-form__label">
                                                     Poster (upload image)
                                                 </label>
-                                                <div style={{ width: '70%' }}>
+                                                <div className="create-group-form__field">
                                                     <input
                                                         type="file"
                                                         accept="image/*"
@@ -449,15 +422,13 @@ const GroupMainContent = ({ currentUser }) => {
                                                 </div>
                                             </div>
 
-                                            <div className="align-items-center
-                                            justify-content-center">
+                                            <div className="create-group-form__actions">
                                                 <button
                                                     type="button"
-                                                    className="btn rounded-3 px-5 py-2"
+                                                    className="btn rounded-3 px-5 py-2 create-group-form__submit"
                                                     onClick={handleCreateGroup}
                                                     style={{
-                                                        background: " #0076EA",
-                                                        marginLeft: "6rem",
+                                                        background: "#0076EA",
                                                         color: "white",
                                                         border: "none",
                                                         fontSize: "16px",
