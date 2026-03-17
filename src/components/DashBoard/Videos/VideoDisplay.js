@@ -364,7 +364,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                 </div>
 
                 {/* Videos Sidebar */}
-                <div className="mt-4">
+                <div className="mt-4 video-sidebar-wrap">
                     <div className={`card border-0 bg-white video-sidebar-card ${showUploadModal ? 'video-sidebar-card--upload-open' : ''}`}>
                         <div className="card-header border-0 d-flex justify-content-between align-items-center p-3 bg-white video-sidebar-header">
                             <h5 className="mb-0 fw-semibold me-1">Videos</h5>
