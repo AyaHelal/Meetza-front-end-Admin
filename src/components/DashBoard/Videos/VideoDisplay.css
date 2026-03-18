@@ -525,7 +525,6 @@ small {
 
 /* ========== VideoDisplay layout & components (moved from inline styles) ========== */
 .video-page-root {
-  background-color: #f5f5f5;
   /* Match dashboard side nav height (see `Dashboard.css` `.dashboard-sidebar`) */
   height: 980px;
   max-height: calc(100vh - 40px);
