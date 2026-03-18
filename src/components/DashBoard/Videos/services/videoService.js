@@ -212,27 +212,20 @@ export async function summarizeVideo(videoId, videoUrl, language = 'en') {
     if (!videoId) throw new Error('video ID is required');
     if (!videoUrl) throw new Error('video URL is required');
 
-    const videoResponse = await axios.get(videoUrl, {
-        responseType: 'blob',
-        timeout: 1800000,
-    });
-
     const formData = new FormData();
-    formData.append('file', videoResponse.data, 'video.mp4');
     formData.append('url', videoUrl);
 
-    const res = await axios.post(
-        `http://localhost:8000/summarize_video/${encodeURIComponent(videoId)}`,
+    const res = await api.post(
+        `/video/summarize_video/${encodeURIComponent(videoId)}`,
         formData,
         {
             timeout: 1800000,
             headers: {
                 'X-Localization': language,
-                'X-API-Key': '#$$0limaaaannnn##sddsdsd23233522dd',
             },
         }
     );
 
     const root = res?.data;
-    return root?.data ?? root;
+    return root;
 }

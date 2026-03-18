@@ -35,7 +35,11 @@ api.interceptors.request.use((config) => {
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
-        if (locale) {
+        const hasLocalizationHeader =
+            typeof config.headers?.["X-localization"] !== "undefined" ||
+            typeof config.headers?.["X-Localization"] !== "undefined";
+
+        if (locale && !hasLocalizationHeader) {
             config.headers["X-localization"] = locale;
         }
 
