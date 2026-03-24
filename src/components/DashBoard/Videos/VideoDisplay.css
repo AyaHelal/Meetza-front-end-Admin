@@ -38,14 +38,17 @@
     margin-left: 5%;
     max-height: 900px !important;
   }
+
   .h-820 {
     height: 820px !important;
   }
 }
+
 @media (max-height: 900px) {
   .comment_scrollbar_height {
     max-height: 170px !important;
   }
+
   .input-custom-width {
     width: 590px !important;
   }
@@ -53,6 +56,7 @@
 
 /* 1440x900 screens - keep URL, copy, like, dislike on same line */
 @media (width: 1440px) and (height: 900px) {
+
   /* Override inline flexWrap style - target the container directly */
   .width-850.bg-light.shadow-sm {
     flex-wrap: nowrap !important;
@@ -66,7 +70,7 @@
   }
 
   /* Ensure URL container doesn't wrap */
-  .width-850.bg-light.shadow-sm > .d-flex.flex-grow-1 {
+  .width-850.bg-light.shadow-sm>.d-flex.flex-grow-1 {
     flex-wrap: nowrap !important;
     min-width: 0 !important;
   }
@@ -83,7 +87,8 @@
 }
 
 .comment_scrollbar_height::-webkit-scrollbar {
-  width: 10px; /* عرض scrollbar */
+  width: 10px;
+  /* عرض scrollbar */
 }
 
 .comment_scrollbar_height::-webkit-scrollbar-track {
@@ -91,13 +96,15 @@
 }
 
 .comment_scrollbar_height::-webkit-scrollbar-thumb {
-  background: #c5c6c6; /* لون المقبض عند hover */
+  background: #c5c6c6;
+  /* لون المقبض عند hover */
 
   border-radius: 10px;
 }
 
 .comment_scrollbar_height::-webkit-scrollbar-thumb:hover {
-  background: #c5c6c6; /* لون المقبض عند hover */
+  background: #c5c6c6;
+  /* لون المقبض عند hover */
 }
 
 /* Search animation styles */
@@ -118,6 +125,7 @@
     opacity: 0;
     transform: scale(0.8);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -313,6 +321,7 @@ input[type="date"] {
 .video-upload-form input[type="date"]:not(:valid)::-webkit-datetime-edit {
   color: #888888;
 }
+
 /* Video Upload Form Styles */
 .video-upload-form input::placeholder,
 .video-upload-form textarea::placeholder,
@@ -415,10 +424,12 @@ input[type="date"] {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+
   .video-upload-form input,
   .video-upload-form select,
   .video-upload-form textarea {
-    font-size: 16px !important; /* Prevents zoom on iOS */
+    font-size: 16px !important;
+    /* Prevents zoom on iOS */
   }
 }
 
@@ -437,9 +448,11 @@ small {
   font-size: 13px;
   line-height: 1.4;
 }
+
 .f::placeholder {
   color: #000000 !important;
 }
+
 .videos-sidebar-scroll::-webkit-scrollbar {
   width: 4px;
 }
@@ -475,6 +488,7 @@ small {
 
 /* Ensure like/dislike/comment buttons stay on the right */
 @media (max-width: 768px) {
+
   /* Make buttons smaller on mobile */
   .width-850 .btn-sm {
     padding: 0.25rem 0.5rem !important;
@@ -502,6 +516,7 @@ small {
 }
 
 @media (max-width: 480px) {
+
   /* Make buttons even smaller */
   .width-850 .btn-sm {
     padding: 0.2rem 0.4rem !important;
@@ -542,7 +557,8 @@ small {
 .video-sidebar-wrap {
   display: flex;
   flex-direction: column;
-  height: calc(100% - 1.5rem); /* accounts for `mt-4` */
+  height: calc(100% - 1.5rem);
+  /* accounts for `mt-4` */
   min-height: 0;
 }
 
@@ -683,6 +699,26 @@ small {
 .video-btn-copy {
   background-color: #00dc85;
   color: #ffffff;
+}
+
+.video-btn-download {
+  background: #00dc85;
+  color: #ffffff;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.video-btn-download:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: #03c175;
+  box-shadow: 0 4px 12px rgba(0, 118, 234, 0.3);
+  color: #ffffff;
+  opacity: 0.9;
+}
+
+.video-btn-download:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 .video-btn-stat {
@@ -826,8 +862,7 @@ small {
   max-height: none;
 }
 
-.video-sidebar-card:not(.video-sidebar-card--upload-open)
-  .videos-sidebar-scroll {
+.video-sidebar-card:not(.video-sidebar-card--upload-open) .videos-sidebar-scroll {
   max-height: none;
 }
 
@@ -1054,8 +1089,7 @@ small {
   }
 
   .video-sidebar-card--upload-open .videos-sidebar-scroll,
-  .video-sidebar-card:not(.video-sidebar-card--upload-open)
-    .videos-sidebar-scroll {
+  .video-sidebar-card:not(.video-sidebar-card--upload-open) .videos-sidebar-scroll {
     max-height: 40vh !important;
   }
 
