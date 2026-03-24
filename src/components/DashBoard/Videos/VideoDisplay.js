@@ -1,6 +1,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { ThumbsDown, HeartStraight, ChatTeardropDots, PencilSimpleLine, Trash, MagnifyingGlass, ArrowLeft, UploadSimple, FileText } from 'phosphor-react';
+import { ThumbsDown, HeartStraight, ChatTeardropDots, PencilSimpleLine, Trash, MagnifyingGlass, ArrowLeft, UploadSimple, FileText, DownloadSimple } from 'phosphor-react';
+import { downloadVideo } from '../../../utils/videoUtils';
 import './VideoDisplay.css';
 import { useVideoDisplay } from './hooks/useVideoDisplay';
 
@@ -49,6 +50,33 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
         setShowDeleteCommentModal,
         setCommentToDelete,
     } = useVideoDisplay(currentUserProp);
+    
+    // Download states
+    const [downloadingMap, setDownloadingMap] = React.useState({});
+    const [downloadingDetail, setDownloadingDetail] = React.useState(false);
+    
+    const handleDownloadClick = (video, isDetail = false) => {
+        const videoId = video._id || video.id;
+        const videoUrl = buildFileUrl(video.video_url);
+        
+        const onStart = () => {
+            if (isDetail) setDownloadingDetail(true);
+            else setDownloadingMap(prev => ({ ...prev, [videoId]: true }));
+        };
+        
+        const onEnd = () => {
+            if (isDetail) setDownloadingDetail(false);
+            else setDownloadingMap(prev => ({ ...prev, [videoId]: false }));
+        };
+        
+        downloadVideo(
+            videoUrl,
+            video.title,
+            onStart,
+            onEnd,
+            onEnd
+        );
+    };
 
     if (loading) {
         return (
@@ -299,6 +327,21 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                         >
                                             Copy
                                         </button>
+                                        <button
+                                            type="button"
+                                            className="btn rounded-3 btn-sm p-1 px-2 fw-semibold video-btn-download ms-2"
+                                            onClick={() => handleDownloadClick(currentVideo, true)}
+                                            disabled={downloadingDetail}
+                                        >
+                                            <div className="d-flex align-items-center gap-1">
+                                                {downloadingDetail ? (
+                                                    <div className="spinner-border spinner-border-sm text-white" role="status" style={{ width: '14px', height: '14px' }}></div>
+                                                ) : (
+                                                    <DownloadSimple size={16} />
+                                                )}
+                                                <span>{downloadingDetail ? 'Downloading...' : 'Download'}</span>
+                                            </div>
+                                        </button>
                                         <button type="button" className="btn rounded-5 p-1 btn-sm video-btn-stat">
                                             <span className="m-1">{likeCounts[currentVideo._id || currentVideo.id]?.dislike || 0}</span>
                                             <ThumbsDown size={24} />
@@ -430,6 +473,24 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                                 </p>
                                             </div>
                                             <div className="d-flex gap-1">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm p-0 rounded-5"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDownloadClick(video);
+                                                    }}
+                                                    title="Download video"
+                                                    disabled={downloadingMap[videoId]}
+                                                >
+                                                    <span className="video-icon-edit-span">
+                                                        {downloadingMap[videoId] ? (
+                                                            <div className="spinner-border spinner-border-sm text-primary" role="status" style={{ width: '16px', height: '16px' }}></div>
+                                                        ) : (
+                                                            <DownloadSimple size={20} />
+                                                        )}
+                                                    </span>
+                                                </button>
                                                 <button
                                                     type="button"
                                                     className="btn btn-sm p-0 rounded-5"
