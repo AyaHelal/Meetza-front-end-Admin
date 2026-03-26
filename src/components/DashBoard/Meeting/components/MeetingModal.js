@@ -20,6 +20,10 @@ const MeetingModal = ({ mode, data, groups = [], onChange, onClose, onSubmit }) 
         onChange({ ...data, end_time: e.target.value });
     };
 
+    const handleWeeklyChange = (e) => {
+        onChange({ ...data, weekly: e.target.value });
+    };
+
     return (
         <div className="modal d-block" style={{ background: 'rgba(0,0,0,0.45)' }}>
             <div className="card p-4 mx-auto" style={{ maxWidth: 560, borderRadius: 12, marginTop: '6rem' }}>
@@ -135,6 +139,28 @@ const MeetingModal = ({ mode, data, groups = [], onChange, onClose, onSubmit }) 
                                 onChange={() => onChange({ ...data, recordMeeting: 'Not Recording' })}
                             />
                             Not Recording
+                        </label>
+                    </div>
+
+                    <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Weekly Meeting</label>
+                    <div className="d-flex gap-3 mb-3">
+                        <label className="d-flex align-items-center gap-2" style={{ cursor: 'pointer', fontSize: 14 }}>
+                            <input
+                                type="radio"
+                                name="weekly"
+                                checked={data.weekly === 'Active' || data.weekly === 1 || data.weekly === '1'}
+                                onChange={() => onChange({ ...data, weekly: 'Active' })}
+                            />
+                            Active Weekly
+                        </label>
+                        <label className="d-flex align-items-center gap-2" style={{ cursor: 'pointer', fontSize: 14 }}>
+                            <input
+                                type="radio"
+                                name="weekly"
+                                checked={data.weekly === 'Deactive' || data.weekly === 0 || data.weekly === '0'}
+                                onChange={() => onChange({ ...data, weekly: 'Deactive' })}
+                            />
+                            Deactive Weekly
                         </label>
                     </div>
 

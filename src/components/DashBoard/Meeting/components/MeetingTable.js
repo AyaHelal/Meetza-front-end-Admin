@@ -53,7 +53,8 @@ export const MeetingTable = ({
                 <th className="fw-semibold px-4 meeting-th">Group</th>
                 <th className="fw-semibold px-4 meeting-th">Start_Time</th>
                 <th className="fw-semibold px-4 meeting-th">End_Time</th>
-                <th className="fw-semibold px-2 meeting-th">Recording</th>
+                <th className="fw-semibold px-4 meeting-th">Recording</th>
+                <th className="fw-semibold px-4 meeting-th">Weekly</th>
                 <th className="fw-semibold px-4 meeting-th">Status</th>
                 <th className="fw-semibold meeting-th">Actions</th>
               </tr>
@@ -61,19 +62,19 @@ export const MeetingTable = ({
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-4">
+                  <td colSpan={8} className="text-center py-4">
                     Loading...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-4 text-danger">
+                  <td colSpan={8} className="text-center py-4 text-danger">
                     {error}
                   </td>
                 </tr>
               ) : meetings.length === 0 && !addingNew ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-4">
+                  <td colSpan={8} className="text-center py-4">
                     No meetings found
                   </td>
                 </tr>
