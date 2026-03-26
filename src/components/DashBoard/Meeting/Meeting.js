@@ -4,6 +4,7 @@ import useMeetingData from "./hooks/useMeetingData";
 import { MeetingTable } from "./components/MeetingTable";
 import UserWelcomeHeader from "../shared/UserWelcomeHeader";
 import { ConfirmDeleteModal } from "../shared/ConfirmDeleteModal";
+import { WeeklyDeleteModal } from "./components/WeeklyDeleteModal";
 import { useGroupData } from "../Group/hooks/useGroupData";
 import MeetingModal from "./components/MeetingModal";
 import { useAuth } from "../../../context/AuthContext";
@@ -21,7 +22,9 @@ export default function Meeting() {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showWeeklyDeleteModal, setShowWeeklyDeleteModal] = useState(false);
     const [meetingToDelete, setMeetingToDelete] = useState(null);
+    const [deletingMeeting, setDeletingMeeting] = useState(false);
     const [modalData, setModalData] = useState({
         id: null,
         title: '',
@@ -31,6 +34,7 @@ export default function Meeting() {
         group_id: '',
         description: '',
         recordMeeting: 'Recording',
+        weekly: 'Active',
         poster_file: null,
         files: [],
     });
@@ -52,14 +56,25 @@ export default function Meeting() {
     };
 
     const handleDelete = (id) => {
-        setMeetingToDelete(id);
-        setShowDeleteModal(true);
+        const meeting = meetings.find(m => String(m.id) === String(id));
+        if (meeting) {
+            const isWeeklyActive = meeting.weekly === 1 || meeting.weekly === '1' || meeting.is_weekly === 1;
+            setMeetingToDelete(meeting);
+            
+            // Show weekly delete modal if meeting is weekly active, otherwise show regular delete modal
+            if (isWeeklyActive) {
+                setShowWeeklyDeleteModal(true);
+            } else {
+                setShowDeleteModal(true);
+            }
+        }
     };
 
     const confirmDeleteMeeting = async () => {
         if (!meetingToDelete) return;
+        setDeletingMeeting(true);
         try {
-            await deleteMeeting(meetingToDelete);
+            await deleteMeeting(meetingToDelete.id);
             setShowDeleteModal(false);
             setMeetingToDelete(null);
             await fetchMeetings();
@@ -67,6 +82,42 @@ export default function Meeting() {
             smartToast.error(err?.response?.data?.message || "Failed to delete meeting");
             setShowDeleteModal(false);
             setMeetingToDelete(null);
+        } finally {
+            setDeletingMeeting(false);
+        }
+    };
+
+    const confirmWeeklyDeleteMeeting = async (deleteAllWeeks = false) => {
+        if (!meetingToDelete) return;
+        setDeletingMeeting(true);
+        try {
+            const apiCommon = require("../../../utils/api").default;
+            const meetingId = meetingToDelete.id;
+            const isWeeklyActive = meetingToDelete.weekly === 1 || meetingToDelete.weekly === '1' || meetingToDelete.is_weekly === 1;
+            
+            if (isWeeklyActive && deleteAllWeeks) {
+                // First deactivate recurrence for all future weeks
+                await apiCommon.patch(`/meeting/${meetingId}/deactivate-recurrence`);
+                // Then delete the current meeting
+                await deleteMeeting(meetingId);
+                smartToast.success("All weekly meetings deleted successfully");
+            } else {
+                // Regular delete for this week only
+                await deleteMeeting(meetingId);
+                smartToast.success("Meeting deleted successfully");
+            }
+            
+            setShowWeeklyDeleteModal(false);
+            setShowDeleteModal(false);
+            setMeetingToDelete(null);
+            await fetchMeetings();
+        } catch (err) {
+            smartToast.error(err?.response?.data?.message || "Error deleting meeting");
+            setShowWeeklyDeleteModal(false);
+            setShowDeleteModal(false);
+            setMeetingToDelete(null);
+        } finally {
+            setDeletingMeeting(false);
         }
     };
 
@@ -84,6 +135,10 @@ export default function Meeting() {
             recordMeeting: (() => {
                 const r = m?.recording ?? m?.record_meeting;
                 return (r === true || r === 1 || r === '1') ? 'Recording' : 'Not Recording';
+            })(),
+            weekly: (() => {
+                const w = m?.weekly ?? m?.weekly_option ?? m?.is_weekly;
+                return (w === true || w === 1 || w === '1') ? 'Active' : (w === false || w === 0 || w === '0') ? 'Deactive' : 'Active';
             })(),
             poster_file: null,
             files: [],
@@ -103,6 +158,7 @@ export default function Meeting() {
             group_id: '',
             description: '',
             recordMeeting: 'Recording',
+            weekly: 'Active',
             poster_file: null,
             files: [],
         });
@@ -136,6 +192,13 @@ export default function Meeting() {
             onConfirm={confirmDeleteMeeting}
             title="Delete Meeting"
             message="Are you sure you want to delete this meeting? This action cannot be undone."
+        />
+        <WeeklyDeleteModal
+            show={showWeeklyDeleteModal}
+            onClose={() => { setShowWeeklyDeleteModal(false); setMeetingToDelete(null); }}
+            onConfirmThisWeek={() => confirmWeeklyDeleteMeeting(false)}
+            onConfirmAllWeeks={() => confirmWeeklyDeleteMeeting(true)}
+            confirming={deletingMeeting}
         />
         </main>
     );

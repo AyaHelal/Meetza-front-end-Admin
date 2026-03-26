@@ -98,6 +98,7 @@ import { useAuth } from "../../../../context/AuthContext";
         formData.append("group_id", groupId);
         formData.append("status", data.status);
         formData.append("recording", (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0");
+        formData.append("weekly", (data.weekly || data.weekly_option) === "Active" ? "1" : (data.weekly || data.weekly_option) === "Deactive" ? "0" : "");
         // description is optional and not displayed, but sent to backend
         if (data.description) {
             formData.append("description", data.description);
@@ -147,6 +148,7 @@ import { useAuth } from "../../../../context/AuthContext";
             formData.append("group_id", data.group_id || originalMeeting?.group_id);
             if (data.description != null) formData.append("description", data.description);
             formData.append("recording", (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0");
+            formData.append("weekly", (data.weekly || data.weekly_option) === "Active" ? "1" : (data.weekly || data.weekly_option) === "Deactive" ? "0" : "");
 
             if (hasPoster) {
                 formData.append("poster_file", data.poster_file);
@@ -163,6 +165,7 @@ import { useAuth } from "../../../../context/AuthContext";
                 status: data.status,
                 group_id: data.group_id || originalMeeting?.group_id,
                 recording: (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0",
+                weekly: (data.weekly || data.weekly_option) === "Active" ? "1" : (data.weekly || data.weekly_option) === "Deactive" ? "0" : "",
             };
             res = await apiCommon.put(`/meeting/${id}`, payload);
         }
@@ -185,17 +188,18 @@ import { useAuth } from "../../../../context/AuthContext";
 
 
     const deleteMeeting = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this meeting?")) return;
         try {
-        const res = await apiCommon.delete(`/meeting/${id}`);
-        if (res.data.success) {
-            setMeetings((prev) => prev.filter((m) => m.id !== id));
-            smartToast.success("Meeting deleted successfully");
-            return res.data;
-        } else smartToast.error(res.data.message || "Failed to delete meeting");
+            const res = await apiCommon.delete(`/meeting/${id}`);
+            if (res.data.success) {
+                smartToast.success("Meeting deleted successfully");
+                setMeetings(prev => prev.filter(m => m.id !== id));
+                return res.data;
+            } else {
+                smartToast.error(res.data.message || "Failed to delete meeting");
+            }
         } catch (err) {
-        smartToast.error(err.response?.data?.message || "Error deleting meeting");
-        throw err;
+            smartToast.error(err.response?.data?.message || "Error deleting meeting");
+            throw err;
         }
     };
 

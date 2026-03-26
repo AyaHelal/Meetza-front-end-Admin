@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Trash, CheckCircle, PencilSimpleLine } from "phosphor-react";
+import { Trash, CheckCircle, PencilSimpleLine, CaretDown, CalendarPlus, CalendarX } from "phosphor-react";
+import { smartToast } from "../../../../utils/toastManager";
 
 export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, onDelete, currentUser}) => {
     const [data, setData] = useState({
@@ -9,6 +10,7 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
         status: meeting?.status || "Scheduled",
         group_id: meeting?.group_id || "",
     });
+    const [weeklyDropdownOpen, setWeeklyDropdownOpen] = useState(null);
 
     useEffect(() => {
         if (meeting) {
@@ -44,8 +46,32 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
     };
 
     const handleSave = () => {
-        if (!data.title || !data.start_time || !data.end_time) return alert("Title, start time, and end time are required");
+        if (!data.title || !data.start_time || !data.end_time) {
+            smartToast.error("Title, start time, and end time are required");
+            return;
+        }
         onSave(meeting?.id, data);
+    };
+
+    const handleWeeklyStatusChange = async (meetingId, newStatus) => {
+        if (!meetingId) return;
+        try {
+            const apiCommon = require("../../../../utils/api").default;
+            if (newStatus === 'active') {
+                await apiCommon.post(`/meeting/${meetingId}/activate-recurrence`);
+                smartToast.success("Weekly recurrence activated successfully");
+            } else {
+                await apiCommon.patch(`/meeting/${meetingId}/deactivate-recurrence`);
+                smartToast.success("Weekly recurrence deactivated successfully");
+            }
+            // Trigger a re-fetch instead of full page reload
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (err) {
+            smartToast.error(`Failed to ${newStatus} weekly recurrence: ${err.response?.data?.message || err.message}`);
+        }
+        setWeeklyDropdownOpen(null);
     };
 
     const handleCancel = () => {
@@ -134,6 +160,116 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
                     return isRecording ? 'Yes' : 'No';
                 })()}
             </div>
+        </td>
+
+        <td>
+            {showInput ? (
+                <div style={textStyle}>Active/Deactive</div>
+            ) : (
+                <div className="weekly-meeting-dropdown" style={{ position: 'relative' }}>
+                    <button
+                        type="button"
+                        className="btn btn-sm d-flex align-items-center gap-2"
+                        style={{
+                            padding: '4px 8px',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            border: '1px solid #dee2e6',
+                            borderRadius: '4px',
+                            background: '#ffffff'
+                        }}
+                        onClick={() => setWeeklyDropdownOpen(weeklyDropdownOpen === meeting?.id ? null : meeting?.id)}
+                    >
+                        {(() => {
+                            const w = meeting?.weekly ?? meeting?.weekly_option ?? meeting?.is_weekly;
+                            const isActive = w === true || w === 1 || w === '1' || String(w).trim() === '1' || w === 'Active';
+                            return isActive ? (
+                                <>
+                                    <CalendarPlus size={14} weight="fill" style={{ color: '#10b981' }} />
+                                    <span style={{ color: '#10b981' }}>Active</span>
+                                </>
+                            ) : (
+                                <>
+                                    <CalendarX size={14} weight="fill" style={{ color: '#ef4444' }} />
+                                    <span style={{ color: '#ef4444' }}>Deactive</span>
+                                </>
+                            );
+                        })()}
+                        <CaretDown size={10} weight="bold" />
+                    </button>
+                    
+                    {weeklyDropdownOpen === meeting?.id && (
+                        <div className="dropdown-menu show" style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: '0',
+                            right: '0',
+                            margin: '4px 0 0',
+                            background: '#ffffff',
+                            border: '1px solid #dee2e6',
+                            borderRadius: '4px',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                            zIndex: 1000,
+                            overflow: 'hidden'
+                        }}>
+                            <button
+                                type="button"
+                                className="dropdown-item d-flex align-items-center gap-2"
+                                style={{
+                                    width: '100%',
+                                    padding: '8px 12px',
+                                    border: 'none',
+                                    background: '#ffffff',
+                                    cursor: 'pointer',
+                                    fontSize: '12px',
+                                    fontWeight: '500',
+                                    color: '#495057',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onClick={() => handleWeeklyStatusChange(meeting?.id, 'active')}
+                                onMouseOver={(e) => {
+                                    e.target.style.background = '#f0fdf4';
+                                    e.target.style.color = '#10b981';
+                                }}
+                                onMouseOut={(e) => {
+                                    e.target.style.background = '#ffffff';
+                                    e.target.style.color = '#495057';
+                                }}
+                            >
+                                <CalendarPlus size={14} weight="fill" />
+                                Active Weekly
+                            </button>
+                            <button
+                                type="button"
+                                className="dropdown-item d-flex align-items-center gap-2"
+                                style={{
+                                    width: '100%',
+                                    padding: '8px 12px',
+                                    border: 'none',
+                                    background: '#ffffff',
+                                    cursor: 'pointer',
+                                    fontSize: '12px',
+                                    fontWeight: '500',
+                                    color: '#495057',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onClick={() => handleWeeklyStatusChange(meeting?.id, 'deactive')}
+                                onMouseOver={(e) => {
+                                    e.target.style.background = '#fef2f2';
+                                    e.target.style.color = '#ef4444';
+                                }}
+                                onMouseOut={(e) => {
+                                    e.target.style.background = '#ffffff';
+                                    e.target.style.color = '#495057';
+                                }}
+                            >
+                                <CalendarX size={14} weight="fill" />
+                                Deactive Weekly
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
         </td>
 
         <td>
