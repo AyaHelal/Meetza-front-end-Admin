@@ -18,6 +18,7 @@ import {
     deleteCommentApi,
     uploadVideoApi,
     summarizeVideo,
+    formatRelativeTime,
 } from '../services/videoService';
 
 const initialUploadFormData = {
@@ -54,6 +55,14 @@ export function useVideoDisplay(currentUserProp) {
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [is1440x900, setIs1440x900] = useState(false);
+    const [tick, setTick] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTick((t) => t + 1);
+        }, 60000);
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -489,6 +498,7 @@ export function useVideoDisplay(currentUserProp) {
         formatDate,
         getVideoDuration,
         // handlers
+        formatRelativeTime,
         handleVideoSelect,
         handleEditVideo,
         handleUpdateVideo,

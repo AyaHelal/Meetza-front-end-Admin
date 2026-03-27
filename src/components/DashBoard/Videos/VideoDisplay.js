@@ -29,6 +29,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
         buildFileUrl,
         formatDuration,
         getVideoDuration,
+        formatRelativeTime,
         handleVideoSelect,
         handleEditVideo,
         handleUpdateVideo,
@@ -376,7 +377,12 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                                     className="rounded-circle me-3 video-comment-avatar"
                                                 />
                                                 <div className="flex-grow-1">
-                                                    <h6 className="mb-1 fw-semibold">{comment.member_name}</h6>
+                                                    <h6 className="mb-1 fw-semibold d-flex align-items-center">
+                                                        {comment.member_name}
+                                                        <small className="text-muted ms-2 fw-normal" style={{ fontSize: '0.7rem' }}>
+                                                            {formatRelativeTime(comment.timestamp || comment.created_at || comment.createdAt)}
+                                                        </small>
+                                                    </h6>
                                                     <p className="mb-0 small">{comment.comment_text || comment.text || comment.content}</p>
                                                 </div>
 
