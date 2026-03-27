@@ -187,11 +187,10 @@ import { useAuth } from "../../../../context/AuthContext";
 };
 
 
-    const deleteMeeting = async (id) => {
+    const deleteMeeting = async (id, config = {}) => {
         try {
-            const res = await apiCommon.delete(`/meeting/${id}`);
+            const res = await apiCommon.delete(`/meeting/${id}`, config);
             if (res.data.success) {
-                smartToast.success("Meeting deleted successfully");
                 setMeetings(prev => prev.filter(m => m.id !== id));
                 return res.data;
             } else {

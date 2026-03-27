@@ -91,15 +91,12 @@ export default function Meeting() {
         if (!meetingToDelete) return;
         setDeletingMeeting(true);
         try {
-            const apiCommon = require("../../../utils/api").default;
             const meetingId = meetingToDelete.id;
             const isWeeklyActive = meetingToDelete.weekly === 1 || meetingToDelete.weekly === '1' || meetingToDelete.is_weekly === 1;
             
             if (isWeeklyActive && deleteAllWeeks) {
-                // First deactivate recurrence for all future weeks
-                await apiCommon.patch(`/meeting/${meetingId}/deactivate-recurrence`);
-                // Then delete the current meeting
-                await deleteMeeting(meetingId);
+                // Delete all weekly meetings (series)
+                await deleteMeeting(meetingId, { params: { scope: 'series' } });
                 smartToast.success("All weekly meetings deleted successfully");
             } else {
                 // Regular delete for this week only
