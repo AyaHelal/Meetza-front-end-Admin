@@ -60,7 +60,7 @@ export default function Meeting() {
         if (meeting) {
             const isWeeklyActive = meeting.weekly === 1 || meeting.weekly === '1' || meeting.is_weekly === 1;
             setMeetingToDelete(meeting);
-            
+
             // Show weekly delete modal if meeting is weekly active, otherwise show regular delete modal
             if (isWeeklyActive) {
                 setShowWeeklyDeleteModal(true);
@@ -93,7 +93,7 @@ export default function Meeting() {
         try {
             const meetingId = meetingToDelete.id;
             const isWeeklyActive = meetingToDelete.weekly === 1 || meetingToDelete.weekly === '1' || meetingToDelete.is_weekly === 1;
-            
+
             if (isWeeklyActive && deleteAllWeeks) {
                 // Delete all weekly meetings (series)
                 await deleteMeeting(meetingId, { params: { scope: 'series' } });
@@ -103,7 +103,7 @@ export default function Meeting() {
                 await deleteMeeting(meetingId);
                 smartToast.success("Meeting deleted successfully");
             }
-            
+
             setShowWeeklyDeleteModal(false);
             setShowDeleteModal(false);
             setMeetingToDelete(null);
@@ -135,7 +135,7 @@ export default function Meeting() {
             })(),
             weekly: (() => {
                 const w = m?.weekly ?? m?.weekly_option ?? m?.is_weekly;
-                return (w === true || w === 1 || w === '1') ? 'Active' : (w === false || w === 0 || w === '0') ? 'Deactive' : 'Active';
+                return (w === true || w === 1 || w === '1') ? 'Active' : (w === false || w === 0 || w === '0') ? 'Inactive' : 'Active';
             })(),
             poster_file: null,
             files: [],

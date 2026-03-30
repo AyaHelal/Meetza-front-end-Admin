@@ -164,7 +164,7 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
 
         <td>
             {showInput ? (
-                <div style={textStyle}>Active/Deactive</div>
+                <div style={textStyle}>Active/Inactive</div>
             ) : (
                 <div className="weekly-meeting-dropdown" style={{ position: 'relative' }}>
                     <button
@@ -191,13 +191,13 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
                             ) : (
                                 <>
                                     <CalendarX size={14} weight="fill" style={{ color: '#ef4444' }} />
-                                    <span style={{ color: '#ef4444' }}>Deactive</span>
+                                    <span style={{ color: '#ef4444' }}>Inactive</span>
                                 </>
                             );
                         })()}
                         <CaretDown size={10} weight="bold" />
                     </button>
-                    
+
                     {weeklyDropdownOpen === meeting?.id && (
                         <div className="dropdown-menu show" style={{
                             position: 'absolute',
@@ -253,7 +253,7 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
                                     color: '#495057',
                                     transition: 'all 0.2s ease'
                                 }}
-                                onClick={() => handleWeeklyStatusChange(meeting?.id, 'deactive')}
+                                onClick={() => handleWeeklyStatusChange(meeting?.id, 'Inactive')}
                                 onMouseOver={(e) => {
                                     e.target.style.background = '#fef2f2';
                                     e.target.style.color = '#ef4444';
@@ -264,7 +264,7 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
                                 }}
                             >
                                 <CalendarX size={14} weight="fill" />
-                                Deactive Weekly
+                                Inactive Weekly
                             </button>
                         </div>
                     )}
