@@ -157,10 +157,10 @@ const MeetingModal = ({ mode, data, groups = [], onChange, onClose, onSubmit }) 
                             <input
                                 type="radio"
                                 name="weekly"
-                                checked={data.weekly === 'Deactive' || data.weekly === 0 || data.weekly === '0'}
-                                onChange={() => onChange({ ...data, weekly: 'Deactive' })}
+                                checked={data.weekly === 'Inactive' || data.weekly === 0 || data.weekly === '0'}
+                                onChange={() => onChange({ ...data, weekly: 'Inactive' })}
                             />
-                            Deactive Weekly
+                            Inactive Weekly
                         </label>
                     </div>
 
