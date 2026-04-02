@@ -3,7 +3,7 @@ import { Trash, File, Link as LinkIcon } from "phosphor-react";
 
 const formatCreatedAt = (created_at) => {
   if (!created_at) return "—";
-  return new Date(new Date(created_at).getTime() + 60 * 60 * 1000).toLocaleString("en-EG", {
+  return new Date(created_at).toLocaleString("en-EG", {
     timeZone: "Africa/Cairo",
     year: "numeric",
     month: "2-digit",
