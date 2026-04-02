@@ -479,37 +479,8 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                                 </p>
                                             </div>
                                             <div className="d-flex gap-1">
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-sm p-0 rounded-5"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleDownloadClick(video);
-                                                    }}
-                                                    title="Download video"
-                                                    disabled={downloadingMap[videoId]}
-                                                >
-                                                    <span className="video-icon-edit-span">
-                                                        {downloadingMap[videoId] ? (
-                                                            <div className="spinner-border spinner-border-sm text-primary" role="status" style={{ width: '16px', height: '16px' }}></div>
-                                                        ) : (
-                                                            <DownloadSimple size={20} />
-                                                        )}
-                                                    </span>
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-sm p-0 rounded-5"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleSummarizeVideo(video);
-                                                    }}
-                                                    title="Generate summary"
-                                                >
-                                                    <span className="video-icon-edit-span">
-                                                        <FileText size={20} />
-                                                    </span>
-                                                </button>
+
+
                                                 <button
                                                     type="button"
                                                     className="btn btn-sm p-0 rounded-5"
