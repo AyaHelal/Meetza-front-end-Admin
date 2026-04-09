@@ -1,10 +1,12 @@
 import React from "react";
-import { UsersThree, PencilSimpleLine, Trash } from "phosphor-react";
+import { UsersThree, PencilSimpleLine, Trash, UserPlus, UserMinus } from "phosphor-react";
 
 export const GroupRowCard = ({
   group,
   onEdit,
   onDelete,
+  onAssignAdmin,
+  onRemoveAssignAdmin,
   getPositionName,
   getAdminName,
   isAdmin,
@@ -12,6 +14,17 @@ export const GroupRowCard = ({
   contents = [],
 }) => {
   const canEditDelete = isAdmin && (
+    currentUser?.role === "Super_Admin" ||
+    (currentUser?.role === "Administrator" && (
+      group.admin_id === currentUser?.id ||
+      group.adminId === currentUser?.id ||
+      group.administrator_id === currentUser?.id ||
+      group.user_id === currentUser?.id ||
+      group.admin?.id === currentUser?.id
+    ))
+  );
+
+  const canAssignAdmins = isAdmin && (
     currentUser?.role === "Super_Admin" ||
     (currentUser?.role === "Administrator" && (
       group.admin_id === currentUser?.id ||
@@ -61,6 +74,44 @@ export const GroupRowCard = ({
           <span className="user-card-value user-card-value-wrap">{contentNames}</span>
         </div>
         <div className="user-card-actions">
+          {canAssignAdmins && (
+            <>
+              <button
+                type="button"
+                className="btn btn-sm user-card-btn"
+                onClick={() => onAssignAdmin?.(group)}
+                aria-label="Assign admin to group"
+                style={{
+                  backgroundColor: "#0076EA",
+                  borderRadius: 12,
+                  color: "white",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <UserPlus size={20} />
+                <span>Assign</span>
+              </button>
+              <button
+                type="button"
+                className="btn btn-sm user-card-btn"
+                onClick={() => onRemoveAssignAdmin?.(group)}
+                aria-label="Remove assigned admin"
+                style={{
+                  backgroundColor: "#fd7e14",
+                  borderRadius: 12,
+                  color: "white",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <UserMinus size={20} />
+                <span>Remove</span>
+              </button>
+            </>
+          )}
           <button
             type="button"
             className="btn btn-sm user-card-btn user-card-btn-edit"
