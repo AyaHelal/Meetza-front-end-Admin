@@ -880,12 +880,18 @@ small {
 }
 
 .video-sidebar-item--selected .video-sidebar-item-title,
-.video-sidebar-item--selected .video-sidebar-item-meta {
+.video-sidebar-item--selected .video-sidebar-item-meta,
+.video-sidebar-item--selected .video-sidebar-item-group {
   color: #ffffff;
 }
 
-.video-sidebar-item-meta {
+.video-sidebar-item-meta,
+.video-sidebar-item-group {
   color: #6c757d;
+}
+
+.video-sidebar-item-group {
+  font-weight: 500;
 }
 
 .video-sidebar-thumb {

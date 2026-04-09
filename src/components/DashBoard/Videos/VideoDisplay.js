@@ -293,7 +293,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                     <div className="d-flex flex-column min-w-0 flex-grow-1">
                                         <h5 className="mb-0 fw-semibold text-truncate">{currentVideo.title}</h5>
                                         {(currentVideo.group_name || currentVideo.groupName) && (
-                                            <span className="small fw-semibold text-success mt-1 text-truncate">
+                                            <span className="small text-muted mt-1 text-truncate">
                                                 {currentVideo.group_name || currentVideo.groupName}
                                             </span>
                                         )}
@@ -481,7 +481,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                             <div className="flex-grow-1 ms-3 min-w-0">
                                                 <h6 className="mb-1 small video-sidebar-item-title text-truncate">{video.title}</h6>
                                                 {(video.group_name || video.groupName) && (
-                                                    <p className="mb-0 small text-success fw-semibold text-truncate">
+                                                    <p className="mb-0 small video-sidebar-item-group text-truncate">
                                                         {video.group_name || video.groupName}
                                                     </p>
                                                 )}
