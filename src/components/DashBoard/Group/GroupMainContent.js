@@ -12,6 +12,9 @@ import { ConfirmDeleteModal } from "../shared/ConfirmDeleteModal";
 import { PlusCircle, ArrowLeft } from "phosphor-react";
 import Select from 'react-select';
 import "./GroupMainComponent.css";
+import api from "../../../utils/api";
+import AssignGroupAdminModal from "./AssignGroupAdminModal";
+import RemoveGroupAdminModal from "./RemoveGroupAdminModal";
 
 const GroupMainContent = ({ currentUser }) => {
     const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator" || (currentUser?.role || "").toLowerCase() === "super_admin";
@@ -67,6 +70,14 @@ const GroupMainContent = ({ currentUser }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [groupToDelete, setGroupToDelete] = useState(null);
+    const [showAssignAdminModal, setShowAssignAdminModal] = useState(false);
+    const [assignTargetGroup, setAssignTargetGroup] = useState(null);
+    const [assignAdminForm, setAssignAdminForm] = useState({ email: "", role: "" });
+    const [assigningAdmin, setAssigningAdmin] = useState(false);
+    const [showRemoveAdminModal, setShowRemoveAdminModal] = useState(false);
+    const [removeTargetGroup, setRemoveTargetGroup] = useState(null);
+    const [removeAdminForm, setRemoveAdminForm] = useState({ email: "" });
+    const [removingAdmin, setRemovingAdmin] = useState(false);
 
     const openCreateForm = () => {
         setModalMode("create");
@@ -219,6 +230,92 @@ const GroupMainContent = ({ currentUser }) => {
         return user?.name || `User ${adminId}`;
     };
 
+    const openAssignAdmin = (group) => {
+        setAssignTargetGroup(group);
+        setAssignAdminForm({ email: "", role: "" });
+        setShowAssignAdminModal(true);
+    };
+
+    const closeAssignAdmin = () => {
+        if (assigningAdmin) return;
+        setShowAssignAdminModal(false);
+        setAssignTargetGroup(null);
+        setAssignAdminForm({ email: "", role: "" });
+    };
+
+    const openRemoveAssignAdmin = (group) => {
+        setRemoveTargetGroup(group);
+        setRemoveAdminForm({ email: "" });
+        setShowRemoveAdminModal(true);
+    };
+
+    const resetRemoveAdminModal = () => {
+        setShowRemoveAdminModal(false);
+        setRemoveTargetGroup(null);
+        setRemoveAdminForm({ email: "" });
+    };
+
+    const closeRemoveAssignAdmin = () => {
+        if (removingAdmin) return;
+        resetRemoveAdminModal();
+    };
+
+    const handleRemoveAssignAdmin = async () => {
+        const gid = removeTargetGroup?.id;
+        const email = (removeAdminForm.email || "").trim();
+
+        if (!gid) {
+            toast.error("Please select a group");
+            return;
+        }
+        if (!email) {
+            toast.error("Please enter an email");
+            return;
+        }
+
+        try {
+            setRemovingAdmin(true);
+            await api.delete(`/group/${gid}/admins/${encodeURIComponent(email)}`);
+            toast.success("Admin assignment removed");
+            resetRemoveAdminModal();
+            fetchData();
+        } catch (error) {
+            const msg = error?.response?.data?.message || error?.message || "Failed to remove admin";
+            toast.error(msg);
+        } finally {
+            setRemovingAdmin(false);
+        }
+    };
+
+    const handleAssignAdmin = async () => {
+        const gid = assignTargetGroup?.id;
+        const email = (assignAdminForm.email || "").trim();
+        const role = (assignAdminForm.role || "").trim();
+
+        if (!gid) {
+            toast.error("Please select a group");
+            return;
+        }
+        if (!email) {
+            toast.error("Please enter an email");
+            return;
+        }
+
+        try {
+            setAssigningAdmin(true);
+            const body = role ? { email, role } : { email };
+            await api.post(`/group/${gid}/admins`, body);
+            toast.success("Admin assigned successfully");
+            closeAssignAdmin();
+            fetchData();
+        } catch (error) {
+            const msg = error?.response?.data?.message || error?.message || "Failed to assign admin";
+            toast.error(msg);
+        } finally {
+            setAssigningAdmin(false);
+        }
+    };
+
 
 
 
@@ -262,6 +359,8 @@ const GroupMainContent = ({ currentUser }) => {
                                 error={error}
                                 onEdit={openEditModal}
                                 onDelete={handleDeleteGroup}
+                                onAssignAdmin={openAssignAdmin}
+                                onRemoveAssignAdmin={openRemoveAssignAdmin}
                                 getPositionName={getPositionName}
                                 getAdminName={getAdminName}
                                 isAdmin={isAdmin}
@@ -463,6 +562,28 @@ const GroupMainContent = ({ currentUser }) => {
                 <GroupDetails
                     group={groupDetailsData}
                     onClose={() => setShowGroupDetails(false)}
+                />
+            )}
+
+            {showAssignAdminModal && (
+                <AssignGroupAdminModal
+                    group={assignTargetGroup}
+                    formData={assignAdminForm}
+                    setFormData={setAssignAdminForm}
+                    onSave={handleAssignAdmin}
+                    onClose={closeAssignAdmin}
+                    saving={assigningAdmin}
+                />
+            )}
+
+            {showRemoveAdminModal && (
+                <RemoveGroupAdminModal
+                    group={removeTargetGroup}
+                    formData={removeAdminForm}
+                    setFormData={setRemoveAdminForm}
+                    onConfirm={handleRemoveAssignAdmin}
+                    onClose={closeRemoveAssignAdmin}
+                    saving={removingAdmin}
                 />
             )}
 

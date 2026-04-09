@@ -289,9 +289,16 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                             <div className="card border-0 mt-4 width-850 video-current-card">
 
                                 {/* Video Header */}
-                                <div className="card-header border-0 d-flex justify-content-between align-items-center p-3">
-                                    <h5 className="mb-0 fw-semibold">{currentVideo.title}</h5>
-                                    <span className="badge text-dark fw-semibold">
+                                <div className="card-header border-0 d-flex justify-content-between align-items-center p-3 flex-wrap gap-2">
+                                    <div className="d-flex flex-column min-w-0 flex-grow-1">
+                                        <h5 className="mb-0 fw-semibold text-truncate">{currentVideo.title}</h5>
+                                        {(currentVideo.group_name || currentVideo.groupName) && (
+                                            <span className="small fw-semibold text-success mt-1 text-truncate">
+                                                {currentVideo.group_name || currentVideo.groupName}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span className="badge text-dark fw-semibold flex-shrink-0">
                                         Duration:{" "}
                                         {formatDuration(getVideoDuration(currentVideo))}
                                     </span>
@@ -471,8 +478,13 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                                 alt={video.title}
                                                 className="rounded video-sidebar-thumb"
                                             />
-                                            <div className="flex-grow-1 ms-3">
-                                                <h6 className="mb-1 small video-sidebar-item-title">{video.title}</h6>
+                                            <div className="flex-grow-1 ms-3 min-w-0">
+                                                <h6 className="mb-1 small video-sidebar-item-title text-truncate">{video.title}</h6>
+                                                {(video.group_name || video.groupName) && (
+                                                    <p className="mb-0 small text-success fw-semibold text-truncate">
+                                                        {video.group_name || video.groupName}
+                                                    </p>
+                                                )}
                                                 <p className="mb-0 small video-sidebar-item-meta">
                                                     Duration:{" "}
                                                     {formatDuration(getVideoDuration(video))}

@@ -2,6 +2,65 @@ import { useState, useEffect, useCallback } from "react";
 import api from "../../../../utils/api";
 import { useAuth } from "../../../../context/AuthContext";
 
+function pickPrimaryAdminFromAdmins(admins) {
+  if (!Array.isArray(admins) || admins.length === 0) return null;
+  const upper = (r) => String(r || "").toUpperCase();
+  const owner = admins.find((a) => upper(a.role) === "OWNER");
+  if (owner) return owner;
+  const adm = admins.find((a) => upper(a.role) === "ADMIN");
+  if (adm) return adm;
+  return admins[0];
+}
+
+function isGroupManagedByUser(g, userId) {
+  if (userId == null) return false;
+  const uid = String(userId);
+  const candidates = [
+    g.admin_id,
+    g.adminId,
+    g.administrator_id,
+    g.user_id,
+    g.admin?.id,
+  ];
+  if (candidates.some((id) => id != null && String(id) === uid)) return true;
+  if (Array.isArray(g.admins)) {
+    return g.admins.some((a) => a?.user_id != null && String(a.user_id) === uid);
+  }
+  return false;
+}
+
+function mapApiGroupToRow(g) {
+  const primary = pickPrimaryAdminFromAdmins(g.admins);
+  const adminUserId =
+    g.admin_id ||
+    g.adminId ||
+    g.administrator_id ||
+    g.user_id ||
+    g.admin?.id ||
+    primary?.user_id ||
+    primary?.userId ||
+    null;
+  const adminName =
+    g.admin?.name ||
+    g.admin_name ||
+    g.administrator_name ||
+    primary?.name ||
+    null;
+  return {
+    id: g.id,
+    name: g.name || g.group_name,
+    group_name: g.group_name,
+    position_id: g.position_id,
+    description: g.description || "",
+    group_content_id: g.group_content_id || null,
+    group_photo: g.group_photo || null,
+    memberCount: g.memberCount || g.member_count || 0,
+    admin_id: adminUserId,
+    admin_name: adminName,
+    createdAt: g.createdAt || g.created_at,
+  };
+}
+
 export const useGroupData = () => {
   const { user } = useAuth();
   const [groups, setGroups] = useState([]);
@@ -24,29 +83,11 @@ export const useGroupData = () => {
       let filteredGroups = payload;
 
       if (isAdministrator && !isSuperAdmin) {
-        filteredGroups = payload.filter(g =>
-          g.admin_id === user?.id ||
-          g.adminId === user?.id ||
-          g.administrator_id === user?.id ||
-          g.user_id === user?.id ||
-          g.admin?.id === user?.id
-        );
+        filteredGroups = payload.filter((g) => isGroupManagedByUser(g, user?.id));
       }
       // Super_Admin sees all groups (no filtering)
 
-      const normalized = filteredGroups.map((g) => ({
-        id: g.id,
-        name: g.name || g.group_name,
-        group_name: g.group_name,
-        position_id: g.position_id,
-        description: g.description || "",
-        group_content_id: g.group_content_id || null, // Use API value directly
-        group_photo: g.group_photo || null,
-        memberCount: g.memberCount || g.member_count || 0,
-        admin_id: g.admin_id || g.adminId || g.administrator_id || g.user_id || g.admin?.id || null,
-        admin_name: g.admin?.name || g.admin_name || g.administrator_name || null,
-        createdAt: g.createdAt || g.created_at,
-      }));
+      const normalized = filteredGroups.map((g) => mapApiGroupToRow(g));
       setGroups(normalized);
     } catch (err) {
       console.error("Fetch error:", err);
@@ -174,29 +215,11 @@ export const useGroupData = () => {
       let filteredGroups = payload;
 
       if (isAdministrator && !isSuperAdmin) {
-        filteredGroups = payload.filter(g =>
-          g.admin_id === user?.id ||
-          g.adminId === user?.id ||
-          g.administrator_id === user?.id ||
-          g.user_id === user?.id ||
-          g.admin?.id === user?.id
-        );
+        filteredGroups = payload.filter((g) => isGroupManagedByUser(g, user?.id));
       }
       // Super_Admin sees all groups (no filtering)
 
-      const normalized = filteredGroups.map((g) => ({
-        id: g.id,
-        name: g.name || g.group_name,
-        group_name: g.group_name,
-        position_id: g.position_id,
-        description: g.description || "",
-        group_content_id: g.group_content_id || null,
-        group_photo: g.group_photo || null,
-        memberCount: g.memberCount || g.member_count || 0,
-        admin_id: g.admin_id || g.adminId || g.administrator_id || g.user_id || g.admin?.id || null,
-        admin_name: g.admin?.name || g.admin_name || g.administrator_name || null,
-        createdAt: g.createdAt || g.created_at,
-      }));
+      const normalized = filteredGroups.map((g) => mapApiGroupToRow(g));
       setGroups(normalized);
     } catch (e) {
       console.error("Search error:", e);

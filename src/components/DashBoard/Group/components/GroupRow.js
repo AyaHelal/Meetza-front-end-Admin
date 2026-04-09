@@ -1,10 +1,12 @@
 import React from "react";
-import { UsersThree, PencilSimpleLine, Trash } from "phosphor-react";
+import { UsersThree, PencilSimpleLine, Trash, UserPlus, UserMinus } from "phosphor-react";
 
 export const GroupRow = ({
   group,
   onEdit,
   onDelete,
+  onAssignAdmin,
+  onRemoveAssignAdmin,
   getPositionName,
   getAdminName,
   isAdmin,
@@ -13,6 +15,17 @@ export const GroupRow = ({
 }) => {
   // Check if current user can edit/delete this group
   const canEditDelete = isAdmin && (
+    currentUser?.role === "Super_Admin" ||
+    (currentUser?.role === "Administrator" && (
+      group.admin_id === currentUser?.id ||
+      group.adminId === currentUser?.id ||
+      group.administrator_id === currentUser?.id ||
+      group.user_id === currentUser?.id ||
+      group.admin?.id === currentUser?.id
+    ))
+  );
+
+  const canAssignAdmins = isAdmin && (
     currentUser?.role === "Super_Admin" ||
     (currentUser?.role === "Administrator" && (
       group.admin_id === currentUser?.id ||
@@ -65,6 +78,32 @@ export const GroupRow = ({
       </td>
       <td>
         <div className="d-flex gap-2">
+          {canAssignAdmins && (
+            <>
+              <button
+                type="button"
+                className="btn btn-sm"
+                onClick={() => onAssignAdmin?.(group)}
+                title="Assign admin to group"
+                style={{ backgroundColor: "#0076EA", borderRadius: "12px" }}
+              >
+                <span style={{ color: "white" }}>
+                  <UserPlus size={24} />
+                </span>
+              </button>
+              <button
+                type="button"
+                className="btn btn-sm"
+                onClick={() => onRemoveAssignAdmin?.(group)}
+                title="Remove assigned admin"
+                style={{ backgroundColor: "#fd7e14", borderRadius: "12px" }}
+              >
+                <span style={{ color: "white" }}>
+                  <UserMinus size={24} />
+                </span>
+              </button>
+            </>
+          )}
           <button
             className="btn btn-sm"
             onClick={() => onEdit(group)}

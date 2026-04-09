@@ -6,11 +6,10 @@ import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import VerifyResetCode from "./pages/VerifyResetCode/VerifyResetCode";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
-import Home from "./pages/Home/Home";
 import { AnimatePresence } from 'framer-motion';
 import Dashboard from './pages/Dashboard/Dashboard';
 import PageLoader from './components/PageLoader/PageLoader';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { extractUserFromToken } from "./utils/token";
 
@@ -18,7 +17,16 @@ import { extractUserFromToken } from "./utils/token";
 function ProtectedRoute({ children }) {
   const { token, user, initializing } = useAuth();
 
-  if (initializing) return <PageLoader />;
+  if (initializing) {
+    return (
+      <div
+        className="vh-100"
+        style={{ background: "linear-gradient(to bottom, #00bfa5, #0066ff)" }}
+        aria-busy="true"
+        aria-label="Loading"
+      />
+    );
+  }
   if (!token) return <Navigate to="/login" replace />;
 
   const userRole = (user?.role || "").toString().trim().toLowerCase();
@@ -33,9 +41,26 @@ function ProtectedRoute({ children }) {
 function AnimatedRoutes() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [autoLoginAttempted, setAutoLoginAttempted] = useState(false);
-  const { loginUser, user } = useAuth();
+  const [authRouteLoading, setAuthRouteLoading] = useState(false);
+  const prevPathRef = useRef(location.pathname);
+  const { loginUser } = useAuth();
+
+  // Dashboard Lottie only: login → dashboard or dashboard → login (logout)
+  useEffect(() => {
+    const current = location.pathname;
+    const prev = prevPathRef.current;
+    prevPathRef.current = current;
+
+    const showLoader =
+      (prev === "/login" && current === "/dashboard") ||
+      (prev === "/dashboard" && current === "/login");
+
+    if (!showLoader) return undefined;
+
+    setAuthRouteLoading(true);
+    const t = setTimeout(() => setAuthRouteLoading(false), 700);
+    return () => clearTimeout(t);
+  }, [location.pathname]);
 
   // Handle social login redirect (token + user in URL)
   useEffect(() => {
@@ -62,7 +87,7 @@ function AnimatedRoutes() {
         navigate('/login?error=parse_error', { replace: true });
       }
     }
-  }, [location.search, navigate, loginUser]);
+  }, [location.search, location.pathname, navigate, loginUser]);
 
   // Auto-redirect when remember me and valid token (role from token)
   useEffect(() => {
@@ -75,14 +100,19 @@ function AnimatedRoutes() {
         setTimeout(() => navigate('/dashboard', { replace: true }), 100);
       }
     }
-    setAutoLoginAttempted(true);
-    const t = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(t);
   }, [location.pathname, navigate]);
 
-  if (loading && !autoLoginAttempted) return <PageLoader />;
-
   return (
+    <>
+      {authRouteLoading && (
+        <div
+          className="position-fixed top-0 start-0 w-100 h-100"
+          style={{ zIndex: 20000 }}
+          aria-hidden="true"
+        >
+          <PageLoader />
+        </div>
+      )}
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Navigate to="/login" replace />} />
@@ -95,6 +125,7 @@ function AnimatedRoutes() {
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       </Routes>
     </AnimatePresence>
+    </>
   );
 }
 

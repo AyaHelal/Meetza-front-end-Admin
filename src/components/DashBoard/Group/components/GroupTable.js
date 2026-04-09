@@ -11,6 +11,8 @@ export const GroupTable = ({
   error,
   onEdit,
   onDelete,
+  onAssignAdmin,
+  onRemoveAssignAdmin,
   getPositionName,
   getAdminName,
   isAdmin,
@@ -57,6 +59,8 @@ export const GroupTable = ({
                   group={group}
                   onEdit={onEdit}
                   onDelete={onDelete}
+                  onAssignAdmin={onAssignAdmin}
+                  onRemoveAssignAdmin={onRemoveAssignAdmin}
                   getPositionName={getPositionName}
                   getAdminName={getAdminName}
                   isAdmin={isAdmin}
@@ -84,6 +88,8 @@ export const GroupTable = ({
               group={group}
               onEdit={onEdit}
               onDelete={onDelete}
+              onAssignAdmin={onAssignAdmin}
+              onRemoveAssignAdmin={onRemoveAssignAdmin}
               getPositionName={getPositionName}
               getAdminName={getAdminName}
               isAdmin={isAdmin}
