@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import api from "../../../../utils/api";
+import { dedupeById } from "../../../../utils/dedupeById";
+import { groupIsManagedByUser } from "../../../../utils/groupIsManagedByUser";
 
 export const useGroupMembershipData = (currentUser = null) => {
   const [memberships, setMemberships] = useState([]);
@@ -175,21 +177,17 @@ export const useGroupMembershipData = (currentUser = null) => {
       let payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
 
       const user = currentUser;
-      const isSuperAdmin = user?.role === "Super_Admin";
-      const isAdministrator = user?.role === "Administrator";
+      const roleNorm = String(user?.role || "").trim();
+      const isSuperAdmin =
+        roleNorm === "Super_Admin" || roleNorm.toLowerCase() === "super_admin";
+      const isAdministrator =
+        roleNorm === "Administrator" || roleNorm.toLowerCase() === "administrator";
 
-      let filteredGroups = payload;
+      let filteredGroups = dedupeById(payload);
 
       if (isAdministrator && !isSuperAdmin) {
-        filteredGroups = payload.filter(g =>
-          g.admin_id === user?.id ||
-          g.adminId === user?.id ||
-          g.administrator_id === user?.id ||
-          g.user_id === user?.id ||
-          g.admin?.id === user?.id
-        );
+        filteredGroups = filteredGroups.filter((g) => groupIsManagedByUser(g, user?.id));
       }
-      // Super_Admin sees all groups (no filtering)
 
       setGroups(filteredGroups);
     } catch (err) {

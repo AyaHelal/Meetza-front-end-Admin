@@ -26,10 +26,6 @@ export default function GroupContent() {
     } = useGroupContentData();
 
     useEffect(() => {
-        fetchContents();
-    }, []);
-
-    useEffect(() => {
     const fetchUsers = async () => {
         const res = await apiCommon.get("/user");
         setUsers(res.data.data || res.data);

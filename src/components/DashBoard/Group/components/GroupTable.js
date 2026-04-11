@@ -5,7 +5,6 @@ import "../../CSS/Table.css";
 
 export const GroupTable = ({
   groups,
-  positions,
   users,
   loading,
   error,
@@ -13,7 +12,6 @@ export const GroupTable = ({
   onDelete,
   onAssignAdmin,
   onRemoveAssignAdmin,
-  getPositionName,
   getAdminName,
   isAdmin,
   currentUser = null,
@@ -27,7 +25,6 @@ export const GroupTable = ({
           <thead className="table-header-sticky">
             <tr>
               <th className="fw-semibold px-4 group-th">Name</th>
-              <th className="fw-semibold group-th">Position</th>
               <th className="fw-semibold group-th">Admin</th>
               <th className="fw-semibold group-th">Group Content</th>
               <th className="fw-semibold group-th">Actions</th>
@@ -36,19 +33,19 @@ export const GroupTable = ({
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={5} className="text-center py-4 text-muted">
+                <td colSpan={4} className="text-center py-4 text-muted">
                   Loading...
                 </td>
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan={5} className="text-center py-4 text-danger">
+                <td colSpan={4} className="text-center py-4 text-danger">
                   {error}
                 </td>
               </tr>
             ) : groups.length === 0 ? (
               <tr>
-                <td colSpan={5} className="text-center py-4 text-muted">
+                <td colSpan={4} className="text-center py-4 text-muted">
                   No groups found
                 </td>
               </tr>
@@ -61,7 +58,6 @@ export const GroupTable = ({
                   onDelete={onDelete}
                   onAssignAdmin={onAssignAdmin}
                   onRemoveAssignAdmin={onRemoveAssignAdmin}
-                  getPositionName={getPositionName}
                   getAdminName={getAdminName}
                   isAdmin={isAdmin}
                   currentUser={currentUser}
@@ -90,7 +86,6 @@ export const GroupTable = ({
               onDelete={onDelete}
               onAssignAdmin={onAssignAdmin}
               onRemoveAssignAdmin={onRemoveAssignAdmin}
-              getPositionName={getPositionName}
               getAdminName={getAdminName}
               isAdmin={isAdmin}
               currentUser={currentUser}

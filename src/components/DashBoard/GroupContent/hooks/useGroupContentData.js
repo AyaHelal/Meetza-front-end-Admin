@@ -1,8 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { smartToast } from "../../../../utils/toastManager";
 import apiCommon from "../../../../utils/api";
 import { useGroupData } from "../../Group/hooks/useGroupData";
+import { dedupeById } from "../../../../utils/dedupeById";
+import { groupIsManagedByUser } from "../../../../utils/groupIsManagedByUser";
 import { useAuth } from "../../../../context/AuthContext";
+
+/** Content row visible to a group admin: legacy owner fields, or linked group they manage, or group uses this content id. */
+function contentVisibleToAdministrator(content, userId, groupsData) {
+    if (!content || userId == null) return false;
+    const uid = String(userId);
+    if (content.administrator_id != null && String(content.administrator_id) === uid) return true;
+    if (content.admin_id != null && String(content.admin_id) === uid) return true;
+    if (content.user_id != null && String(content.user_id) === uid) return true;
+    const gid = content.group_id;
+    if (gid) {
+        const g = groupsData.find((x) => String(x.id) === String(gid));
+        if (g && groupIsManagedByUser(g, uid)) return true;
+    }
+    const cid = content.id;
+    if (cid != null && Array.isArray(groupsData)) {
+        const linked = groupsData.filter(
+            (x) => x.group_content_id != null && String(x.group_content_id) === String(cid)
+        );
+        if (linked.some((g) => groupIsManagedByUser(g, uid))) return true;
+    }
+    return false;
+}
 
 export default function useGroupContentData() {
     const { user: currentUser } = useAuth();
@@ -11,7 +35,7 @@ export default function useGroupContentData() {
     const [error, setError] = useState(null);
     const { fetchData: refetchGroups } = useGroupData();
 
-    const fetchContents = async () => {
+    const fetchContents = useCallback(async () => {
         try {
             setLoading(true);
 
@@ -23,37 +47,41 @@ export default function useGroupContentData() {
             }
 
             const user = currentUser;
-            const isSuperAdmin = user?.role === "Super_Admin";
-            const isAdministrator = user?.role === "Administrator";
-
-            let filteredContents = contentsResponse.data.data;
-
-            // Filter contents based on user role
-            if (isAdministrator && !isSuperAdmin) {
-                // Administrator can only see contents they created (where administrator_id matches their user ID)
-                filteredContents = contentsResponse.data.data.filter(c =>
-                    c.administrator_id === user?.id ||
-                    c.admin_id === user?.id ||
-                    c.user_id === user?.id
-                );
-            }
-            // Super_Admin sees all contents (no filtering)
+            const roleNorm = String(user?.role || "").trim();
+            const isSuperAdmin =
+                roleNorm === "Super_Admin" || roleNorm.toLowerCase() === "super_admin";
+            const isAdministrator =
+                roleNorm === "Administrator" || roleNorm.toLowerCase() === "administrator";
 
             const groupsResponse = await apiCommon.get("/group");
-            const groupsData = groupsResponse.data.data || groupsResponse.data;
+            const rawGroups = groupsResponse.data?.data ?? groupsResponse.data;
+            const groupsData = dedupeById(Array.isArray(rawGroups) ? rawGroups : []);
 
-            const contentsWithGroups = filteredContents.map((content) => {
+            const allContents = Array.isArray(contentsResponse.data.data)
+                ? contentsResponse.data.data
+                : [];
+
+            let filteredContents = allContents;
+            if (isAdministrator && !isSuperAdmin) {
+                filteredContents = allContents.filter((c) =>
+                    contentVisibleToAdministrator(c, user?.id, groupsData)
+                );
+            }
+
+            const byContentId = new Map();
+            for (const content of filteredContents) {
+                const cid = content?.id != null ? String(content.id) : "";
+                if (!cid || byContentId.has(cid)) continue;
                 const assignedGroup = groupsData.find(
                     (g) => String(g.id) === String(content.group_id)
                 );
-                return {
+                byContentId.set(cid, {
                     ...content,
                     assigned_group_id: assignedGroup ? assignedGroup.id : null,
                     assigned_group_name: assignedGroup ? assignedGroup.group_name : "Unassigned"
-                };
-            });
-
-            setContents(contentsWithGroups);
+                });
+            }
+            setContents(Array.from(byContentId.values()));
 
         } catch (err) {
             console.error(err);
@@ -63,7 +91,7 @@ export default function useGroupContentData() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [currentUser]);
 
     // Add new content
     const addContent = async (data) => {
@@ -157,7 +185,7 @@ export default function useGroupContentData() {
 
     useEffect(() => {
         fetchContents();
-    }, []);
+    }, [fetchContents]);
 
     // Search contents
     const searchContents = async (query) => {
@@ -171,27 +199,38 @@ export default function useGroupContentData() {
             }
 
             const user = currentUser;
-            const isSuperAdmin = user?.role === "Super_Admin" || user?.role === "Administrator";
-
-            const filteredContents = isSuperAdmin
-                ? response.data.data
-                : response.data.data.filter(c => c.administrator_id === user?.id);
+            const roleNorm = String(user?.role || "").trim();
+            const isSuperAdmin =
+                roleNorm === "Super_Admin" || roleNorm.toLowerCase() === "super_admin";
+            const isAdministrator =
+                roleNorm === "Administrator" || roleNorm.toLowerCase() === "administrator";
 
             const groupsResponse = await apiCommon.get("/group");
-            const groupsData = groupsResponse.data.data || groupsResponse.data;
+            const rawGroups = groupsResponse.data?.data ?? groupsResponse.data;
+            const groupsData = dedupeById(Array.isArray(rawGroups) ? rawGroups : []);
 
-            const contentsWithGroups = filteredContents.map((content) => {
+            const allFound = Array.isArray(response.data.data) ? response.data.data : [];
+            let filteredContents = allFound;
+            if (isAdministrator && !isSuperAdmin) {
+                filteredContents = allFound.filter((c) =>
+                    contentVisibleToAdministrator(c, user?.id, groupsData)
+                );
+            }
+
+            const byContentId = new Map();
+            for (const content of filteredContents) {
+                const cid = content?.id != null ? String(content.id) : "";
+                if (!cid || byContentId.has(cid)) continue;
                 const assignedGroup = groupsData.find(
                     (g) => g.group_content_id === content.id
                 );
-                return {
+                byContentId.set(cid, {
                     ...content,
                     assigned_group_id: assignedGroup ? assignedGroup.id : null,
                     assigned_group_name: assignedGroup ? assignedGroup.group_name : "Unassigned"
-                };
-            });
-
-            setContents(contentsWithGroups);
+                });
+            }
+            setContents(Array.from(byContentId.values()));
         } catch (err) {
             console.error(err);
             setError(err);

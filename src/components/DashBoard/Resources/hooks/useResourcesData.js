@@ -65,7 +65,6 @@ export default function useResourcesData(fetchContents) {
   }, [fetchContents]);
 
   const deleteResource = useCallback(async (meetingContentId, resourceId) => {
-    if (!window.confirm("Are you sure you want to delete this resource?")) return;
     try {
       setLoading(true);
       const res = await api.delete(`/group-contents/${meetingContentId}/files/${resourceId}`);
