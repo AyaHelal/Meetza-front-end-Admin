@@ -51,6 +51,8 @@ function mapApiGroupToRow(g) {
     name: g.name || g.group_name,
     group_name: g.group_name,
     position_id: g.position_id,
+    year: g.year ?? null,
+    semester: g.semester ?? null,
     description: g.description || "",
     group_content_id: g.group_content_id || null,
     group_photo: g.group_photo || null,
@@ -129,23 +131,77 @@ export const useGroupData = () => {
 
   // Accept optional description (string) and posterFile (File object). When posterFile is provided
   // the request will be sent as multipart/form-data with the poster attached under the 'poster' key.
-  const createGroup = async (group_name, position_id, year, semester, group_content_name, content_description = undefined, description = undefined, group_photo = undefined) => {
+  /**
+   * @param {object} params
+   * @param {string} params.group_name
+   * @param {string|number|undefined} [params.position_id] — omit for non–super-admin create
+   * @param {string|number} params.year
+   * @param {string} params.semester
+   * @param {string} params.group_content_name
+   * @param {string} [params.group_content_description]
+   * @param {string} [params.description]
+   * @param {File} [params.group_photo]
+   * @param {number[]} [params.admin_ids] — super admin: assign group admins by user id
+   */
+  const createGroup = async ({
+    group_name,
+    position_id,
+    year,
+    semester,
+    group_content_name,
+    group_content_description,
+    description,
+    group_photo,
+    admin_ids,
+  }) => {
     try {
-      const payload = { group_name, position_id, year, semester, group_content_name };
-      if (content_description !== undefined && content_description !== '') payload.group_content_description = content_description;
-      if (description !== undefined && description !== '') payload.description = description;
+      const isSuperAdmin = user?.role === "Super_Admin";
+      const selfId = user?.id ?? user?._id;
+
+      let administrator_id;
+      if (isSuperAdmin && Array.isArray(admin_ids) && admin_ids.length > 0) {
+        administrator_id = admin_ids[0];
+      } else if (selfId != null && selfId !== "") {
+        administrator_id = selfId;
+      }
+
+      if (administrator_id === undefined || administrator_id === null || administrator_id === "") {
+        throw new Error("Missing administrator_id (log in again or select at least one admin)");
+      }
+
+      const payload = {
+        group_name,
+        year,
+        semester,
+        group_content_name,
+        administrator_id,
+      };
+      if (position_id !== undefined && position_id !== null && position_id !== "") {
+        payload.position_id = position_id;
+      }
+      if (group_content_description !== undefined && group_content_description !== "") {
+        payload.group_content_description = group_content_description;
+      }
+      if (description !== undefined && description !== "") payload.description = description;
+      if (Array.isArray(admin_ids) && admin_ids.length > 0) {
+        payload.admins = admin_ids;
+      }
 
       let res;
       if (group_photo) {
         const form = new FormData();
-        // append payload fields
         Object.entries(payload).forEach(([k, v]) => {
-          if (v !== undefined && v !== null) form.append(k, v);
+          if (v === undefined || v === null) return;
+          if (k === "admins" && Array.isArray(v)) {
+            form.append(k, JSON.stringify(v));
+          } else {
+            form.append(k, v);
+          }
         });
-        form.append('group_photo', group_photo);
-        res = await api.post('/group', form, { headers: { 'Content-Type': 'multipart/form-data' } });
+        form.append("group_photo", group_photo);
+        res = await api.post("/group", form, { headers: { "Content-Type": "multipart/form-data" } });
       } else {
-        res = await api.post('/group', payload);
+        res = await api.post("/group", payload);
       }
 
       const newGroup = res.data?.data || res.data;
@@ -158,28 +214,43 @@ export const useGroupData = () => {
     }
   };
 
-  const updateGroup = async (id, group_name, position_id, group_content_id, description = undefined, group_photo = undefined) => {
+  /**
+   * Matches backend `updateGroup`: group_name, description, year, semester, group_photo only.
+   */
+  const updateGroup = async (id, { group_name, description, year, semester, group_photo } = {}) => {
     try {
-      // Update group in DB with group_content_id directly
-      const payload = {
-        ...(group_name !== undefined && { group_name }),
-        ...(position_id !== undefined && { position_id }),
-        group_content_id: group_content_id ?? null,
-        ...(description !== undefined && { description })
-      };
+      const payload = {};
+      if (group_name !== undefined && group_name !== null && group_name !== "") {
+        payload.group_name = group_name;
+      }
+      if (description !== undefined) payload.description = description;
+      if (year !== undefined && year !== null && year !== "") payload.year = year;
+      if (semester !== undefined && semester !== null && semester !== "") payload.semester = semester;
 
       let response;
       if (group_photo) {
         const form = new FormData();
-        Object.entries(payload).forEach(([k, v]) => { if (v !== undefined && v !== null) form.append(k, v); });
-        form.append('group_photo', group_photo);
-        response = await api.put(`/group/${id}`, form, { headers: { 'Content-Type': 'multipart/form-data' } });
+        Object.entries(payload).forEach(([k, v]) => {
+          if (v !== undefined && v !== null) form.append(k, v);
+        });
+        form.append("group_photo", group_photo);
+        response = await api.put(`/group/${id}`, form, { headers: { "Content-Type": "multipart/form-data" } });
       } else {
         response = await api.put(`/group/${id}`, payload);
       }
 
-      // Update local state
-      setGroups(prev => prev.map(g => g.id === id ? { ...g, ...payload } : g));
+      setGroups((prev) =>
+        prev.map((g) => {
+          if (g.id !== id) return g;
+          return {
+            ...g,
+            ...(payload.group_name !== undefined && { name: payload.group_name, group_name: payload.group_name }),
+            ...(payload.description !== undefined && { description: payload.description }),
+            ...(payload.year !== undefined && { year: payload.year }),
+            ...(payload.semester !== undefined && { semester: payload.semester }),
+          };
+        })
+      );
 
       return response.data;
     } catch (err) {
