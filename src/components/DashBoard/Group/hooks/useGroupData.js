@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import api from "../../../../utils/api";
 import { useAuth } from "../../../../context/AuthContext";
+import { dedupeById } from "../../../../utils/dedupeById";
+import { groupIsManagedByUser } from "../../../../utils/groupIsManagedByUser";
 
 function pickPrimaryAdminFromAdmins(admins) {
   if (!Array.isArray(admins) || admins.length === 0) return null;
@@ -10,23 +12,6 @@ function pickPrimaryAdminFromAdmins(admins) {
   const adm = admins.find((a) => upper(a.role) === "ADMIN");
   if (adm) return adm;
   return admins[0];
-}
-
-function isGroupManagedByUser(g, userId) {
-  if (userId == null) return false;
-  const uid = String(userId);
-  const candidates = [
-    g.admin_id,
-    g.adminId,
-    g.administrator_id,
-    g.user_id,
-    g.admin?.id,
-  ];
-  if (candidates.some((id) => id != null && String(id) === uid)) return true;
-  if (Array.isArray(g.admins)) {
-    return g.admins.some((a) => a?.user_id != null && String(a.user_id) === uid);
-  }
-  return false;
 }
 
 function mapApiGroupToRow(g) {
@@ -60,13 +45,13 @@ function mapApiGroupToRow(g) {
     admin_id: adminUserId,
     admin_name: adminName,
     createdAt: g.createdAt || g.created_at,
+    ...(Array.isArray(g.admins) ? { admins: g.admins } : {}),
   };
 }
 
 export const useGroupData = () => {
   const { user } = useAuth();
   const [groups, setGroups] = useState([]);
-  const [positions, setPositions] = useState([]);
   const [users, setUsers] = useState([]);
   const [contents, setContents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -85,11 +70,10 @@ export const useGroupData = () => {
       let filteredGroups = payload;
 
       if (isAdministrator && !isSuperAdmin) {
-        filteredGroups = payload.filter((g) => isGroupManagedByUser(g, user?.id));
+        filteredGroups = payload.filter((g) => groupIsManagedByUser(g, user?.id));
       }
-      // Super_Admin sees all groups (no filtering)
 
-      const normalized = filteredGroups.map((g) => mapApiGroupToRow(g));
+      const normalized = dedupeById(filteredGroups).map((g) => mapApiGroupToRow(g));
       setGroups(normalized);
     } catch (err) {
       console.error("Fetch error:", err);
@@ -99,21 +83,11 @@ export const useGroupData = () => {
     }
   }, [user?.id, user?.role]);
 
-  const fetchPositions = useCallback(async () => {
-    try {
-      const res = await api.get("/position");
-      const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
-      setPositions(payload);
-    } catch (err) {
-      console.error("Failed to fetch positions:", err);
-    }
-  }, []);
-
   const fetchUsers = useCallback(async () => {
     try {
       const res = await api.get("/user");
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
-      setUsers(payload);
+      setUsers(dedupeById(payload));
     } catch (err) {
       console.error("Failed to fetch users:", err);
     }
@@ -123,7 +97,7 @@ export const useGroupData = () => {
     try {
       const res = await api.get("/group-contents");
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
-      setContents(payload);
+      setContents(dedupeById(payload));
     } catch (err) {
       console.error("Failed to fetch group contents:", err);
     }
@@ -141,7 +115,7 @@ export const useGroupData = () => {
    * @param {string} [params.group_content_description]
    * @param {string} [params.description]
    * @param {File} [params.group_photo]
-   * @param {number[]} [params.admin_ids] — super admin: assign group admins by user id
+   * @param {number[]} [params.admin_ids] — super admin: sent as `administrator_ids[0]`, `[1]`, … plus `administrator_id` (first)
    */
   const createGroup = async ({
     group_name,
@@ -183,8 +157,13 @@ export const useGroupData = () => {
         payload.group_content_description = group_content_description;
       }
       if (description !== undefined && description !== "") payload.description = description;
-      if (Array.isArray(admin_ids) && admin_ids.length > 0) {
-        payload.admins = admin_ids;
+      if (isSuperAdmin && Array.isArray(admin_ids) && admin_ids.length > 0) {
+        const normAdminIds = admin_ids
+          .map((id) => (id != null && String(id).trim() !== "" ? String(id).trim() : null))
+          .filter(Boolean);
+        normAdminIds.forEach((sid, index) => {
+          payload[`administrator_ids[${index}]`] = sid;
+        });
       }
 
       let res;
@@ -192,11 +171,7 @@ export const useGroupData = () => {
         const form = new FormData();
         Object.entries(payload).forEach(([k, v]) => {
           if (v === undefined || v === null) return;
-          if (k === "admins" && Array.isArray(v)) {
-            form.append(k, JSON.stringify(v));
-          } else {
-            form.append(k, v);
-          }
+          form.append(k, v);
         });
         form.append("group_photo", group_photo);
         res = await api.post("/group", form, { headers: { "Content-Type": "multipart/form-data" } });
@@ -286,11 +261,10 @@ export const useGroupData = () => {
       let filteredGroups = payload;
 
       if (isAdministrator && !isSuperAdmin) {
-        filteredGroups = payload.filter((g) => isGroupManagedByUser(g, user?.id));
+        filteredGroups = payload.filter((g) => groupIsManagedByUser(g, user?.id));
       }
-      // Super_Admin sees all groups (no filtering)
 
-      const normalized = filteredGroups.map((g) => mapApiGroupToRow(g));
+      const normalized = dedupeById(filteredGroups).map((g) => mapApiGroupToRow(g));
       setGroups(normalized);
     } catch (e) {
       console.error("Search error:", e);
@@ -300,14 +274,12 @@ export const useGroupData = () => {
 
   useEffect(() => {
     fetchData();
-    fetchPositions();
     fetchUsers();
     fetchGroupContents();
-  }, [fetchData, fetchPositions, fetchUsers, fetchGroupContents]);
+  }, [fetchData, fetchUsers, fetchGroupContents]);
 
   return {
     groups,
-    positions,
     users,
     contents,
     loading,

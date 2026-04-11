@@ -12,6 +12,7 @@ import Select from 'react-select';
 import "../User/UserMainComponent.css";
 import { ArrowLeft } from "phosphor-react";
 import api from "../../../utils/api";
+
 const GroupMembershipContent = ({ currentUser }) => {
     const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator" || (currentUser?.role || "").toLowerCase() === "super_admin";
 
@@ -34,24 +35,6 @@ const GroupMembershipContent = ({ currentUser }) => {
     const [membershipToDelete, setMembershipToDelete] = useState(null);
 
     // Filter groups based on user role (same logic as useGroupData.js)
-    const isSuperAdmin = (currentUser?.role || "").toLowerCase() === "super_admin";
-    const isAdministrator = (currentUser?.role || "").toLowerCase() === "administrator";
-
-    let visibleGroups = groups;
-
-    if (isAdministrator && !isSuperAdmin) {
-        // Administrator can only see groups they created (where admin_id matches their user ID)
-        visibleGroups = groups.filter(g =>
-            g.admin_id === currentUser?.id ||
-            g.adminId === currentUser?.id ||
-            g.administrator_id === currentUser?.id ||
-            g.user_id === currentUser?.id ||
-            g.admin?.id === currentUser?.id
-        );
-    }
-    // Super_Admin sees all groups (no filtering)
-
-
     const openCreateForm = () => {
         setFormData({ group_id: "", member_email: "" });
         setShowForm(true);
@@ -237,8 +220,30 @@ const GroupMembershipContent = ({ currentUser }) => {
                                                 </label>
                                                 <div className="create-membership-form__field">
                                                     <Select
-                                                        options={visibleGroups.map(g => ({ value: g.id, label: g.name || g.group_name || `Group ${g.id}` }))}
-                                                        value={formData.group_id ? { value: formData.group_id, label: groups.find(g => g.id === formData.group_id)?.name || groups.find(g => g.id === formData.group_id)?.group_name || `Group ${formData.group_id}` } : null}
+                                                        options={groups.map((g) => ({
+                                                            value: g.id,
+                                                            label: g.name || g.group_name || `Group ${g.id}`,
+                                                        }))}
+                                                        value={
+                                                            formData.group_id
+                                                                ? (() => {
+                                                                      const g = groups.find(
+                                                                          (x) =>
+                                                                              String(x.id) ===
+                                                                              String(formData.group_id)
+                                                                      );
+                                                                      return g
+                                                                          ? {
+                                                                                value: g.id,
+                                                                                label:
+                                                                                    g.name ||
+                                                                                    g.group_name ||
+                                                                                    `Group ${g.id}`,
+                                                                            }
+                                                                          : null;
+                                                                  })()
+                                                                : null
+                                                        }
                                                         onChange={(opt) => setFormData({ ...formData, group_id: opt?.value ?? '' })}
                                                         placeholder="Select a group"
                                                         menuPortalTarget={document.body}

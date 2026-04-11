@@ -53,17 +53,20 @@ export default function AssignGroupAdminModal({
 
               <div className="mb-3">
                 <label className="form-label fw-semibold" style={{ color: "#010101" }}>
-                  User Email <span style={{ color: "#FF0000" }}>*</span>
+                  Administrator emails <span style={{ color: "#FF0000" }}>*</span>
                 </label>
-                <input
-                  type="email"
+                <textarea
                   className="form-control rounded-3"
-                  name="email"
-                  value={formData.email || ""}
+                  name="emailsText"
+                  rows={4}
+                  value={formData.emailsText || ""}
                   onChange={handleChange}
-                  placeholder="Enter user email"
-                  style={{ border: "2px solid #E9ECEF", padding: "0.75rem", fontSize: "16px" }}
+                  placeholder="One per line, or separated by commas"
+                  style={{ border: "2px solid #E9ECEF", padding: "0.75rem", fontSize: "16px", resize: "vertical" }}
                 />
+                <div className="form-text" style={{ fontSize: "13px" }}>
+                  You can paste several administrator emails at once.
+                </div>
               </div>
 
               <div className="mb-3">
@@ -90,7 +93,7 @@ export default function AssignGroupAdminModal({
               type="button"
               className="btn rounded-3 px-4 py-2"
               onClick={onSave}
-              disabled={saving || !(formData.email || "").trim()}
+              disabled={saving || !(formData.emailsText || "").trim()}
               style={{
                 flex: 1,
                 background: "#007bff",

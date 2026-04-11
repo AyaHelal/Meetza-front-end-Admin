@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../../../context/AuthContext';
+import { dedupeById } from '../../../../utils/dedupeById';
+import { groupIsManagedByUser } from '../../../../utils/groupIsManagedByUser';
 import {
     buildFileUrl,
     durationFromApiToSeconds,
@@ -99,18 +101,17 @@ export function useVideoDisplay(currentUserProp) {
         try {
             const payload = await fetchGroupsApi();
             const user = authUser || currentUser;
-            const isSuperAdmin = user?.role === 'Super_Admin';
-            const isAdministrator = user?.role === 'Administrator';
-            let filteredGroups = payload;
+            const roleNorm = String(user?.role || '').trim();
+            const isSuperAdmin =
+                roleNorm === 'Super_Admin' || roleNorm.toLowerCase() === 'super_admin';
+            const isAdministrator =
+                roleNorm === 'Administrator' || roleNorm.toLowerCase() === 'administrator';
+
+            let filteredGroups = dedupeById(Array.isArray(payload) ? payload : []);
             if (isAdministrator && !isSuperAdmin) {
-                filteredGroups = payload.filter(
-                    (g) =>
-                        g.admin_id === user?.id ||
-                        g.adminId === user?.id ||
-                        g.administrator_id === user?.id ||
-                        g.user_id === user?.id ||
-                        g.admin?.id === user?.id
-                );
+                filteredGroups = user?.id
+                    ? filteredGroups.filter((g) => groupIsManagedByUser(g, user.id))
+                    : [];
             }
             setGroups(filteredGroups);
         } catch (err) {
@@ -122,7 +123,7 @@ export function useVideoDisplay(currentUserProp) {
     useEffect(() => {
         fetchVideos();
         fetchGroups();
-    }, []);
+    }, [authUser?.id, authUser?.role]);
 
     useEffect(() => {
         return () => {
