@@ -18,6 +18,7 @@ import RemoveGroupAdminModal from "./RemoveGroupAdminModal";
 
 const GroupMainContent = ({ currentUser }) => {
     const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator" || (currentUser?.role || "").toLowerCase() === "super_admin";
+    const isSuperAdmin = currentUser?.role === "Super_Admin";
 
     const {
         groups,
@@ -34,31 +35,17 @@ const GroupMainContent = ({ currentUser }) => {
 
     const { contents: allContents = [], fetchContents } = useGroupContentData();
 
-    const positionOptions = positions.map(p => ({
-        value: p.id,
-        label: p.name || p.position_name || p.title || `Position ${p.id}`
-    }));
-
-    // Filter contents to only show unassigned ones (group_id is null) or the one already assigned to the current group
-    // In GroupMainContent.js
-    const getAvailableContents = useMemo(() => {
-        return (currentGroupId) => {
-            const assignedContentIds = new Set(
-                groups
-                    .filter(g => g.group_content_id && g.id !== currentGroupId) // exclude current group
-                    .map(g => g.group_content_id)
-            );
-
-            const currentGroup = groups.find(g => g.id === currentGroupId);
-            const currentContentId = currentGroup?.group_content_id;
-
-            return allContents.filter(content =>
-                (!assignedContentIds.has(content.id)) &&
-                (content.group_id === null || content.id === currentContentId)
-            );
-        };
-    }, [groups, allContents]);
-
+    const adminUserOptions = useMemo(() => {
+        return users
+            .filter((u) => {
+                const r = String(u.role || u.Role || "").trim();
+                return r === "Administrator" || r.toLowerCase() === "administrator";
+            })
+            .map((u) => ({
+                value: u.id,
+                label: `${u.name || u.email || "User"}${u.email ? ` (${u.email})` : ""}`,
+            }));
+    }, [users]);
 
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [formData, setFormData] = useState({});
@@ -81,7 +68,15 @@ const GroupMainContent = ({ currentUser }) => {
 
     const openCreateForm = () => {
         setModalMode("create");
-        setFormData({ group_name: "", position_id: "", year: "", semester: "", group_content_id: null, description: "", group_photo: null });
+        setFormData({
+            group_name: "",
+            year: "",
+            semester: "",
+            group_content_id: null,
+            description: "",
+            group_photo: null,
+            admin_ids: [],
+        });
         setSelectedGroup(null);
         setShowForm(true);
     };
@@ -90,14 +85,12 @@ const GroupMainContent = ({ currentUser }) => {
         setModalMode("edit");
         setFormData({
             name: group.name,
-            group_content_id: group.group_content_id ?? null,
-            description: group.description || '',
-            group_photo: null
+            year: group.year != null && group.year !== "" ? String(group.year) : "",
+            semester: group.semester || "",
+            description: group.description || "",
+            group_photo: null,
         });
-        setSelectedGroup({
-            ...group,
-            position_id: group.position_id || group.positionId
-        });
+        setSelectedGroup({ ...group });
         setShowEditModal(true);
     };
 
@@ -120,24 +113,26 @@ const GroupMainContent = ({ currentUser }) => {
     };
 
     const handleCreateGroup = async () => {
-        if (!formData.group_name || !formData.position_id || !formData.year || !formData.semester || !formData.group_content_name) {
-            toast.error("Please fill all required fields: group name, position, year, semester and content name");
+        if (!formData.group_name || !formData.year || !formData.semester || !formData.group_content_name) {
+            toast.error("Please fill all required fields: group name, year, semester, and content name");
+            return;
+        }
+        if (isSuperAdmin && (!Array.isArray(formData.admin_ids) || formData.admin_ids.length === 0)) {
+            toast.error("Please select at least one administrator for the group");
             return;
         }
 
         try {
-            await createGroup(
-                formData.group_name,
-                formData.position_id,
-                formData.year,
-                formData.semester,
-                formData.group_content_name,
-                formData.content_description ?? undefined,
-                // description (may be undefined or empty string)
-                formData.description ?? undefined,
-                // poster file (File object or undefined/null)
-                formData.group_photo ?? undefined
-            );
+            await createGroup({
+                group_name: formData.group_name,
+                year: formData.year,
+                semester: formData.semester,
+                group_content_name: formData.group_content_name,
+                group_content_description: formData.content_description ?? undefined,
+                description: formData.description ?? undefined,
+                group_photo: formData.group_photo ?? undefined,
+                ...(isSuperAdmin ? { admin_ids: formData.admin_ids } : {}),
+            });
             setShowForm(false);
             toast.success("Group created successfully");
             fetchData();
@@ -156,16 +151,14 @@ const GroupMainContent = ({ currentUser }) => {
 
     const groupId = selectedGroup.id;
 
-    const payload = {
-            group_name: formData.name,
-            position_id: selectedGroup.position_id
-        };
-
         try {
-            // ensure we send explicit null when the user cleared the group content
-            const contentIdToSend = formData.group_content_id === undefined ? undefined : formData.group_content_id === null ? null : formData.group_content_id;
-
-            const res = await updateGroup(groupId, formData.name, selectedGroup.position_id, contentIdToSend, formData.description ?? undefined, formData.group_photo ?? undefined);
+            await updateGroup(groupId, {
+                group_name: formData.name,
+                description: formData.description,
+                year: formData.year,
+                semester: formData.semester,
+                group_photo: formData.group_photo ?? undefined,
+            });
         setShowEditModal(false);
         toast.success("Group updated successfully");
         fetchData();
@@ -407,22 +400,32 @@ const GroupMainContent = ({ currentUser }) => {
                                                 />
                                             </div>
 
-                                            <div className="mb-4">
-                                                <label className="form-label fw-semibold create-group-form__label">
-                                                    Position <span style={{ color: "#FF0000" }}>*</span>
-                                                </label>
-                                                <div className="create-group-form__field rounded-3">
-                                                    <Select
-                                                        className="rounded-3"
-                                                        options={positionOptions}
-                                                        value={positionOptions.find(opt => String(opt.value) === String(formData.position_id)) || null}
-                                                        onChange={(opt) => setFormData({ ...formData, position_id: opt?.value ?? '' })}
-                                                        placeholder="Select a position"
-                                                        menuPortalTarget={document.body}
-                                                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                                                    />
+                                            {isSuperAdmin && (
+                                                <div className="mb-4">
+                                                    <label className="form-label fw-semibold create-group-form__label">
+                                                        Group admins <span style={{ color: "#FF0000" }}>*</span>
+                                                    </label>
+                                                    <div className="create-group-form__field rounded-3 dashboard-form-modal__select-wrap">
+                                                        <Select
+                                                            isMulti
+                                                            className="rounded-3"
+                                                            options={adminUserOptions}
+                                                            value={adminUserOptions.filter((opt) =>
+                                                                (formData.admin_ids || []).some((id) => String(id) === String(opt.value))
+                                                            )}
+                                                            onChange={(opts) =>
+                                                                setFormData({
+                                                                    ...formData,
+                                                                    admin_ids: (opts || []).map((o) => o.value),
+                                                                })
+                                                            }
+                                                            placeholder="Select administrators…"
+                                                            menuPortalTarget={document.body}
+                                                            styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                                                        />
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            )}
 
                                             <div className="mb-4">
                                                 <div className="mb-4 create-group-form__field">
@@ -551,8 +554,6 @@ const GroupMainContent = ({ currentUser }) => {
                     mode={modalMode}
                     formData={formData}
                     setFormData={setFormData}
-                    positions={positions}
-                    contents={getAvailableContents(selectedGroup?.id)}
                     onSave={modalMode === 'create' ? handleCreateGroup : handleUpdateGroup}
                     onClose={() => setShowEditModal(false)}
                 />
