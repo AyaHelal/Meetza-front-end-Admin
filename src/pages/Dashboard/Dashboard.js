@@ -11,16 +11,16 @@ import {
 } from "phosphor-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Dashboard.css";
-import UserMainContent from "../../components/DashBoard/User/UserMainContent";
-import Position from "../../components/DashBoard/Position/Position";
-import GroupContent from "../../components/DashBoard/GroupContent/GroupContent.js";
-import Meeting from "../../components/DashBoard/Meeting/Meeting.js";
+import UserMainContent from "../../Features/DashBoard/User/UserMainContent";
+import Position from "../../Features/DashBoard/Position/Position";
+import GroupContent from "../../Features/DashBoard/GroupContent/GroupContent.js";
+import Meeting from "../../Features/DashBoard/Meeting/Meeting.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import GroupMainContent from "../../components/DashBoard/Group/GroupMainContent";
-import GroupMembershipContent from "../../components/DashBoard/GroupMembership/GroupMembershipContent";
-import VideoDisplay from "../../components/DashBoard/Videos/VideoDisplay";
-import ResourcesPage from "../../components/DashBoard/Resources/ResourcesPage";
+import GroupMainContent from "../../Features/DashBoard/Group/GroupMainContent";
+import GroupMembershipContent from "../../Features/DashBoard/GroupMembership/GroupMembershipContent";
+import VideoDisplay from "../../Features/DashBoard/Videos/VideoDisplay";
+import ResourcesPage from "../../Features/DashBoard/Resources/ResourcesPage";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 

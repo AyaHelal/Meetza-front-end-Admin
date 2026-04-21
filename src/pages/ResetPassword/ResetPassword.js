@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LogoSection } from "../../components";
+import { LogoSection } from "../../Features";
 import { usePasswordVisibility } from "../../hooks";
 import { Eye, EyeSlash } from "phosphor-react";
 import '../Login/LoginForm.css';

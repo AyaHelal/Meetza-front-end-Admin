@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Envelope, User, Password, Eye, EyeSlash } from "phosphor-react";
 import { motion } from "framer-motion";
 import "../Login/LoginForm.css";
-import { FormInput, ToggleButton, LogoSection } from "../../components";
+import { FormInput, ToggleButton, LogoSection } from "../../Features";
 import { useFormValidation, usePasswordVisibility } from "../../hooks";
 import { signupValidationRules } from "../../utils";
-import PasswordStrengthIndicator from "../../components/common/StrongPassword";
-import SocialLoginButtons from "../../components/common/SocialLoginButtons";
+import PasswordStrengthIndicator from "../../Features/common/StrongPassword";
+import SocialLoginButtons from "../../Features/common/SocialLoginButtons";
 import apiCommon from "../../utils/api";
 
 export default function SignUpForm() {
@@ -212,7 +212,7 @@ export default function SignUpForm() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: 0.3 }}
                     >
-                        <SocialLoginButtons role="Administrator" redirectUrl={`${window.location.origin}/dashboard`}/>
+                        <SocialLoginButtons role="Administrator" redirectUrl={`${window.location.origin}/dashboard`} />
                     </motion.div>
                 </form>
             </div>
