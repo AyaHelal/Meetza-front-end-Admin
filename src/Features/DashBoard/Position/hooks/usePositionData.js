@@ -3,15 +3,21 @@ import api from "../../../../utils/api";
 import { smartToast } from "../../../../utils/toastManager";
 
 export const usePositionData = (userId, authUser = null) => {
-  const [positions, setPositions] = useState([]);
+  const cacheKey = `admin_positions_cache_${userId || 'guest'}`;
+
+  const [positions, setPositions] = useState(() => {
+    const cached = localStorage.getItem(cacheKey);
+    return cached ? JSON.parse(cached) : [];
+  });
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(positions.length === 0);
   const [error, setError] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
   const fetchData = useCallback(async () => {
+    const hasCache = positions.length > 0;
     try {
-      setLoading(true);
+      if (!hasCache) setLoading(true);
       setError(null);
 
       const [userRes, posRes] = await Promise.all([
@@ -32,8 +38,9 @@ export const usePositionData = (userId, authUser = null) => {
         return;
       }
 
+      let finalPositions = [];
       if (currentUser.role === 'Super_Admin') {
-        const positionsWithUsers = allPositions.map(position => {
+        finalPositions = allPositions.map(position => {
           const user = allUsers.find(u => u.id === position.administrator_id) || {};
           return {
             ...position,
@@ -48,20 +55,24 @@ export const usePositionData = (userId, authUser = null) => {
 
         setUsers(allUsers);
         setCurrentUser(currentUser);
-        setPositions(positionsWithUsers);
+        setPositions(finalPositions);
       } else {
-        const userPositions = allPositions.filter(pos => pos.administrator_id === userId);
-        setUsers([{ ...currentUser, positions: userPositions }]);
+        finalPositions = allPositions.filter(pos => pos.administrator_id === userId);
+        setUsers([{ ...currentUser, positions: finalPositions }]);
         setCurrentUser(currentUser);
-        setPositions(userPositions);
+        setPositions(finalPositions);
       }
+
+      localStorage.setItem(cacheKey, JSON.stringify(finalPositions));
     } catch (err) {
-      smartToast.error("Failed to load positions");
-      setError("Failed to load data");
+      if (!hasCache) {
+        smartToast.error("Failed to load positions");
+        setError("Failed to load data");
+      }
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, positions.length, cacheKey]);
 
 const createPosition = async (title, selectedUser) => {
   try {

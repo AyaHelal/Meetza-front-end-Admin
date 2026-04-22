@@ -30,19 +30,27 @@ function contentVisibleToAdministrator(content, userId, groupsData) {
 
 export default function useGroupContentData() {
     const { user: currentUser } = useAuth();
-    const [contents, setContents] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const cacheKey = `admin_contents_cache_${currentUser?.id || 'guest'}`;
+
+    const [contents, setContents] = useState(() => {
+        const cached = localStorage.getItem(cacheKey);
+        return cached ? JSON.parse(cached) : [];
+    });
+    const [loading, setLoading] = useState(contents.length === 0);
     const [error, setError] = useState(null);
     const { fetchData: refetchGroups } = useGroupData();
 
     const fetchContents = useCallback(async () => {
+        const hasCache = contents.length > 0;
         try {
-            setLoading(true);
+            if (!hasCache) setLoading(true);
 
             const contentsResponse = await apiCommon.get("/group-contents");
             if (!contentsResponse.data.success) {
-                smartToast.error("Failed to load contents");
-                setContents([]);
+                if (!hasCache) {
+                    smartToast.error("Failed to load contents");
+                    setContents([]);
+                }
                 return;
             }
 
@@ -81,17 +89,21 @@ export default function useGroupContentData() {
                     assigned_group_name: assignedGroup ? assignedGroup.group_name : "Unassigned"
                 });
             }
-            setContents(Array.from(byContentId.values()));
+            const finalContents = Array.from(byContentId.values());
+            setContents(finalContents);
+            localStorage.setItem(cacheKey, JSON.stringify(finalContents));
 
         } catch (err) {
             console.error(err);
-            setError(err);
-            smartToast.error(err.response?.data?.message || "Error loading contents");
-            setContents([]);
+            if (!hasCache) {
+                setError(err);
+                smartToast.error(err.response?.data?.message || "Error loading contents");
+                setContents([]);
+            }
         } finally {
             setLoading(false);
         }
-    }, [currentUser]);
+    }, [currentUser, contents.length, cacheKey]);
 
     // Add new content
     const addContent = async (data) => {

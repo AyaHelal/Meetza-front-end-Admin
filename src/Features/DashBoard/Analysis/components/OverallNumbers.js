@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import {
     UsersFour,
     ChartLineUp,
@@ -8,9 +8,15 @@ import {
     WaveSine,
     Headset
 } from "phosphor-react";
-import { AreaChart, Area, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area } from 'recharts';
 
 const OverallNumbers = ({ cardsData }) => {
+    const [isMounted, setIsMounted] = useState(false);
+    
+    useEffect(() => {
+        const timer = setTimeout(() => setIsMounted(true), 150);
+        return () => clearTimeout(timer);
+    }, []);
     const renderIcon = (iconType) => {
         const size = 40;
         const gradientColor = "url(#icon-gradient)";
@@ -73,9 +79,9 @@ const OverallNumbers = ({ cardsData }) => {
 
                         {card.sparkline && (
                             <div className="analysis-card-sparkline-wrapper d-flex justify-content-end mt-2" style={{ height: '55px' }}>
-                                <div style={{ width: '130px', height: '100%' }}>
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart data={card.sparkline}>
+                                <div style={{ width: '130px', height: '55px', position: 'relative' }}>
+                                    {isMounted && (
+                                        <AreaChart width={130} height={55} data={card.sparkline}>
                                             <defs>
                                                 <linearGradient id={`gradient-${index}`} x1="0" y1="0" x2="1" y2="0">
                                                     <stop offset="0%" stopColor="#00DC85" stopOpacity={1} />
@@ -96,7 +102,7 @@ const OverallNumbers = ({ cardsData }) => {
                                                 isAnimationActive={true}
                                             />
                                         </AreaChart>
-                                    </ResponsiveContainer>
+                                    )}
                                 </div>
                             </div>
                         )}
