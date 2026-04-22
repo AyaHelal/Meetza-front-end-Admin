@@ -45,6 +45,7 @@
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -70,7 +71,8 @@
 }
 
 .table-responsive::-webkit-scrollbar-thumb {
-  background: #c5c6c6; /* لون المقبض عند hover */
+  background: #c5c6c6;
+  /* لون المقبض عند hover */
   border-radius: 10px;
 }
 
@@ -82,7 +84,8 @@
 .form-scroll-container {
   max-height: 520px;
   overflow-y: auto;
-  padding-right: 10px; /* give some space for scrollbar so content doesn't shift */
+  padding-right: 10px;
+  /* give some space for scrollbar so content doesn't shift */
 }
 
 @media (max-height: 900px) {
@@ -95,13 +98,16 @@
 .form-scroll-container::-webkit-scrollbar {
   width: 10px;
 }
+
 .form-scroll-container::-webkit-scrollbar-track {
   border-radius: 10px;
 }
+
 .form-scroll-container::-webkit-scrollbar-thumb {
   background: #c5c6c6;
   border-radius: 10px;
 }
+
 .form-scroll-container::-webkit-scrollbar-thumb:hover {
   background: #c5c6c6;
 }
@@ -126,7 +132,8 @@
 }
 
 .form-control::placeholder {
-  color: white; /* keep global default (used elsewhere) */
+  color: white;
+  /* keep global default (used elsewhere) */
 }
 
 /* Make placeholders inside group forms visible on white backgrounds */
@@ -135,6 +142,7 @@
 .modal .form-control::placeholder {
   color: #6c757d !important;
 }
+
 .ff::placeholder {
   color: #888888 !important;
 }
@@ -144,14 +152,17 @@
   transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
+
 .custom-select option:hover {
   background-color: #e9ecef !important;
   color: #000000 !important;
 }
+
 .custom-select option:checked {
   background-color: #0d6efd !important;
   color: white !important;
 }
+
 /* Modal backdrop */
 .modal {
   backdrop-filter: blur(4px);
@@ -188,7 +199,7 @@
 }
 
 /* React-Select inside create group form */
-.create-group-form__field > div {
+.create-group-form__field>div {
   width: 100%;
 }
 
@@ -264,9 +275,11 @@
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }

@@ -8,9 +8,11 @@ import {
     File,
     SignOut,
     List,
+    CirclesFour,
 } from "phosphor-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Dashboard.css";
+import Analysis from "../../Features/DashBoard/Analysis/Analysis.js";
 import UserMainContent from "../../Features/DashBoard/User/UserMainContent";
 import Position from "../../Features/DashBoard/Position/Position";
 import GroupContent from "../../Features/DashBoard/GroupContent/GroupContent.js";
@@ -27,7 +29,7 @@ import { useNavigate } from "react-router-dom";
 const UserDashboard = () => {
     const { user: currentUser, logoutUser } = useAuth();
     const navigate = useNavigate();
-    const [activeMenu, setActiveMenu] = useState("user");
+    const [activeMenu, setActiveMenu] = useState("dashboard");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     // Close sidebar when route/content changes (e.g. on mobile after menu click)
@@ -59,6 +61,7 @@ const UserDashboard = () => {
 
     // ---------- MENU ----------
     const menuItems = [
+        { id: "dashboard", icon: CirclesFour, label: "Dashboard" },
         { id: "user", icon: User, label: "User" },
         { id: "position", icon: UserList, label: "Position" },
         { id: "group", icon: UsersThree, label: "Group" },
@@ -141,6 +144,9 @@ const UserDashboard = () => {
 
             {/* MAIN AREA */}
             <main className="dashboard-main">
+                {activeMenu === "dashboard" && (
+                    <Analysis currentUser={currentUser} />
+                )}
                 {activeMenu === "user" && (
                     <UserMainContent currentUser={currentUser} />
                 )}
@@ -166,7 +172,7 @@ const UserDashboard = () => {
                     <VideoDisplay currentUser={currentUser} />
                 )}
 
-                {activeMenu !== "user" && activeMenu !== "position" && activeMenu !== "content" && activeMenu !== "resources" && activeMenu !== "meeting" && activeMenu !== "group" && activeMenu !== "membership" && activeMenu !== "videos" && (
+                {activeMenu !== "dashboard" && activeMenu !== "user" && activeMenu !== "position" && activeMenu !== "content" && activeMenu !== "resources" && activeMenu !== "meeting" && activeMenu !== "group" && activeMenu !== "membership" && activeMenu !== "videos" && (
                     <div className="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
                         <h4 className="mb-2">{getMenuLabel(activeMenu)}</h4>
                         <p className="mb-0">Main component for {getMenuLabel(activeMenu)} goes here.</p>
