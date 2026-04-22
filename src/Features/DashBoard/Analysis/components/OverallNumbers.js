@@ -4,21 +4,23 @@ import {
     ChartLineUp,
     CalendarCheck,
     Chats,
+    ChatsCircle,
     WaveSine,
     Headset
 } from "phosphor-react";
+import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 
 const OverallNumbers = ({ cardsData }) => {
     const renderIcon = (iconType) => {
-        const size = 32;
+        const size = 40;
         const gradientColor = "url(#icon-gradient)";
 
         switch (iconType) {
             case "UsersFour":
                 return <UsersFour size={size} weight="regular" color={gradientColor} />;
             case "ChartLineUp": return <ChartLineUp size={size} weight="regular" color={gradientColor} />;
-            case "CalendarCheck": return <CalendarCheck size={size} weight="regular" color={gradientColor} />;
-            case "Chats": return <Chats size={size} weight="regular" color={gradientColor} />;
+            case "CalendarCheck": return <CalendarCheck size={size} weight="bold" color={gradientColor} />;
+            case "Chats": return <ChatsCircle size={size} weight="regular" color={gradientColor} />;
             case "WaveSine": return <WaveSine size={size} weight="regular" color={gradientColor} />;
             case "Headset": return <Headset size={size} weight="regular" color={gradientColor} />;
             case "Progress":
@@ -63,9 +65,41 @@ const OverallNumbers = ({ cardsData }) => {
                             <span className="analysis-card-value">{card.value}</span>
                         </div>
 
-                        <div className="analysis-card-icon-wrapper">
-                            {renderIcon(card.iconType)}
-                        </div>
+                        {!card.sparkline && (
+                            <div className="analysis-card-icon-wrapper">
+                                {renderIcon(card.iconType)}
+                            </div>
+                        )}
+
+                        {card.sparkline && (
+                            <div className="analysis-card-sparkline-wrapper d-flex justify-content-end mt-2" style={{ height: '55px' }}>
+                                <div style={{ width: '130px', height: '100%' }}>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={card.sparkline}>
+                                            <defs>
+                                                <linearGradient id={`gradient-${index}`} x1="0" y1="0" x2="1" y2="0">
+                                                    <stop offset="0%" stopColor="#00DC85" stopOpacity={1} />
+                                                    <stop offset="100%" stopColor="#0076EA" stopOpacity={1} />
+                                                </linearGradient>
+                                                <linearGradient id={`fill-gradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stopColor="#00DC85" stopOpacity={0.4} />
+                                                    <stop offset="100%" stopColor="#0076EA" stopOpacity={0} />
+                                                </linearGradient>
+                                            </defs>
+                                            <Area
+                                                type="monotone"
+                                                dataKey="value"
+                                                stroke={`url(#gradient-${index})`}
+                                                strokeWidth={3}
+                                                fillOpacity={card.showFill ? 1 : 0}
+                                                fill={card.showFill ? `url(#fill-gradient-${index})` : 'none'}
+                                                isAnimationActive={true}
+                                            />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

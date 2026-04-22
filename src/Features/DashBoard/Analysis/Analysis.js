@@ -4,6 +4,7 @@ import OverallNumbers from './components/OverallNumbers';
 import ActivityComparison from './components/ActivityComparison';
 import DailyActivity from './components/DailyActivity';
 import GroupsTable from './components/GroupsTable';
+import ScheduledMeetingsTable from './components/ScheduledMeetingsTable';
 import useAnalysisData from './hooks/useAnalysisData';
 import './Analysis.css';
 
@@ -25,7 +26,7 @@ const Analysis = ({ currentUser }) => {
     const startDate = dateRange[0] ? formatDate(dateRange[0]) : null;
     const endDate = dateRange[1] ? formatDate(dateRange[1]) : startDate;
 
-    const { cardsData, comparisonData, dailyActivityData, groupsData } = useAnalysisData(startDate, endDate);
+    const { cardsData, comparisonData, dailyActivityData, groupsData, meetingsData } = useAnalysisData(startDate, endDate);
 
     return (
         <div className="w-100">
@@ -46,6 +47,7 @@ const Analysis = ({ currentUser }) => {
             </div>
 
             <GroupsTable groupsData={groupsData} />
+            <ScheduledMeetingsTable meetingsData={meetingsData} />
 
             {/* Future analysis components will go here */}
         </div>

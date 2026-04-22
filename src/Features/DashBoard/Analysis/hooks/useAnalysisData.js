@@ -6,6 +6,7 @@ const useAnalysisData = (startDate, endDate) => {
     const [rawComparison, setRawComparison] = useState(null);
     const [rawTrends, setRawTrends] = useState([]);
     const [rawGroups, setRawGroups] = useState([]);
+    const [rawMeetings, setRawMeetings] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -29,6 +30,7 @@ const useAnalysisData = (startDate, endDate) => {
                 setRawComparison(responseData?.comparison || null);
                 setRawTrends(responseData?.activityTrends || []);
                 setRawGroups(responseData?.groups || []);
+                setRawMeetings(responseData?.meetings || []);
             } catch (error) {
                 console.error("Failed to load analytics data:", error);
             } finally {
@@ -43,12 +45,38 @@ const useAnalysisData = (startDate, endDate) => {
         if (!summary) return [];
         return [
             { title: "Total Groups", value: `${summary.totalGroups ?? 0} Groups`, change: "+2.45%", iconType: "UsersFour", showAvatars: true },
-            { title: "Total Members", value: `${summary.totalMembers ?? 0} Members`, change: "+2.45%", iconType: "ChartLineUp", showAvatars: true },
+            { 
+                title: "Total Members", 
+                value: `${summary.totalMembers ?? 0} Members`, 
+                change: "+2.45%", 
+                iconType: "ChartLineUp", 
+                showAvatars: true,
+                sparkline: [
+                    { value: 10 }, { value: 20 }, { value: 15 }, { value: 30 }, 
+                    { value: 25 }, { value: 40 }, { value: 35 }, { value: 50 }, 
+                    { value: 45 }, { value: 65 }, { value: 60 }, { value: 95 }
+                ],
+                sparklineColor: "#00DC85",
+                showFill: true
+            },
             { title: "Total Meetings", value: `${summary.totalMeetings ?? 0} Meetings`, change: "+2.45%", iconType: "Headset", showAvatars: true },
             { title: "Total Videos", value: `${summary.totalVideos ?? 0} Videos`, change: "+2.45%", iconType: "Progress", showAvatars: true },
             { title: "Total Messages", value: `${summary.totalMessages ?? 0} Messages`, change: "+2.45%", iconType: "Chats", showAvatars: false },
             { title: "Average Meeting Time", value: `${summary.avgMeetingDuration ?? 0} Mins`, change: null, iconType: "CalendarCheck", showAvatars: false },
-            { title: "Avg attendance", value: `${summary.avgAttendance ?? 0}%`, change: "+2.45%", iconType: "Waveform", showAvatars: false }
+            { title: "Avg attendance", 
+                value: `${summary.avgAttendance ?? 0}%`, 
+                change: "+2.45%", 
+                iconType: "Waveform", 
+                showAvatars: false,
+                sparkline: [
+                    { value: 40 }, { value: 90 }, { value: 30 }, { value: 95 }, 
+                    { value: 50 }, { value: 100 }, { value: 40 }, { value: 105 },
+                    { value: 60 }, { value: 110 }, { value: 50 }, { value: 115 },
+                    { value: 70 }, { value: 120 }, { value: 60 }, { value: 125 }
+                ],
+                sparklineColor: "#0076EA",
+                showFill: false
+            }
         ];
     }, [summary]);
 
@@ -114,7 +142,27 @@ const useAnalysisData = (startDate, endDate) => {
         });
     }, [rawGroups]);
 
-    return { cardsData, comparisonData, dailyActivityData, groupsData, loading };
+    const meetingsData = useMemo(() => {
+        if (!rawMeetings || rawMeetings.length === 0) return [];
+        return rawMeetings.map(meeting => {
+            const startDate = new Date(meeting.start_time);
+            return {
+                id: meeting.id,
+                title: meeting.title,
+                group: meeting.group_name,
+                startDate: meeting.start_time
+                    ? `${startDate.getDate()}/${startDate.getMonth() + 1}/${startDate.getFullYear()}`
+                    : '-',
+                duration: `${meeting.duration ?? 0} mins`,
+                status: meeting.status,
+                isWeekly: meeting.is_weekly,
+                isRecorded: meeting.recording === true || meeting.recording === 1 || meeting.recording === '1' || String(meeting.recording).trim() === '1' || meeting.recording === 'Recording' || 
+                           meeting.record_meeting === true || meeting.record_meeting === 1 || meeting.record_meeting === '1' || meeting.recordMeeting === 'Recording'
+            };
+        });
+    }, [rawMeetings]);
+
+    return { cardsData, comparisonData, dailyActivityData, groupsData, meetingsData, loading };
 };
 
 export default useAnalysisData;
