@@ -14,6 +14,7 @@
 }
 
 .analysis-card {
+    position: relative;
     min-width: 250px;
     background: radial-gradient(ellipse at top right,
             #80BAF5 0%,
@@ -75,7 +76,12 @@
 
 .analysis-card-icon-wrapper {
     align-self: flex-end;
-    margin-top: 1rem;
-    color: #00f2fe;
-    /* Base color for icons */
+    margin-top: 1.5rem;
+    width: 58px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    padding: 4px;
 }
