@@ -3,6 +3,7 @@ import AnalysisHeader from './components/AnalysisHeader';
 import OverallNumbers from './components/OverallNumbers';
 import ActivityComparison from './components/ActivityComparison';
 import DailyActivity from './components/DailyActivity';
+import GroupsTable from './components/GroupsTable';
 import useAnalysisData from './hooks/useAnalysisData';
 import './Analysis.css';
 
@@ -24,18 +25,18 @@ const Analysis = ({ currentUser }) => {
     const startDate = dateRange[0] ? formatDate(dateRange[0]) : null;
     const endDate = dateRange[1] ? formatDate(dateRange[1]) : startDate;
 
-    const { cardsData, comparisonData, dailyActivityData } = useAnalysisData(startDate, endDate);
+    const { cardsData, comparisonData, dailyActivityData, groupsData } = useAnalysisData(startDate, endDate);
 
     return (
         <div className="w-100">
-            <AnalysisHeader 
-                currentUser={currentUser} 
-                dateRange={dateRange} 
-                setDateRange={setDateRange} 
+            <AnalysisHeader
+                currentUser={currentUser}
+                dateRange={dateRange}
+                setDateRange={setDateRange}
             />
             <OverallNumbers cardsData={cardsData} />
 
-            <div className="row px-4  mb-4 g-4">
+            <div className="row px-4 mb-2 g-4">
                 <div className="col-12 col-xl-6">
                     <ActivityComparison data={comparisonData} />
                 </div>
@@ -43,6 +44,8 @@ const Analysis = ({ currentUser }) => {
                     <DailyActivity data={dailyActivityData} />
                 </div>
             </div>
+
+            <GroupsTable groupsData={groupsData} />
 
             {/* Future analysis components will go here */}
         </div>

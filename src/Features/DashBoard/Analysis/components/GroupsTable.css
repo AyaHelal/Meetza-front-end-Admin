@@ -1,0 +1,45 @@
+.groups-table-card {
+    border-radius: 16px;
+    border: none;
+}
+
+
+.bg-g {
+    background: linear-gradient(to bottom left, rgba(0, 118, 234, 0.15) 0%, #FFFFFF 100%) !important;
+}
+
+
+.groups-table-container {
+    z-index: 1;
+}
+
+/* ✅ Make table transparent so gradient shows through */
+.groups-table,
+.groups-table thead,
+.groups-table tbody,
+.groups-table tr,
+.groups-table th,
+.groups-table td {
+    background: transparent !important;
+}
+
+.groups-table th {
+    color: #888888;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.groups-table td {
+    color: #010101;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.groups-table tbody tr {
+    border-bottom: 1px solid #e0e0e0 !important;
+}
+
+.groups-table tbody tr:last-child {
+    border-bottom: none;
+}

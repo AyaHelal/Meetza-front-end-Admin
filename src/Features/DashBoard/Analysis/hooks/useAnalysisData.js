@@ -5,6 +5,7 @@ const useAnalysisData = (startDate, endDate) => {
     const [summary, setSummary] = useState(null);
     const [rawComparison, setRawComparison] = useState(null);
     const [rawTrends, setRawTrends] = useState([]);
+    const [rawGroups, setRawGroups] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -18,11 +19,16 @@ const useAnalysisData = (startDate, endDate) => {
                 }
 
                 const response = await api.get('/reports/analytics', { params });
+                console.log("raw response:", response.data); // 👈 هنا
+
+
                 const responseData = response.data?.data || response.data;
+                console.log("groups:", responseData.groups); // 👈 هنا
 
                 setSummary(responseData?.summary || responseData);
                 setRawComparison(responseData?.comparison || null);
                 setRawTrends(responseData?.activityTrends || []);
+                setRawGroups(responseData?.groups || []);
             } catch (error) {
                 console.error("Failed to load analytics data:", error);
             } finally {
@@ -35,7 +41,6 @@ const useAnalysisData = (startDate, endDate) => {
 
     const cardsData = useMemo(() => {
         if (!summary) return [];
-
         return [
             { title: "Total Groups", value: `${summary.totalGroups ?? 0} Groups`, change: "+2.45%", iconType: "UsersFour", showAvatars: true },
             { title: "Total Members", value: `${summary.totalMembers ?? 0} Members`, change: "+2.45%", iconType: "ChartLineUp", showAvatars: true },
@@ -53,7 +58,6 @@ const useAnalysisData = (startDate, endDate) => {
             current: rawComparison[category]?.current || 0,
             previous: rawComparison[category]?.previous || 0
         });
-
         return [
             { name: 'Groups', ...safeGet('groups') },
             { name: 'Members', ...safeGet('members') },
@@ -66,15 +70,12 @@ const useAnalysisData = (startDate, endDate) => {
 
     const dailyActivityData = useMemo(() => {
         if (!rawTrends || rawTrends.length === 0) return null;
-
         return rawTrends.map(trend => {
-            // Optional: format date if it's full YYYY-MM-DD
             let displayDate = trend.date;
             try {
                 if (trend.date && trend.date.includes('-')) {
                     const parts = trend.date.split('T')[0].split('-');
                     if (parts.length === 3) {
-                        // Create date in local timezone to avoid off-by-one errors
                         const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
                         displayDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
                     } else {
@@ -84,10 +85,7 @@ const useAnalysisData = (startDate, endDate) => {
                         }
                     }
                 }
-            } catch (e) {
-                // ignore
-            }
-
+            } catch (e) { }
             return {
                 name: displayDate,
                 groups: trend.groups || 0,
@@ -97,7 +95,26 @@ const useAnalysisData = (startDate, endDate) => {
         });
     }, [rawTrends]);
 
-    return { cardsData, comparisonData, dailyActivityData, loading };
+    const groupsData = useMemo(() => {
+        if (!rawGroups || rawGroups.length === 0) return [];
+        return rawGroups.map(group => {
+            const date = new Date(group.created_at);
+            return {
+                id: group.id,
+                name: group.group_name,
+                members: group.totalMembers ?? 0,
+                meetings: group.totalMeetings ?? 0,
+                videos: group.totalVideos ?? 0,
+                messages: group.totalMessages ?? 0,
+                comments: group.totalComments ?? 0,
+                createdAt: group.created_at
+                    ? `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+                    : '-'
+            };
+        });
+    }, [rawGroups]);
+
+    return { cardsData, comparisonData, dailyActivityData, groupsData, loading };
 };
 
 export default useAnalysisData;
