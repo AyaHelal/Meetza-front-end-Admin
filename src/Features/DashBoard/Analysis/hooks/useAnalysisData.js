@@ -1,17 +1,28 @@
 import { useState, useEffect, useMemo } from 'react';
 import api from '../../../../utils/api';
 
-const useAnalysisData = () => {
+const useAnalysisData = (startDate, endDate) => {
     const [summary, setSummary] = useState(null);
+    const [rawComparison, setRawComparison] = useState(null);
+    const [rawTrends, setRawTrends] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchAnalytics = async () => {
             try {
-                // Fetch reports summary data from API
-                const response = await api.get('/reports/analytics');
-                const data = response.data?.summary || response.data?.data?.summary || response.data;
-                setSummary(data);
+                setLoading(true);
+                const params = {};
+                if (startDate && endDate) {
+                    params.startDate = startDate;
+                    params.endDate = endDate;
+                }
+
+                const response = await api.get('/reports/analytics', { params });
+                const responseData = response.data?.data || response.data;
+
+                setSummary(responseData?.summary || responseData);
+                setRawComparison(responseData?.comparison || null);
+                setRawTrends(responseData?.activityTrends || []);
             } catch (error) {
                 console.error("Failed to load analytics data:", error);
             } finally {
@@ -20,7 +31,7 @@ const useAnalysisData = () => {
         };
 
         fetchAnalytics();
-    }, []);
+    }, [startDate, endDate]);
 
     const cardsData = useMemo(() => {
         if (!summary) return [];
@@ -36,7 +47,57 @@ const useAnalysisData = () => {
         ];
     }, [summary]);
 
-    return { cardsData, loading };
+    const comparisonData = useMemo(() => {
+        if (!rawComparison) return null;
+        const safeGet = (category) => ({
+            current: rawComparison[category]?.current || 0,
+            previous: rawComparison[category]?.previous || 0
+        });
+
+        return [
+            { name: 'Groups', ...safeGet('groups') },
+            { name: 'Members', ...safeGet('members') },
+            { name: 'Meetings', ...safeGet('meetings') },
+            { name: 'Videos', ...safeGet('videos') },
+            { name: 'Messages', ...safeGet('messages') },
+            { name: 'Attendance', ...safeGet('attendance') }
+        ];
+    }, [rawComparison]);
+
+    const dailyActivityData = useMemo(() => {
+        if (!rawTrends || rawTrends.length === 0) return null;
+
+        return rawTrends.map(trend => {
+            // Optional: format date if it's full YYYY-MM-DD
+            let displayDate = trend.date;
+            try {
+                if (trend.date && trend.date.includes('-')) {
+                    const parts = trend.date.split('T')[0].split('-');
+                    if (parts.length === 3) {
+                        // Create date in local timezone to avoid off-by-one errors
+                        const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+                        displayDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                    } else {
+                        const dateObj = new Date(trend.date);
+                        if (!isNaN(dateObj)) {
+                            displayDate = dateObj.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+                        }
+                    }
+                }
+            } catch (e) {
+                // ignore
+            }
+
+            return {
+                name: displayDate,
+                groups: trend.groups || 0,
+                meetings: trend.meetings || 0,
+                videos: trend.videos || 0
+            };
+        });
+    }, [rawTrends]);
+
+    return { cardsData, comparisonData, dailyActivityData, loading };
 };
 
 export default useAnalysisData;
