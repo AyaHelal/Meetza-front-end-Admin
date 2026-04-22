@@ -2,14 +2,20 @@ import { useState, useEffect, useCallback } from "react";
 import api from "../../../../utils/api";
 
 export const useUserData = () => {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const cacheKey = "admin_users_cache";
+
+    const [users, setUsers] = useState(() => {
+        const cached = localStorage.getItem(cacheKey);
+        return cached ? JSON.parse(cached) : [];
+    });
+    const [loading, setLoading] = useState(users.length === 0);
     const [error, setError] = useState(null);
 
     // 🟩 Fetch all users
     const fetchData = useCallback(async () => {
+        const hasCache = users.length > 0;
         try {
-            setLoading(true);
+            if (!hasCache) setLoading(true);
             setError(null);
 
             const res = await api.get("/user");
@@ -29,13 +35,14 @@ export const useUserData = () => {
             }));
 
             setUsers(normalized);
+            localStorage.setItem(cacheKey, JSON.stringify(normalized));
         } catch (err) {
             console.error("Fetch error:", err);
-            setError("Failed to load users");
+            if (!hasCache) setError("Failed to load users");
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [users.length]);
 
     // ➕ Create new user
     const createUser = async (name, email, password, role) => {

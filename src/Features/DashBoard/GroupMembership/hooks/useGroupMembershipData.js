@@ -4,127 +4,76 @@ import { dedupeById } from "../../../../utils/dedupeById";
 import { groupIsManagedByUser } from "../../../../utils/groupIsManagedByUser";
 
 export const useGroupMembershipData = (currentUser = null) => {
-  const [memberships, setMemberships] = useState([]);
-  const [groups, setGroups] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const cacheKey = `admin_membership_cache_${currentUser?.id || 'guest'}`;
+
+  const [memberships, setMemberships] = useState(() => {
+    const cached = localStorage.getItem(cacheKey);
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [groups, setGroups] = useState(() => {
+    const cached = localStorage.getItem(`${cacheKey}_groups`);
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [users, setUsers] = useState(() => {
+    const cached = localStorage.getItem(`${cacheKey}_users`);
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [loading, setLoading] = useState(memberships.length === 0);
   const [error, setError] = useState(null);
   // Store a mapping of group_id + member_id -> membership_id for quick lookup
   const membershipIdMapRef = useRef(new Map());
 
   // 🟩 Fetch all memberships
   const fetchData = useCallback(async () => {
+    const hasCache = memberships.length > 0;
     try {
-      setLoading(true);
+      if (!hasCache) setLoading(true);
       setError(null);
 
-      // Fetch the nested structure (for display)
       const res = await api.get("/group-membership");
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
-
-      // Try to fetch flat structure with IDs by calling a different endpoint format
-      // or try with different query parameters
       const membershipIdMap = new Map();
 
       try {
-        // Try to get all memberships in a flat format (some APIs support this)
-        // Try multiple approaches to get flat structure with IDs
-        const flatRes = await api.get("/group-membership"); // Some backends have /all endpoint
-        if (flatRes.data && Array.isArray(flatRes.data) && flatRes.data.length > 0) {
+        const flatRes = await api.get("/group-membership");
+        if (flatRes.data && Array.isArray(flatRes.data)) {
           const flatData = Array.isArray(flatRes.data) ? flatRes.data : flatRes.data?.data || [];
-          if (flatData.length > 0 && flatData[0].id && flatData[0].group_id && flatData[0].member_id) {
-            // Build map: "group_id_member_id" -> membership_id
-            flatData.forEach((membership) => {
-              const key = `${membership.group_id}_${membership.member_id || membership.memberId}`;
-              membershipIdMap.set(key, membership.id || membership.membership_id);
-            });
-          }
-        }
-      } catch (e1) {
-        // Try another format - maybe the API returns flat structure with different parameter
-        try {
-          const flatRes2 = await api.get("/group-membership", {
-            params: { include_ids: true, format: "flat" }
+          flatData.forEach((membership) => {
+            const key = `${membership.group_id}_${membership.member_id || membership.memberId}`;
+            membershipIdMap.set(key, membership.id || membership.membership_id);
           });
-          const flatData2 = Array.isArray(flatRes2.data) ? flatRes2.data : flatRes2.data?.data || [];
-          if (flatData2.length > 0 && flatData2[0].id && flatData2[0].group_id) {
-            flatData2.forEach((membership) => {
-              const key = `${membership.group_id}_${membership.member_id || membership.memberId}`;
-              membershipIdMap.set(key, membership.id || membership.membership_id);
-            });
-          }
-        } catch (e2) {
         }
-      }
+      } catch (e1) {}
 
-      // Store the map for later use
       membershipIdMapRef.current = membershipIdMap;
-
-      // Try to fetch membership IDs by making requests for each pair
-      // Or try a different endpoint that returns IDs
-      // For now, we'll store the pairs and try to fetch IDs when needed for deletion
-
-      // Handle nested structure: array of groups with members array
-      // Transform to grouped structure where each group appears once with all its members
       let groupedMemberships = [];
 
       if (payload.length > 0 && payload[0].group_id && payload[0].members) {
-        // New nested structure: [{ group_id, group_name, members: [{ member_id, member_name, member_email, member_photo, id? }] }]
-        // Use the membershipIdMap we fetched earlier (if available)
-
-        // Already in the correct format - one group per item with members array
-        groupedMemberships = payload.map((group) => {
-          return {
-            id: group.group_id, // Use group_id as the ID for the row
-            group_id: group.group_id,
-            group_name: group.group_name || null,
-            members: (group.members || []).map((member, index) => {
-              // Try to extract membership ID from various possible fields
-              let membershipId = member.id
-                || member.membership_id
-                || member.group_membership_id
-                || member._id
-                || member.membershipId
-                || member.groupMembershipId
-                || (member.membership && member.membership.id)
-                || (member.groupMembership && member.groupMembership.id);
-
-              // If not found in nested structure, try to find it in the ID map we fetched
-              if (!membershipId && membershipIdMap.size > 0) {
-                const key = `${group.group_id}_${member.member_id}`;
-                membershipId = membershipIdMap.get(key);
-              }
-
-              // Store the membership ID in the ref for later use
-              if (membershipId) {
-                const key = `${group.group_id}_${member.member_id}`;
-                membershipIdMapRef.current.set(key, membershipId);
-              } else {
-                console.warn(`No membership ID found for member ${member.member_id} in group ${group.group_id}`);
-              }
-
-              return {
-                id: membershipId || null, // Store actual membership ID from database
-                member_id: String(member.member_id || ""),
-                member_name: member.member_name || null,
-                member_email: member.member_email || null,
-                member_photo: member.member_photo || null,
-                // Store composite ID for delete operations (fallback)
-                composite_id: membershipId || `${group.group_id}_${member.member_id}`,
-              };
-            }),
-          };
-        });
+        groupedMemberships = payload.map((group) => ({
+          id: group.group_id,
+          group_id: group.group_id,
+          group_name: group.group_name || null,
+          members: (group.members || []).map((member) => {
+            let membershipId = member.id || member.membership_id || (member.membership && member.membership.id);
+            if (!membershipId) {
+              const key = `${group.group_id}_${member.member_id}`;
+              membershipId = membershipIdMap.get(key);
+            }
+            return {
+              id: membershipId || null,
+              member_id: String(member.member_id || ""),
+              member_name: member.member_name || null,
+              member_email: member.member_email || null,
+              member_photo: member.member_photo || null,
+              composite_id: membershipId || `${group.group_id}_${member.member_id}`,
+            };
+          }),
+        }));
       } else {
         const groupMap = {};
-
         payload.forEach((m) => {
           const groupId = m.group_id || m.groupId;
           if (!groupId) return;
-
-          // In flat structure, m.id is the membership ID
-          const membershipId = m.id || m.membership_id || m.group_membership_id;
-
           if (!groupMap[groupId]) {
             groupMap[groupId] = {
               id: groupId,
@@ -133,82 +82,56 @@ export const useGroupMembershipData = (currentUser = null) => {
               members: [],
             };
           }
-
           groupMap[groupId].members.push({
-            id: membershipId || null, // Store actual membership ID from database
+            id: m.id || m.membership_id || null,
             member_id: String(m.member_id || m.memberId || m.user_id || m.userId || ""),
             member_name: m.member?.name || m.user?.name || m.member_name || null,
             member_email: m.member?.email || m.user?.email || m.member_email || null,
             member_photo: m.member?.photo || m.user?.photo || m.member_photo || null,
-            // Use membership ID if available, otherwise create composite
-            composite_id: membershipId || `${groupId}_${m.member_id || m.memberId || m.user_id || m.userId}`,
+            composite_id: m.id || `${groupId}_${m.member_id || m.memberId || m.user_id || m.userId}`,
           });
         });
-
         groupedMemberships = Object.values(groupMap);
       }
 
-      // Build membership ID map from the grouped memberships we just created
-      // This will help us look up IDs when needed for deletion
-      const idMap = new Map();
-      groupedMemberships.forEach((group) => {
-        group.members.forEach((member) => {
-          if (member.id) {
-            const key = `${group.group_id}_${member.member_id}`;
-            idMap.set(key, member.id);
-          }
-        });
-      });
-      membershipIdMapRef.current = idMap;
-
       setMemberships(groupedMemberships);
+      localStorage.setItem(cacheKey, JSON.stringify(groupedMemberships));
     } catch (err) {
-      console.error("Fetch error:", err);
-      setError("Failed to load memberships");
+      if (!hasCache) setError("Failed to load memberships");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [memberships.length, cacheKey]);
 
   // 🟩 Fetch groups
   const fetchGroups = useCallback(async () => {
     try {
       const res = await api.get("/group");
       let payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
-
       const user = currentUser;
-      const roleNorm = String(user?.role || "").trim();
-      const isSuperAdmin =
-        roleNorm === "Super_Admin" || roleNorm.toLowerCase() === "super_admin";
-      const isAdministrator =
-        roleNorm === "Administrator" || roleNorm.toLowerCase() === "administrator";
+      const roleNorm = String(user?.role || "").trim().toLowerCase();
+      const isSuperAdmin = roleNorm === "super_admin";
+      const isAdministrator = roleNorm === "administrator";
 
       let filteredGroups = dedupeById(payload);
-
       if (isAdministrator && !isSuperAdmin) {
         filteredGroups = filteredGroups.filter((g) => groupIsManagedByUser(g, user?.id));
       }
 
       setGroups(filteredGroups);
-    } catch (err) {
-      console.error("Failed to fetch groups:", err);
-    }
-  }, [currentUser]);
+      localStorage.setItem(`${cacheKey}_groups`, JSON.stringify(filteredGroups));
+    } catch (err) {}
+  }, [currentUser, cacheKey]);
 
-  // 🟩 Fetch members (from member endpoint or user endpoint)
+  // 🟩 Fetch members
   const fetchUsers = useCallback(async () => {
     try {
-
       const res = await api.get("/user");
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
       setUsers(payload);
-
-    } catch (err) {
-
-      console.error("Failed to fetch users:", err);
-
-    }
-  }, []);
+      localStorage.setItem(`${cacheKey}_users`, JSON.stringify(payload));
+    } catch (err) {}
+  }, [cacheKey]);
 
 
   // ➕ Create new membership

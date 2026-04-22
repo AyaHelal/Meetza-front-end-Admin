@@ -35,10 +35,14 @@ const initialUploadFormData = {
 export function useVideoDisplay(currentUserProp) {
     const { user: authUser } = useAuth();
     const currentUser = currentUserProp ?? authUser;
+    const cacheKey = `admin_videos_cache_${authUser?.id || 'guest'}`;
 
-    const [videos, setVideos] = useState([]);
-    const [currentVideo, setCurrentVideo] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [videos, setVideos] = useState(() => {
+        const cached = localStorage.getItem(cacheKey);
+        return cached ? JSON.parse(cached) : [];
+    });
+    const [currentVideo, setCurrentVideo] = useState(() => (videos.length > 0 ? videos[0] : null));
+    const [loading, setLoading] = useState(videos.length === 0);
     const [error, setError] = useState(null);
     const [likeCounts, setLikeCounts] = useState({});
     const [searchQuery, setSearchQuery] = useState('');
@@ -52,7 +56,10 @@ export function useVideoDisplay(currentUserProp) {
     const [videoToDelete, setVideoToDelete] = useState(null);
     const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
     const [commentToDelete, setCommentToDelete] = useState({ videoId: null, commentId: null });
-    const [groups, setGroups] = useState([]);
+    const [groups, setGroups] = useState(() => {
+        const cached = localStorage.getItem(`${cacheKey}_groups`);
+        return cached ? JSON.parse(cached) : [];
+    });
     const [uploadFormData, setUploadFormData] = useState(initialUploadFormData);
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -76,22 +83,27 @@ export function useVideoDisplay(currentUserProp) {
     }, []);
 
     const fetchVideos = async () => {
+        const hasCache = videos.length > 0;
         try {
-            setLoading(true);
+            if (!hasCache) setLoading(true);
             setError(null);
             const videosArray = await fetchVideosApi();
             if (videosArray && videosArray.length > 0) {
                 setVideos(videosArray);
-                setCurrentVideo(videosArray[0]);
+                if (!currentVideo) setCurrentVideo(videosArray[0]);
+                localStorage.setItem(cacheKey, JSON.stringify(videosArray));
             } else {
                 setVideos([]);
                 setCurrentVideo(null);
+                localStorage.removeItem(cacheKey);
             }
         } catch (err) {
             console.error('Error fetching videos:', err);
             const errorMsg = err.response?.data?.message || err.message || 'Failed to fetch videos';
-            setError(errorMsg);
-            toast.error(errorMsg);
+            if (!hasCache) {
+                setError(errorMsg);
+                toast.error(errorMsg);
+            }
         } finally {
             setLoading(false);
         }
@@ -114,9 +126,9 @@ export function useVideoDisplay(currentUserProp) {
                     : [];
             }
             setGroups(filteredGroups);
+            localStorage.setItem(`${cacheKey}_groups`, JSON.stringify(filteredGroups));
         } catch (err) {
             console.error('Failed to fetch groups:', err);
-            toast.error('Failed to load groups');
         }
     };
 

@@ -14,12 +14,18 @@ import { useAuth } from "../../../../context/AuthContext";
 
     export default function useMeetingData() {
     const { user: currentUser } = useAuth();
-    const [meetings, setMeetings] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const cacheKey = `admin_meetings_cache_${currentUser?.id || 'guest'}`;
+
+    const [meetings, setMeetings] = useState(() => {
+        const cached = localStorage.getItem(cacheKey);
+        return cached ? JSON.parse(cached) : [];
+    });
+    const [loading, setLoading] = useState(meetings.length === 0);
     const [error, setError] = useState(null);
 
     const fetchMeetings = async (query = '') => {
-        setLoading(true);
+        const hasCache = meetings.length > 0;
+        if (!hasCache) setLoading(true);
         setError(null);
         try {
         const urlSuffix = query ? `?title=${encodeURIComponent(query)}` : '';
@@ -33,18 +39,15 @@ import { useAuth } from "../../../../context/AuthContext";
             return meeting.administrator_id === currentUser?.id;
             });
 
-            setMeetings(prev => {
-                const list = filteredMeetings || [];
-                return list.map(m => {
-                    const existing = prev.find(p => p.id === m.id);
-                    // Backend returns "recording" (1/0); normalize to record_meeting for form/display
-                    const raw = m.recording ?? m.record_meeting ?? (existing?.record_meeting ?? existing?.recording);
-                    const recordMeeting = (raw !== undefined && raw !== null)
-                        ? raw
-                        : undefined;
-                    return { ...m, record_meeting: recordMeeting, recording: m.recording ?? recordMeeting };
-                });
+            const mapped = (filteredMeetings || []).map(m => {
+                const existing = meetings.find(p => p.id === m.id);
+                const raw = m.recording ?? m.record_meeting ?? (existing?.record_meeting ?? existing?.recording);
+                const recordMeeting = (raw !== undefined && raw !== null) ? raw : undefined;
+                return { ...m, record_meeting: recordMeeting, recording: m.recording ?? recordMeeting };
             });
+
+            setMeetings(mapped);
+            localStorage.setItem(cacheKey, JSON.stringify(mapped));
         } else {
             smartToast.error("Failed to load meetings");
             setMeetings([]);

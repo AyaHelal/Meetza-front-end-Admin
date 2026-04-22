@@ -2,17 +2,38 @@ import { useState, useEffect, useMemo } from 'react';
 import api from '../../../../utils/api';
 
 const useAnalysisData = (startDate, endDate) => {
-    const [summary, setSummary] = useState(null);
-    const [rawComparison, setRawComparison] = useState(null);
-    const [rawTrends, setRawTrends] = useState([]);
-    const [rawGroups, setRawGroups] = useState([]);
-    const [rawMeetings, setRawMeetings] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const cacheKey = `analysis_dashboard_${startDate || 'all'}_${endDate || 'all'}`;
+
+    // Initialize states from cache if available
+    const [summary, setSummary] = useState(() => {
+        const cached = localStorage.getItem(`${cacheKey}_summary`);
+        return cached ? JSON.parse(cached) : null;
+    });
+    const [rawComparison, setRawComparison] = useState(() => {
+        const cached = localStorage.getItem(`${cacheKey}_comparison`);
+        return cached ? JSON.parse(cached) : null;
+    });
+    const [rawTrends, setRawTrends] = useState(() => {
+        const cached = localStorage.getItem(`${cacheKey}_trends`);
+        return cached ? JSON.parse(cached) : [];
+    });
+    const [rawGroups, setRawGroups] = useState(() => {
+        const cached = localStorage.getItem(`${cacheKey}_groups`);
+        return cached ? JSON.parse(cached) : [];
+    });
+    const [rawMeetings, setRawMeetings] = useState(() => {
+        const cached = localStorage.getItem(`${cacheKey}_meetings`);
+        return cached ? JSON.parse(cached) : [];
+    });
+
+    const [loading, setLoading] = useState(!summary);
 
     useEffect(() => {
         const fetchAnalytics = async () => {
+            const hasCache = !!summary;
             try {
-                setLoading(true);
+                if (!hasCache) setLoading(true);
+                
                 const params = {};
                 if (startDate && endDate) {
                     params.startDate = startDate;
@@ -20,17 +41,27 @@ const useAnalysisData = (startDate, endDate) => {
                 }
 
                 const response = await api.get('/reports/analytics', { params });
-                console.log("raw response:", response.data); // 👈 هنا
-
-
                 const responseData = response.data?.data || response.data;
-                console.log("groups:", responseData.groups); // 👈 هنا
 
-                setSummary(responseData?.summary || responseData);
-                setRawComparison(responseData?.comparison || null);
-                setRawTrends(responseData?.activityTrends || []);
-                setRawGroups(responseData?.groups || []);
-                setRawMeetings(responseData?.meetings || []);
+                const newSummary = responseData?.summary || responseData;
+                const newComparison = responseData?.comparison || null;
+                const newTrends = responseData?.activityTrends || [];
+                const newGroups = responseData?.groups || [];
+                const newMeetings = responseData?.meetings || [];
+
+                setSummary(newSummary);
+                setRawComparison(newComparison);
+                setRawTrends(newTrends);
+                setRawGroups(newGroups);
+                setRawMeetings(newMeetings);
+
+                // Save to localStorage
+                localStorage.setItem(`${cacheKey}_summary`, JSON.stringify(newSummary));
+                localStorage.setItem(`${cacheKey}_comparison`, JSON.stringify(newComparison));
+                localStorage.setItem(`${cacheKey}_trends`, JSON.stringify(newTrends));
+                localStorage.setItem(`${cacheKey}_groups`, JSON.stringify(newGroups));
+                localStorage.setItem(`${cacheKey}_meetings`, JSON.stringify(newMeetings));
+
             } catch (error) {
                 console.error("Failed to load analytics data:", error);
             } finally {
@@ -39,7 +70,7 @@ const useAnalysisData = (startDate, endDate) => {
         };
 
         fetchAnalytics();
-    }, [startDate, endDate]);
+    }, [startDate, endDate, cacheKey]);
 
     const cardsData = useMemo(() => {
         if (!summary) return [];

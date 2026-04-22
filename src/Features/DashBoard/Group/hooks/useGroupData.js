@@ -51,15 +51,21 @@ function mapApiGroupToRow(g) {
 
 export const useGroupData = () => {
   const { user } = useAuth();
-  const [groups, setGroups] = useState([]);
+  const cacheKey = `admin_groups_cache_${user?.id || 'guest'}`;
+
+  const [groups, setGroups] = useState(() => {
+    const cached = localStorage.getItem(cacheKey);
+    return cached ? JSON.parse(cached) : [];
+  });
   const [users, setUsers] = useState([]);
   const [contents, setContents] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(groups.length === 0);
   const [error, setError] = useState(null);
 
   const fetchData = useCallback(async () => {
+    const hasCache = groups.length > 0;
     try {
-      setLoading(true);
+      if (!hasCache) setLoading(true);
       setError(null);
       const res = await api.get("/group");
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
@@ -75,13 +81,14 @@ export const useGroupData = () => {
 
       const normalized = dedupeById(filteredGroups).map((g) => mapApiGroupToRow(g));
       setGroups(normalized);
+      localStorage.setItem(cacheKey, JSON.stringify(normalized));
     } catch (err) {
       console.error("Fetch error:", err);
-      setError("Failed to load groups");
+      if (!hasCache) setError("Failed to load groups");
     } finally {
       setLoading(false);
     }
-  }, [user?.id, user?.role]);
+  }, [user?.id, user?.role, groups.length, cacheKey]);
 
   const fetchUsers = useCallback(async () => {
     try {

@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import {
   BarChart,
   Bar,
@@ -12,6 +12,12 @@ import {
 import './ActivityComparison.css';
 
 const ActivityComparison = ({ data }) => {
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setIsMounted(true), 150);
+    return () => clearTimeout(timer);
+  }, []);
   const defaultData = [
     { name: 'Groups', current: 11, previous: 11 },
     { name: 'Members', current: 23, previous: 35 },
@@ -53,10 +59,11 @@ const ActivityComparison = ({ data }) => {
         <h5 className="fw-semibold mb-4" style={{ color: '#888888', fontSize: '1.2rem' }}>Activity Comparison</h5>
         <CustomLegend payload={[{ value: 'current', color: '#0076EA' }, { value: 'previous', color: '#00DC85' }]} />
       </div>
-      <div style={{ width: '100%', height: 300 }}>
-        <ResponsiveContainer>
-          <BarChart
-            data={chartData}
+      <div style={{ width: '100%', height: 300, minHeight: 300, flex: 1 }}>
+        {isMounted && (
+          <ResponsiveContainer width="100%" height={300} minWidth={0} debounce={100}>
+            <BarChart
+              data={chartData}
             margin={{
               top: 5,
               right: 10,
@@ -85,7 +92,8 @@ const ActivityComparison = ({ data }) => {
             <Bar dataKey="previous" fill="#00DC85" radius={[8, 8, 8, 8]} barSize={20} />
             <Bar dataKey="current" fill="#0076EA" radius={[8, 8, 8, 8]} barSize={20} />
           </BarChart>
-        </ResponsiveContainer>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

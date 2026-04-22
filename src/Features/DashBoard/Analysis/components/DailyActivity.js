@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import {
   LineChart,
   Line,
@@ -12,6 +12,12 @@ import {
 import './ActivityComparison.css';
 
 const DailyActivity = ({ data }) => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsMounted(true), 150);
+    return () => clearTimeout(timer);
+  }, []);
   const defaultData = [
     { name: '20 Mar', groups: 6, meetings: 15, videos: 15 },
     { name: '21 Mar', groups: 18, meetings: 18, videos: 22 },
@@ -52,10 +58,11 @@ const DailyActivity = ({ data }) => {
   return (
     <div className="activity-comparison-card w-100 h-100 d-flex flex-column">
       <h5 className="fw-semibold mb-4" style={{ color: '#888888', fontSize: '1.2rem' }}>Daily Activity</h5>
-      <div style={{ width: '100%', flex: 1, minHeight: 300 }}>
-        <ResponsiveContainer>
-          <LineChart
-            data={chartData}
+      <div style={{ width: '100%', height: 300, minHeight: 300, flex: 1 }}>
+        {isMounted && (
+          <ResponsiveContainer width="100%" height={300} minWidth={0} debounce={100}>
+            <LineChart
+              data={chartData}
             margin={{
               top: 5,
               right: 10,
@@ -85,7 +92,8 @@ const DailyActivity = ({ data }) => {
             <Line type="monotone" dataKey="meetings" stroke="#00DC85" strokeWidth={2} dot={false} activeDot={{ r: 6 }} />
             <Line type="monotone" dataKey="videos" stroke="#7E8CF5" strokeWidth={2} dot={false} activeDot={{ r: 6 }} />
           </LineChart>
-        </ResponsiveContainer>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );
