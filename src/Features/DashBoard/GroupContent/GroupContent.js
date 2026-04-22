@@ -26,12 +26,12 @@ export default function GroupContent() {
     } = useGroupContentData();
 
     useEffect(() => {
-    const fetchUsers = async () => {
-        const res = await apiCommon.get("/user");
-        setUsers(res.data.data || res.data);
-    };
+        const fetchUsers = async () => {
+            const res = await apiCommon.get("/user");
+            setUsers(res.data.data || res.data);
+        };
 
-    fetchUsers();
+        fetchUsers();
     }, []);
 
 
@@ -39,51 +39,51 @@ export default function GroupContent() {
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-            const res = await apiCommon.get("/group");
-            setGroups(res.data.data || res.data);
+                const res = await apiCommon.get("/group");
+                setGroups(res.data.data || res.data);
             } catch (err) {
-            smartToast.error("Failed to load groups");
+                smartToast.error("Failed to load groups");
             }
         };
 
         fetchGroups();
-        }, []);
+    }, []);
 
     const handleSave = async (data) => {
-    try {
-        const contentData = {
-            content_name: data.content_name,
-            content_description: data.content_description,
-            group_id: data.group_id ?? null,
-            administrator_id: data.administrator_id,
-            role: currentUser?.role,
-        };
+        try {
+            const contentData = {
+                content_name: data.content_name,
+                content_description: data.content_description,
+                group_id: data.group_id ?? null,
+                administrator_id: data.administrator_id,
+                role: currentUser?.role,
+            };
 
 
 
-        if (currentUser?.role === "Super_Admin") {
-            if (!contentData.administrator_id) {
-                smartToast.error("Please select an Administrator");
-                return;
-            }
-            contentData.administrator_id = data.administrator_id;
+            if (currentUser?.role === "Super_Admin") {
+                if (!contentData.administrator_id) {
+                    smartToast.error("Please select an Administrator");
+                    return;
+                }
+                contentData.administrator_id = data.administrator_id;
             } else {
-            contentData.administrator_id = currentUser.id;
+                contentData.administrator_id = currentUser.id;
             }
 
-        if (editing.id) {
-            await updateContent(editing.id, contentData);
-        } else {
-            await addContent(contentData);
-        }
+            if (editing.id) {
+                await updateContent(editing.id, contentData);
+            } else {
+                await addContent(contentData);
+            }
 
-        setEditing({});
-        setAddingNew(false);
-        await fetchContents();
-    } catch (error) {
-        smartToast.error(error.response?.data?.message || "Failed to save content");
-    }
-};
+            setEditing({});
+            setAddingNew(false);
+            await fetchContents();
+        } catch (error) {
+            smartToast.error(error.response?.data?.message || "Failed to save content");
+        }
+    };
 
 
 
@@ -102,13 +102,13 @@ export default function GroupContent() {
     };
 
     const handleEdit = (id) => {
-    const item = contents.find((c) => c.id === id);
-    setEditing({
-        id: item?.id || null,
-        content_name: item?.content_name || '',
-        content_description: item?.content_description || ''
-    });
-};
+        const item = contents.find((c) => c.id === id);
+        setEditing({
+            id: item?.id || null,
+            content_name: item?.content_name || '',
+            content_description: item?.content_description || ''
+        });
+    };
 
 
     const handleAdd = () => {

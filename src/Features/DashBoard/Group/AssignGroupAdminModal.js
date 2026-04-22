@@ -53,7 +53,7 @@ export default function AssignGroupAdminModal({
 
               <div className="mb-3">
                 <label className="form-label fw-semibold" style={{ color: "#010101" }}>
-                  Administrator emails <span style={{ color: "#FF0000" }}>*</span>
+                  Leaders emails <span style={{ color: "#FF0000" }}>*</span>
                 </label>
                 <textarea
                   className="form-control rounded-3"

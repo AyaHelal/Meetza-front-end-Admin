@@ -3,8 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Envelope, Password, Eye, EyeSlash } from "phosphor-react";
 import { motion } from "framer-motion";
 import api from "../../utils/api";
-import { FormInput, ToggleButton, LogoSection } from "../../components";
-import SocialLoginButtons from "../../components/common/SocialLoginButtons";
+import { FormInput, ToggleButton, LogoSection } from "../../Features";
+import SocialLoginButtons from "../../Features/common/SocialLoginButtons";
 import { useFormValidation, usePasswordVisibility } from "../../hooks";
 import { loginValidationRules } from "../../utils";
 import { useAuth } from "../../context/AuthContext";
@@ -296,7 +296,7 @@ export default function LoginForm() {
 
 
                         <div className="mt-2">
-                            <SocialLoginButtons redirectUrl={`${window.location.origin}/dashboard`}/>
+                            <SocialLoginButtons redirectUrl={`${window.location.origin}/dashboard`} />
                         </div>
                     </form>
                 </div>

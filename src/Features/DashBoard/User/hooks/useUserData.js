@@ -21,7 +21,7 @@ export const useUserData = () => {
                 email: u.email,
                 role:
                     u.role === "Administrator"
-                        ? "administrator"
+                        ? "Leader"
                         : u.role === "Member"
                             ? "member"
                             : (u.role || "").toString().toLowerCase(),

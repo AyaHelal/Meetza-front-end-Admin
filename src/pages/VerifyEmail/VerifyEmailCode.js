@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { LogoSection } from "../../components";
+import { LogoSection } from "../../Features";
 import "../Login/LoginForm.css";
 import { useNavigate } from "react-router-dom";
 import apiCommon from "../../utils/api";
@@ -103,69 +103,69 @@ export default function VerifyEmailCode() {
 
     return (
         <div className="forgot-password-container1">
-        <motion.div
-            className="align-items-center text-center"
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-        >
-            <LogoSection />
+            <motion.div
+                className="align-items-center text-center"
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+                <LogoSection />
 
-            <div className="w-100 d-flex flex-column align-items-center text-center justify-content-center p-8 form-container">
-                <motion.h2
-                    className="fw-semibold mb-3"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                >
-                    Verify Email
-                </motion.h2>
+                <div className="w-100 d-flex flex-column align-items-center text-center justify-content-center p-8 form-container">
+                    <motion.h2
+                        className="fw-semibold mb-3"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                    >
+                        Verify Email
+                    </motion.h2>
 
-                <p className="text-888888 mb-4" style={{ maxWidth: 420, fontSize: "18px" }}>
-                    {email ? (
-                        <>We've sent a verification code to <b>{email}</b>. Please enter it below.</>
-                    ) : (
-                        <>No email found. Please <a href="/signup">sign up again</a>.</>
-                    )}
-                </p>
+                    <p className="text-888888 mb-4" style={{ maxWidth: 420, fontSize: "18px" }}>
+                        {email ? (
+                            <>We've sent a verification code to <b>{email}</b>. Please enter it below.</>
+                        ) : (
+                            <>No email found. Please <a href="/signup">sign up again</a>.</>
+                        )}
+                    </p>
 
-                <div className="d-flex gap-2 mb-3" onPaste={handlePaste}>
-                    {code.map((value, idx) => (
-                        <input
-                            key={idx}
-                            type="text"
-                            inputMode="numeric"
-                            className="form-control text-center"
-                            style={{ width: 56, height: 56, fontSize: 24 }}
-                            maxLength={1}
-                            value={value}
-                            onChange={(e) => handleChange(idx, e.target.value)}
-                            onKeyDown={(e) => handleKeyDown(idx, e)}
-                            ref={(el) => (inputsRef.current[idx] = el)}
-                            disabled={loading}
-                        />
-                    ))}
-                </div>
+                    <div className="d-flex gap-2 mb-3" onPaste={handlePaste}>
+                        {code.map((value, idx) => (
+                            <input
+                                key={idx}
+                                type="text"
+                                inputMode="numeric"
+                                className="form-control text-center"
+                                style={{ width: 56, height: 56, fontSize: 24 }}
+                                maxLength={1}
+                                value={value}
+                                onChange={(e) => handleChange(idx, e.target.value)}
+                                onKeyDown={(e) => handleKeyDown(idx, e)}
+                                ref={(el) => (inputsRef.current[idx] = el)}
+                                disabled={loading}
+                            />
+                        ))}
+                    </div>
 
-                <div className="mb-4 d-flex align-items-center gap-1">
-                    <span>Didn't receive a code?</span>
-                    <button type="button" className="btn btn-link p-0" onClick={handleResend} disabled={loading}>
-                        Request again
+                    <div className="mb-4 d-flex align-items-center gap-1">
+                        <span>Didn't receive a code?</span>
+                        <button type="button" className="btn btn-link p-0" onClick={handleResend} disabled={loading}>
+                            Request again
+                        </button>
+                    </div>
+
+                    <button
+                        type="button"
+                        className="btn btn-primary w-100 py-3 mt-1 mb-3 rounded-4"
+                        style={{ maxWidth: 420 }}
+                        onClick={handleVerify}
+                        disabled={loading}
+                    >
+                        {loading ? "Verifying..." : "Verify Email"}
                     </button>
                 </div>
-
-                <button
-                    type="button"
-                    className="btn btn-primary w-100 py-3 mt-1 mb-3 rounded-4"
-                    style={{ maxWidth: 420 }}
-                    onClick={handleVerify}
-                    disabled={loading}
-                >
-                    {loading ? "Verifying..." : "Verify Email"}
-                </button>
-            </div>
-        </motion.div>
+            </motion.div>
         </div>
     );
 }

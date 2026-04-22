@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LogoSection } from "../../components";
+import { LogoSection } from "../../Features";
 import '../Login/LoginForm.css';
-import { FormInput } from "../../components";
+import { FormInput } from "../../Features";
 import { Envelope } from "phosphor-react";
 import apiCommon from "../../utils/api";
 
