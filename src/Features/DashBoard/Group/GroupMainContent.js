@@ -122,7 +122,7 @@ const GroupMainContent = ({ currentUser }) => {
             return;
         }
         if (isSuperAdmin && (!Array.isArray(formData.admin_ids) || formData.admin_ids.length === 0)) {
-            toast.error("Please select at least one administrator for the group");
+            toast.error("Please select at least one Leader for the group");
             return;
         }
 
@@ -451,7 +451,7 @@ const GroupMainContent = ({ currentUser }) => {
                                                                     admin_ids: (opts || []).map((o) => o.value),
                                                                 })
                                                             }
-                                                            placeholder="Select administrators…"
+                                                            placeholder="Select Leaders…"
                                                             menuPortalTarget={document.body}
                                                             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                                                         />

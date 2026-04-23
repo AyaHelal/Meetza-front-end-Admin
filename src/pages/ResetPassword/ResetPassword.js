@@ -83,7 +83,7 @@ export default function ResetPassword() {
             const response = await apiCommon.post("/auth/reset_password", {
                 email: email,
                 new_password: formData.newPassword,
-                is_verifyed: "true"
+                is_verified: "true"
             });
 
             setSuccess("Password reset successfully!");

@@ -65,7 +65,7 @@ export default function AssignGroupAdminModal({
                   style={{ border: "2px solid #E9ECEF", padding: "0.75rem", fontSize: "16px", resize: "vertical" }}
                 />
                 <div className="form-text" style={{ fontSize: "13px" }}>
-                  You can paste several administrator emails at once.
+                  You can paste several Leaders emails at once.
                 </div>
               </div>
 
