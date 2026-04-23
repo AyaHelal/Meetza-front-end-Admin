@@ -47,12 +47,15 @@
 /* Hide scrollbar on large screens only as requested */
 @media (min-width: 992px) {
     .groups-table-container {
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* IE/Edge */
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE/Edge */
     }
-    
+
     .groups-table-container::-webkit-scrollbar {
-        display: none; /* Chrome/Safari/Webkit */
+        display: none;
+        /* Chrome/Safari/Webkit */
     }
 }
 
@@ -72,7 +75,7 @@
     background: transparent !important;
     color: #888888;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.96rem;
     border-bottom: 1px solid #f0f0f0;
 }
 

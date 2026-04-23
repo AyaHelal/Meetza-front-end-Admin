@@ -5,14 +5,15 @@ import ActivityComparison from './components/ActivityComparison';
 import DailyActivity from './components/DailyActivity';
 import GroupsTable from './components/GroupsTable';
 import ScheduledMeetingsTable from './components/ScheduledMeetingsTable';
+import RecentVideos from './components/RecentVideos';
 import useAnalysisData from './hooks/useAnalysisData';
 import './Analysis.css';
 
 const Analysis = ({ currentUser }) => {
     // Default to the last 7 days or a specific range
     const [dateRange, setDateRange] = useState([
-        new Date("2026-04-20"),
-        new Date("2026-04-26")
+        new Date("2026-04-01"),
+        new Date("2026-04-30")
     ]);
 
     // Format dates to YYYY-MM-DD for API in local timezone to avoid off-by-one errors
@@ -26,7 +27,7 @@ const Analysis = ({ currentUser }) => {
     const startDate = dateRange[0] ? formatDate(dateRange[0]) : null;
     const endDate = dateRange[1] ? formatDate(dateRange[1]) : startDate;
 
-    const { cardsData, comparisonData, dailyActivityData, groupsData, meetingsData } = useAnalysisData(startDate, endDate);
+    const { cardsData, comparisonData, dailyActivityData, groupsData, meetingsData, videosData } = useAnalysisData(startDate, endDate);
 
     return (
         <div className="w-100">
@@ -48,6 +49,7 @@ const Analysis = ({ currentUser }) => {
 
             <GroupsTable groupsData={groupsData} />
             <ScheduledMeetingsTable meetingsData={meetingsData} />
+            <RecentVideos videosData={videosData} />
 
             {/* Future analysis components will go here */}
         </div>

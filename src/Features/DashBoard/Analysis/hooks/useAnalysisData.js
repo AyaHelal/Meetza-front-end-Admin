@@ -25,6 +25,10 @@ const useAnalysisData = (startDate, endDate) => {
         const cached = localStorage.getItem(`${cacheKey}_meetings`);
         return cached ? JSON.parse(cached) : [];
     });
+    const [rawVideos, setRawVideos] = useState(() => {
+        const cached = localStorage.getItem(`${cacheKey}_videos`);
+        return cached ? JSON.parse(cached) : [];
+    });
 
     const [loading, setLoading] = useState(!summary);
 
@@ -42,18 +46,24 @@ const useAnalysisData = (startDate, endDate) => {
 
                 const response = await api.get('/reports/analytics', { params });
                 const responseData = response.data?.data || response.data;
+                
+                console.log("Analysis API Response:", responseData);
 
                 const newSummary = responseData?.summary || responseData;
                 const newComparison = responseData?.comparison || null;
                 const newTrends = responseData?.activityTrends || [];
                 const newGroups = responseData?.groups || [];
                 const newMeetings = responseData?.meetings || [];
+                const newVideos = responseData?.videos || [];
+
+                console.log("Extracted Videos:", newVideos);
 
                 setSummary(newSummary);
                 setRawComparison(newComparison);
                 setRawTrends(newTrends);
                 setRawGroups(newGroups);
                 setRawMeetings(newMeetings);
+                setRawVideos(newVideos);
 
                 // Save to localStorage
                 localStorage.setItem(`${cacheKey}_summary`, JSON.stringify(newSummary));
@@ -61,6 +71,7 @@ const useAnalysisData = (startDate, endDate) => {
                 localStorage.setItem(`${cacheKey}_trends`, JSON.stringify(newTrends));
                 localStorage.setItem(`${cacheKey}_groups`, JSON.stringify(newGroups));
                 localStorage.setItem(`${cacheKey}_meetings`, JSON.stringify(newMeetings));
+                localStorage.setItem(`${cacheKey}_videos`, JSON.stringify(newVideos));
 
             } catch (error) {
                 console.error("Failed to load analytics data:", error);
@@ -94,20 +105,7 @@ const useAnalysisData = (startDate, endDate) => {
             { title: "Total Videos", value: `${summary.totalVideos ?? 0} Videos`, change: "+2.45%", iconType: "Progress", showAvatars: true },
             { title: "Total Messages", value: `${summary.totalMessages ?? 0} Messages`, change: "+2.45%", iconType: "Chats", showAvatars: false },
             { title: "Average Meeting Time", value: `${summary.avgMeetingDuration ?? 0} Mins`, change: null, iconType: "CalendarCheck", showAvatars: false },
-            { title: "Avg attendance", 
-                value: `${summary.avgAttendance ?? 0}%`, 
-                change: "+2.45%", 
-                iconType: "Waveform", 
-                showAvatars: false,
-                sparkline: [
-                    { value: 40 }, { value: 90 }, { value: 30 }, { value: 95 }, 
-                    { value: 50 }, { value: 100 }, { value: 40 }, { value: 105 },
-                    { value: 60 }, { value: 110 }, { value: 50 }, { value: 115 },
-                    { value: 70 }, { value: 120 }, { value: 60 }, { value: 125 }
-                ],
-                sparklineColor: "#0076EA",
-                showFill: false
-            }
+
         ];
     }, [summary]);
 
@@ -123,7 +121,7 @@ const useAnalysisData = (startDate, endDate) => {
             { name: 'Meetings', ...safeGet('meetings') },
             { name: 'Videos', ...safeGet('videos') },
             { name: 'Messages', ...safeGet('messages') },
-            { name: 'Attendance', ...safeGet('attendance') }
+
         ];
     }, [rawComparison]);
 
@@ -193,7 +191,29 @@ const useAnalysisData = (startDate, endDate) => {
         });
     }, [rawMeetings]);
 
-    return { cardsData, comparisonData, dailyActivityData, groupsData, meetingsData, loading };
+    const videosData = useMemo(() => {
+        if (!rawVideos || rawVideos.length === 0) return [];
+        return rawVideos.map(video => {
+            const date = new Date(video.created_at);
+            return {
+                id: video.id,
+                title: video.title,
+                group: video.group_name,
+                date: video.created_at
+                    ? date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                    : '-',
+                posterUrl: video.poster_url || video.thumbnail_url || video.thumbnail || video.cover_url || null,
+                duration: video.duration_seconds || 0,
+                commentCount: video.commentCount || 0,
+                likeCount: video.likeCount || 0,
+                viewerCount: video.viewerCount || 0,
+                avgProgressPercent: video.avgProgressPercent || 0,
+                completionRate: video.completionRate || 0
+            };
+        });
+    }, [rawVideos]);
+
+    return { cardsData, comparisonData, dailyActivityData, groupsData, meetingsData, videosData, loading };
 };
 
 export default useAnalysisData;
