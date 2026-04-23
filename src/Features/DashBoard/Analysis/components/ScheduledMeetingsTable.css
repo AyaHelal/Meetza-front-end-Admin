@@ -1,0 +1,153 @@
+.scheduled-meetings-container {
+    padding: 0 1.5rem 0 1.5rem;
+}
+
+.scheduled-meetings-title {
+    color: #010101;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.scheduled-meetings-card {
+    background: linear-gradient(45deg, rgba(0, 220, 133, 0.2) 0%, rgba(255, 255, 255, 1) 50%);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.scheduled-meetings-header-wrapper {
+    z-index: 10;
+    position: relative;
+    background: transparent !important;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scheduled-meetings-header-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.scheduled-meetings-table-wrapper {
+    max-height: 410px;
+    overflow-y: auto;
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+    margin-top: -1px;
+    border-left: 1px solid #00DC85;
+    border-right: 1px solid #00DC85;
+    border-bottom: 1px solid #00DC85;
+    border-radius: 0 0 20px 20px;
+}
+
+.scheduled-meetings-table-wrapper::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari/Webkit */
+}
+
+.scheduled-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    min-width: 900px;
+}
+
+.scheduled-table th {
+    background-color: transparent;
+    color: #888888;
+    font-weight: 600;
+    font-size: 0.96rem;
+    height: 60px;
+    padding: 0 1rem;
+    border: none !important;
+    box-shadow: inset 0 -1px 0 #00DC85;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.scheduled-table th .sort-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.scheduled-table td {
+    height: 70px;
+    padding: 0 1rem;
+    border-bottom: 1px solid #00DC85 !important;
+    border-right: 1px solid #00DC85;
+    text-align: center;
+    color: #010101;
+    font-weight: 700;
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+
+/* Thicker outer border for the end of the table */
+.scheduled-table tbody tr:last-child td {
+    border-bottom: 2px solid #00DC85;
+}
+
+/* Ensure the top-most td in the body has no border-top or handled by the header's shadow */
+.scheduled-table tbody tr:first-child td {
+    border-top: none;
+}
+
+
+/* Specific styling for the last column to not have the same bold font if it contains badges */
+.scheduled-table td.features-column {
+    font-weight: normal;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-scheduled-green {
+    background-color: #E6FBF3;
+    color: #010101;
+}
+
+.status-completed-blue {
+    background-color: #E6F0FD;
+    color: #010101;
+}
+
+.status-cancelled-red {
+    background-color: #FDE6E6;
+    color: #010101;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.dot-green {
+    background-color: rgba(0, 220, 133, 1);
+}
+
+.dot-blue {
+    background-color: #0076EA;
+}
+
+.dot-red {
+    background-color: #EA0000;
+}
+
+/* Cleaned up old redundant rules */
+.scheduled-table td.features-column {
+    font-weight: normal;
+}
