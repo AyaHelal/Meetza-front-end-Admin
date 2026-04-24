@@ -251,16 +251,20 @@ export function useVideoDisplay(currentUserProp) {
             if (hasPosterFile) formData.append('poster_file', editFormData.poster_file);
             const newPosterUrl = await updateVideoApi(videoId, formData);
             toast.success('Video updated successfully');
+            
+            // Add cache buster to force UI update if poster changed
+            const finalPosterUrl = newPosterUrl ? (newPosterUrl.includes('?') ? `${newPosterUrl}&t=${Date.now()}` : `${newPosterUrl}?t=${Date.now()}`) : null;
+
             setVideos((prev) =>
                 prev.map((v) =>
                     v._id === videoId || v.id === videoId
-                        ? { ...v, title: editFormData.title.trim(), ...(newPosterUrl && { poster_url: newPosterUrl }) }
+                        ? { ...v, title: editFormData.title.trim(), ...(finalPosterUrl && { poster_url: finalPosterUrl }) }
                         : v
                 )
             );
             setCurrentVideo((prev) => {
                 if (!prev || (prev._id !== videoId && prev.id !== videoId)) return prev;
-                return { ...prev, title: editFormData.title.trim(), ...(newPosterUrl && { poster_url: newPosterUrl }) };
+                return { ...prev, title: editFormData.title.trim(), ...(finalPosterUrl && { poster_url: finalPosterUrl }) };
             });
             setShowEditModal(false);
         } catch (err) {
