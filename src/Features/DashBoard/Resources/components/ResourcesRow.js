@@ -37,19 +37,20 @@ export const ResourcesRow = ({ resource, onDelete, contentId }) => {
                 <td className="px-3">{isLink ? "Link" : file_type}</td>
                 <td className="px-4">{file_size}</td>
                 <td className="px-5">
-                {new Date(created_at).toLocaleString(
-                    "en-EG",
-                    {
-                    timeZone: "Africa/Cairo",
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                    hour12: true,
-                    }
-                )}
+                {(() => {
+                    const date = new Date(created_at);
+                    date.setHours(date.getHours() + 1);
+                    return date.toLocaleString("en-EG", {
+                        timeZone: "Africa/Cairo",
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: true,
+                    });
+                })()}
                 </td>
 
 

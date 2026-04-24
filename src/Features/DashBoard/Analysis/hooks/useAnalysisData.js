@@ -47,7 +47,6 @@ const useAnalysisData = (startDate, endDate) => {
                 const response = await api.get('/reports/analytics', { params });
                 const responseData = response.data?.data || response.data;
                 
-                console.log("Analysis API Response:", responseData);
 
                 const newSummary = responseData?.summary || responseData;
                 const newComparison = responseData?.comparison || null;
@@ -56,7 +55,6 @@ const useAnalysisData = (startDate, endDate) => {
                 const newMeetings = responseData?.meetings || [];
                 const newVideos = responseData?.videos || [];
 
-                console.log("Extracted Videos:", newVideos);
 
                 setSummary(newSummary);
                 setRawComparison(newComparison);

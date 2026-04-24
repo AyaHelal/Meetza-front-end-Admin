@@ -22,8 +22,11 @@ export const GroupRowCard = ({
   const selectedContent = contents.find((c) => c.id === group.group_content_id);
   const groupContents = selectedContent ? [selectedContent] : contents.filter((c) => c.group_id === group.id);
   const contentNames = groupContents.map((c) => c.content_name).join(", ") || "—";
-  const name = group.name || group.group_name;
-  const adminName = getAdminName(group.admin_id, group.admin_name);
+  const name = group.group_name || group.name;
+  const displayAdmins =
+    group.admins && group.admins.length > 0
+      ? group.admins.map((a) => a.name || a.email || "N/A").join(", ")
+      : getAdminName(group.admin_id, group.admin_name);
 
   return (
     <div className="user-card group-row-card">
@@ -46,7 +49,7 @@ export const GroupRowCard = ({
         </div>
         <div className="user-card-meta">
           <span className="user-card-label">Admin</span>
-          <span className="user-card-value">{adminName || "—"}</span>
+          <span className="user-card-value">{displayAdmins || "—"}</span>
         </div>
         <div className="user-card-meta">
           <span className="user-card-label">Group Content</span>
