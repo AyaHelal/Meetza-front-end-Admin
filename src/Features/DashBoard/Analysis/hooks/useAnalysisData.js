@@ -37,7 +37,7 @@ const useAnalysisData = (startDate, endDate) => {
             const hasCache = !!summary;
             try {
                 if (!hasCache) setLoading(true);
-                
+
                 const params = {};
                 if (startDate && endDate) {
                     params.startDate = startDate;
@@ -46,7 +46,7 @@ const useAnalysisData = (startDate, endDate) => {
 
                 const response = await api.get('/reports/analytics', { params });
                 const responseData = response.data?.data || response.data;
-                
+
 
                 const newSummary = responseData?.summary || responseData;
                 const newComparison = responseData?.comparison || null;
@@ -83,27 +83,87 @@ const useAnalysisData = (startDate, endDate) => {
 
     const cardsData = useMemo(() => {
         if (!summary) return [];
+
+        const getVal = (item) => {
+            if (typeof item === 'object' && item !== null) {
+                return item.numbers ?? 0;
+            }
+            return item ?? 0;
+        };
+
+        const getPhotos = (item) => {
+            if (typeof item === 'object' && item !== null && Array.isArray(item.photos)) {
+                return item.photos.filter(p => p && p.trim() !== '');
+            }
+            return [];
+        };
+
         return [
-            { title: "Total Groups", value: `${summary.totalGroups ?? 0} Groups`, change: "+2.45%", iconType: "UsersFour", showAvatars: true },
-            { 
-                title: "Total Members", 
-                value: `${summary.totalMembers ?? 0} Members`, 
-                change: "+2.45%", 
-                iconType: "ChartLineUp", 
+            {
+                title: "Total Groups",
+                value: `${getVal(summary.totalGroups)} Groups`,
+                change: null,
+                iconType: "UsersFour",
                 showAvatars: true,
+                avatars: getPhotos(summary.totalGroups)
+            },
+            {
+                title: "Total Members",
+                value: `${getVal(summary.totalMembers)} Members`,
+                change: null,
+                iconType: "ChartLineUp",
+                showAvatars: true,
+                avatars: getPhotos(summary.totalMembers),
                 sparkline: [
-                    { value: 10 }, { value: 20 }, { value: 15 }, { value: 30 }, 
-                    { value: 25 }, { value: 40 }, { value: 35 }, { value: 50 }, 
+                    { value: 10 }, { value: 20 }, { value: 15 }, { value: 30 },
+                    { value: 25 }, { value: 40 }, { value: 35 }, { value: 50 },
                     { value: 45 }, { value: 65 }, { value: 60 }, { value: 95 }
                 ],
                 sparklineColor: "#00DC85",
                 showFill: true
             },
-            { title: "Total Meetings", value: `${summary.totalMeetings ?? 0} Meetings`, change: "+2.45%", iconType: "Headset", showAvatars: true },
-            { title: "Total Videos", value: `${summary.totalVideos ?? 0} Videos`, change: "+2.45%", iconType: "Progress", showAvatars: true },
-            { title: "Total Messages", value: `${summary.totalMessages ?? 0} Messages`, change: "+2.45%", iconType: "Chats", showAvatars: false },
-            { title: "Average Meeting Time", value: `${summary.avgMeetingDuration ?? 0} Mins`, change: null, iconType: "CalendarCheck", showAvatars: false },
-
+            {
+                title: "Total Meetings",
+                value: `${getVal(summary.totalMeetings)} Meetings`,
+                change: null,
+                iconType: "Headset",
+                showAvatars: true,
+                avatars: getPhotos(summary.totalMeetings)
+            },
+            {
+                title: "Total Videos",
+                value: `${getVal(summary.totalVideos)} Videos`,
+                change: null,
+                iconType: "Progress",
+                showAvatars: true,
+                avatars: getPhotos(summary.totalVideos)
+            },
+            {
+                title: "Total Messages",
+                value: `${getVal(summary.totalMessages)} Messages`,
+                change: null,
+                iconType: "Chats",
+                showAvatars: false
+            },
+            {
+                title: "Average Meeting Time",
+                value: `${getVal(summary.avgMeetingDuration)} Mins`,
+                change: null,
+                iconType: "CalendarCheck",
+                showAvatars: false
+            },
+            {
+                title: "Avg Meeting attendance",
+                value: `${getVal(summary.avgMeetingAttendance)}`,
+                change: null,
+                iconType: "WaveSine",
+                showAvatars: false,
+                sparkline: [
+                    { value: 30 }, { value: 40 }, { value: 35 }, { value: 50 },
+                    { value: 49 }, { value: 60 }, { value: 70 }, { value: 91 }
+                ],
+                showFill: true
+            },
         ];
     }, [summary]);
 
@@ -119,7 +179,7 @@ const useAnalysisData = (startDate, endDate) => {
             { name: 'Meetings', ...safeGet('meetings') },
             { name: 'Videos', ...safeGet('videos') },
             { name: 'Messages', ...safeGet('messages') },
-
+            { name: 'Attendance', ...safeGet('meetingAttendance') },
         ];
     }, [rawComparison]);
 
@@ -183,8 +243,10 @@ const useAnalysisData = (startDate, endDate) => {
                 duration: `${meeting.duration ?? 0} mins`,
                 status: meeting.status,
                 isWeekly: meeting.is_weekly,
-                isRecorded: meeting.recording === true || meeting.recording === 1 || meeting.recording === '1' || String(meeting.recording).trim() === '1' || meeting.recording === 'Recording' || 
-                           meeting.record_meeting === true || meeting.record_meeting === 1 || meeting.record_meeting === '1' || meeting.recordMeeting === 'Recording'
+                isRecorded: meeting.recording === true || meeting.recording === 1 || meeting.recording === '1' || String(meeting.recording).trim() === '1' || meeting.recording === 'Recording' ||
+                    meeting.record_meeting === true || meeting.record_meeting === 1 || meeting.record_meeting === '1' || meeting.recordMeeting === 'Recording',
+                attendeeCount: meeting.attendeeCount ?? 0,
+                posterUrl: meeting.poster_url || null
             };
         });
     }, [rawMeetings]);

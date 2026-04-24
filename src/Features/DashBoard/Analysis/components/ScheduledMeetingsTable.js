@@ -19,11 +19,12 @@ const ScheduledMeetingsTable = ({ meetingsData = [] }) => {
                 <div className="scheduled-meetings-header-wrapper" ref={headerRef}>
                     <table className="scheduled-table mb-0">
                         <colgroup>
-                            <col style={{ width: '20%' }} />
+                            <col style={{ width: '22%' }} />
+                            <col style={{ width: '13%' }} />
+                            <col style={{ width: '12%' }} />
+                            <col style={{ width: '11%' }} />
+                            <col style={{ width: '12%' }} />
                             <col style={{ width: '15%' }} />
-                            <col style={{ width: '15%' }} />
-                            <col style={{ width: '15%' }} />
-                            <col style={{ width: '20%' }} />
                             <col style={{ width: '15%' }} />
                         </colgroup>
                         <thead>
@@ -34,6 +35,7 @@ const ScheduledMeetingsTable = ({ meetingsData = [] }) => {
                                 <th>Group</th>
                                 <th>Start Date</th>
                                 <th>Duration</th>
+                                <th>Attendees</th>
                                 <th>
                                     Status <ArrowDown size={20} className="sort-icon" />
                                 </th>
@@ -46,17 +48,18 @@ const ScheduledMeetingsTable = ({ meetingsData = [] }) => {
                 <div className="scheduled-meetings-table-wrapper" onScroll={handleScroll}>
                     <table className="scheduled-table">
                         <colgroup>
-                            <col style={{ width: '20%' }} />
+                            <col style={{ width: '22%' }} />
+                            <col style={{ width: '13%' }} />
+                            <col style={{ width: '12%' }} />
+                            <col style={{ width: '11%' }} />
+                            <col style={{ width: '12%' }} />
                             <col style={{ width: '15%' }} />
-                            <col style={{ width: '15%' }} />
-                            <col style={{ width: '15%' }} />
-                            <col style={{ width: '20%' }} />
                             <col style={{ width: '15%' }} />
                         </colgroup>
                         <tbody>
                             {meetingsData.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="text-center py-4 text-muted">No scheduled meetings found</td>
+                                    <td colSpan={7} className="text-center py-4 text-muted">No scheduled meetings found</td>
                                 </tr>
                             ) : (
                                 meetingsData.map((row, index) => (
@@ -69,6 +72,11 @@ const ScheduledMeetingsTable = ({ meetingsData = [] }) => {
                                         <td>{row.group}</td>
                                         <td>{row.startDate}</td>
                                         <td>{row.duration}</td>
+                                        <td>
+                                            <span className="fw-semibold text-dark">
+                                                {row.attendeeCount ?? 0}
+                                            </span>
+                                        </td>
                                         <td>
                                             {(() => {
                                                 const status = row.status?.toLowerCase();
@@ -93,12 +101,12 @@ const ScheduledMeetingsTable = ({ meetingsData = [] }) => {
                                         </td>
                                         <td className="features-column">
                                             <div className="d-flex flex-wrap justify-content-center gap-1">
-                                                {row.isWeekly && (
+                                                {!!row.isWeekly && (
                                                     <span className="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-2" style={{ fontSize: '0.75rem' }}>
                                                         Weekly
                                                     </span>
                                                 )}
-                                                {row.isRecorded && (
+                                                {!!row.isRecorded && (
                                                     <span className="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-2" style={{ fontSize: '0.75rem' }}>
                                                         Recording
                                                     </span>
