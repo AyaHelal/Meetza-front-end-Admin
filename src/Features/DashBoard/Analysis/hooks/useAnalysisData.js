@@ -29,6 +29,10 @@ const useAnalysisData = (startDate, endDate) => {
         const cached = localStorage.getItem(`${cacheKey}_videos`);
         return cached ? JSON.parse(cached) : [];
     });
+    const [rawReviews, setRawReviews] = useState(() => {
+        const cached = localStorage.getItem(`${cacheKey}_reviews`);
+        return cached ? JSON.parse(cached) : [];
+    });
 
     const [loading, setLoading] = useState(!summary);
 
@@ -54,6 +58,7 @@ const useAnalysisData = (startDate, endDate) => {
                 const newGroups = responseData?.groups || [];
                 const newMeetings = responseData?.meetings || [];
                 const newVideos = responseData?.videos || [];
+                const newReviews = responseData?.reviews || [];
 
 
                 setSummary(newSummary);
@@ -62,6 +67,7 @@ const useAnalysisData = (startDate, endDate) => {
                 setRawGroups(newGroups);
                 setRawMeetings(newMeetings);
                 setRawVideos(newVideos);
+                setRawReviews(newReviews);
 
                 // Save to localStorage
                 localStorage.setItem(`${cacheKey}_summary`, JSON.stringify(newSummary));
@@ -70,6 +76,7 @@ const useAnalysisData = (startDate, endDate) => {
                 localStorage.setItem(`${cacheKey}_groups`, JSON.stringify(newGroups));
                 localStorage.setItem(`${cacheKey}_meetings`, JSON.stringify(newMeetings));
                 localStorage.setItem(`${cacheKey}_videos`, JSON.stringify(newVideos));
+                localStorage.setItem(`${cacheKey}_reviews`, JSON.stringify(newReviews));
 
             } catch (error) {
                 console.error("Failed to load analytics data:", error);
@@ -273,7 +280,27 @@ const useAnalysisData = (startDate, endDate) => {
         });
     }, [rawVideos]);
 
-    return { cardsData, comparisonData, dailyActivityData, groupsData, meetingsData, videosData, loading };
+    const reviewsData = useMemo(() => {
+        if (!rawReviews || rawReviews.length === 0) return [];
+        return rawReviews.map(review => {
+            const date = new Date(review.created_at);
+            return {
+                id: review.id,
+                comment: review.comment_text,
+                reviewerName: review.reviewer_name,
+                reviewerPhoto: review.reviewer_photo,
+                videoTitle: review.video_title,
+                videoPoster: review.video_poster,
+                groupName: review.group_name,
+                date: review.created_at
+                    ? date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                    : '-',
+                rawDate: review.created_at
+            };
+        });
+    }, [rawReviews]);
+
+    return { cardsData, comparisonData, dailyActivityData, groupsData, meetingsData, videosData, reviewsData, loading };
 };
 
 export default useAnalysisData;
