@@ -4,9 +4,9 @@ import './RecentVideos.css';
 
 const RecentVideos = ({ videosData = [] }) => {
     return (
-        <div className="recent-videos-section mt-4 mb-4">
+        <div className="recent-videos-section mt-4 mb-2">
             <h4 className="recent-videos-title mb-3 px-4">Recent Videos</h4>
-            
+
             <div className="recent-videos-grid px-4">
                 {videosData.length === 0 ? (
                     <div className="text-muted p-4">No recent videos found</div>
@@ -14,20 +14,20 @@ const RecentVideos = ({ videosData = [] }) => {
                     videosData.map((video) => (
                         <div className="video-analytics-card" key={video.id}>
                             <div className="video-thumbnail-container">
-                                <img 
-                                    src={video.posterUrl || "/assets/video-standard.png"} 
-                                    alt={video.title} 
-                                    className="video-thumbnail" 
+                                <img
+                                    src={video.posterUrl || "/assets/video-standard.png"}
+                                    alt={video.title}
+                                    className="video-thumbnail"
                                 />
                                 <div className="video-date-badge">
                                     {video.date}
                                 </div>
                             </div>
-                            
+
                             <div className="video-info-content">
-                                <h5 className="video-card-title">{video.title}</h5>
-                                <p className="video-card-group">{video.group}</p>
-                                
+                                <h5 className="video-card-title">Video: {video.title}</h5>
+                                <p className="video-card-group">Group: {video.group}</p>
+
                                 <div className="watch-progress-container">
                                     <div className="watch-progress-header">
                                         <div className="play-icon-wrapper">
@@ -35,15 +35,15 @@ const RecentVideos = ({ videosData = [] }) => {
                                         </div>
                                         <span className="progress-label">Avg watch progress</span>
                                     </div>
-                                    
+
                                     <div className="progress-bar-wrapper">
-                                        <div 
-                                            className="progress-bar-fill" 
+                                        <div
+                                            className="progress-bar-fill"
                                             style={{ width: `${video.avgProgressPercent}%` }}
                                         ></div>
                                     </div>
                                 </div>
-                                
+
                                 <div className="video-card-footer">
                                     <span className="completion-text">{video.completionRate}% Completion</span>
                                     <div className="viewer-count">

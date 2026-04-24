@@ -24,7 +24,7 @@ const ActivityComparison = ({ data }) => {
     { name: 'Meetings', current: 49, previous: 35 },
     { name: 'Videos', current: 27, previous: 35 },
     { name: 'Messages', current: 27, previous: 35 },
-
+    { name: 'Attendance', current: 45, previous: 30 },
   ];
 
   const chartData = data || defaultData;

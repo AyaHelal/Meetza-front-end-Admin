@@ -62,10 +62,39 @@ const OverallNumbers = ({ cardsData }) => {
                         </div>
 
                         <div className="d-flex align-items-center mt-2">
-                            {card.showAvatars && (
+                            {card.showAvatars && card.avatars && card.avatars.length > 0 && (
                                 <div className="analysis-card-avatars">
-                                    <img src="https://i.pravatar.cc/100?img=1" alt="avatar" className="analysis-card-avatar" />
-                                    <img src="https://i.pravatar.cc/100?img=2" alt="avatar" className="analysis-card-avatar" />
+                                    {card.avatars.slice(0, 3).map((avatar, i) => (
+                                        <img 
+                                            key={i} 
+                                            src={avatar || "/assets/default-avatar.png"} 
+                                            alt="avatar" 
+                                            className="analysis-card-avatar"
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.src = "/assets/default-avatar.png";
+                                            }}
+                                        />
+                                    ))}
+                                    {card.avatars.length > 3 && (
+                                        <div className="analysis-card-avatar-more" style={{ 
+                                            width: '24px', 
+                                            height: '24px', 
+                                            borderRadius: '50%', 
+                                            border: '2px solid white', 
+                                            backgroundColor: '#f1f5f9', 
+                                            fontSize: '10px', 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            justifyContent: 'center',
+                                            marginLeft: '-8px',
+                                            color: '#64748b',
+                                            fontWeight: 'bold',
+                                            zIndex: 1
+                                        }}>
+                                            +{card.avatars.length - 3}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                             <span className="analysis-card-value">{card.value}</span>
