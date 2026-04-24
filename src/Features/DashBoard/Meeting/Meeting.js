@@ -75,6 +75,7 @@ export default function Meeting() {
         setDeletingMeeting(true);
         try {
             await deleteMeeting(meetingToDelete.id);
+            smartToast.success("Meeting deleted successfully");
             setShowDeleteModal(false);
             setMeetingToDelete(null);
             await fetchMeetings();

@@ -213,7 +213,9 @@ export async function updateVideoApi(videoId, formData) {
     const response = await api.post(`/video/${videoId}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
     });
-    return response?.data?.data?.poster_url;
+    // The backend mapVideoDetails returns { video: { ... }, admin: { ... }, ... }
+    // while mapVideoRow returns { ...video, admin: { ... }, ... }
+    return response?.data?.data?.video?.poster_url || response?.data?.data?.poster_url;
 }
 
 export async function deleteVideoApi(videoId) {

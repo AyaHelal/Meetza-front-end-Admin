@@ -308,6 +308,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                 <div className="position-relative rounded-3">
                                     <video
                                         src={buildFileUrl(currentVideo.video_url) || undefined}
+                                        poster={buildFileUrl(currentVideo.poster_url) || undefined}
                                         controls
                                         className="w-100 px-3 video-player-el"
                                     />
