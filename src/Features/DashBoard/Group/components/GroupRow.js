@@ -52,7 +52,9 @@ export const GroupRow = ({
         </div>
       </td>
       <td className="fw-semibold" style={{ color: "#888888", fontSize: "16px" }}>
-        {getAdminName(group.admin_id, group.admin_name)}
+        {group.admins && group.admins.length > 0
+          ? group.admins.map((a) => a.name || a.email || "N/A").join(", ")
+          : getAdminName(group.admin_id, group.admin_name)}
       </td>
       <td className="fw-semibold" style={{ color: "#888888", fontSize: "16px" }}>
         {contentNames}

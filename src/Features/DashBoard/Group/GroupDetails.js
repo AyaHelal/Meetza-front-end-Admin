@@ -172,6 +172,64 @@ const GroupDetails = ({ group, onClose }) => {
                                     </div>
                                 </div>
                             )}
+
+                            {/* Admins Section */}
+                            <div className="col-12 mt-4">
+                                <h6 className="fw-bold mb-3" style={{ color: "#010101", fontSize: "18px" }}>
+                                    Group Administrators
+                                </h6>
+                                <div className="row g-3">
+                                    {group.admins && group.admins.length > 0 ? (
+                                        group.admins.map((admin) => (
+                                            <div key={admin.user_id} className="col-md-6">
+                                                <div
+                                                    className="p-3 rounded-3 d-flex align-items-center gap-3"
+                                                    style={{ backgroundColor: "#F9F9F9", border: "1px solid #E9ECEF" }}
+                                                >
+                                                    <div
+                                                        className="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-secondary-subtle"
+                                                        style={{ width: 48, height: 48 }}
+                                                    >
+                                                        {admin.user_photo ? (
+                                                            <img
+                                                                src={admin.user_photo}
+                                                                alt={admin.name}
+                                                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                                            />
+                                                        ) : (
+                                                            <UsersThree size={24} weight="bold" className="text-secondary" />
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-grow-1">
+                                                        <div className="d-flex align-items-center justify-content-between">
+                                                            <p className="mb-0 fw-bold" style={{ fontSize: "14px", color: "#010101" }}>
+                                                                {admin.name || "N/A"}
+                                                            </p>
+                                                            <span
+                                                                className="badge rounded-pill"
+                                                                style={{
+                                                                    fontSize: "10px",
+                                                                    backgroundColor: admin.role === "OWNER" ? "#0076EA" : "#888888",
+                                                                    color: "white"
+                                                                }}
+                                                            >
+                                                                {admin.role}
+                                                            </span>
+                                                        </div>
+                                                        <p className="mb-0 text-muted" style={{ fontSize: "12px" }}>
+                                                            {admin.email}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="col-12">
+                                            <p className="text-muted italic">No administrators listed.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
