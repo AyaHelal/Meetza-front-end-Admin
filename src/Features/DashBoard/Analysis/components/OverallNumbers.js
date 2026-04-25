@@ -31,8 +31,8 @@ const OverallNumbers = ({ cardsData }) => {
             case "Headset": return <Headset size={size} weight="regular" color={gradientColor} />;
             case "Progress":
                 return (
-                    <div style={{ width: '80px', height: '12px', background: '#f1f5f9', borderRadius: '10px', marginTop: '10px' }}>
-                        <div style={{ width: '60%', height: '100%', background: 'linear-gradient(90deg, #00DC85 0%, #0076EA 100%)', borderRadius: '10px' }}></div>
+                    <div style={{ width: '80px', height: '12px', background: 'var(--divider-color)', borderRadius: '10px', marginTop: '10px' }}>
+                        <div style={{ width: '60%', height: '100%', background: 'var(--primary-gradient)', borderRadius: '10px' }}></div>
                     </div>
                 );
             default: return null;
@@ -50,7 +50,7 @@ const OverallNumbers = ({ cardsData }) => {
                 </defs>
             </svg>
 
-            <h5 className="fw-semibold mb-3">Overall Numbers</h5>
+            <h5 className="fw-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Overall Numbers</h5>
             <div className="analysis-cards-container">
                 {cardsData.map((card, index) => (
                     <div key={index} className="analysis-card">
@@ -81,14 +81,14 @@ const OverallNumbers = ({ cardsData }) => {
                                             width: '24px', 
                                             height: '24px', 
                                             borderRadius: '50%', 
-                                            border: '2px solid white', 
-                                            backgroundColor: '#f1f5f9', 
+                                            border: '2px solid var(--card-bg)', 
+                                            backgroundColor: 'var(--bg-light)', 
                                             fontSize: '10px', 
                                             display: 'flex', 
                                             alignItems: 'center', 
                                             justifyContent: 'center',
                                             marginLeft: '-8px',
-                                            color: '#64748b',
+                                            color: 'var(--text-secondary)',
                                             fontWeight: 'bold',
                                             zIndex: 1
                                         }}>

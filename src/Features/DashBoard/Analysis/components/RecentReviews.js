@@ -27,7 +27,7 @@ const RecentReviews = ({ reviewsData }) => {
 
     return (
         <div className="px-4  mb-5">
-            <h5 className="fw-semibold mb-4" style={{ color: '#010101', fontSize: '1.5rem' }}>Recent Reviews</h5>
+            <h5 className="fw-semibold mb-4 recent-reviews-title" style={{ fontSize: '1.5rem' }}>Recent Reviews</h5>
             <div className="reviews-list">
                 {reviewsData.map((review) => (
                     <div key={review.id} className="review-card">

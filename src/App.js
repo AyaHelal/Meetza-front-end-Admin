@@ -13,6 +13,7 @@ import { useState, useEffect, useRef } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { extractUserFromToken } from "./utils/token";
 import { BrandingProvider } from "./context/BrandingContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 // Protected route: only Super_Admin and Administrator (role from token via useAuth)
 function ProtectedRoute({ children }) {
@@ -134,9 +135,11 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <BrandingProvider>
-          <AnimatedRoutes />
-        </BrandingProvider>
+        <ThemeProvider>
+          <BrandingProvider>
+            <AnimatedRoutes />
+          </BrandingProvider>
+        </ThemeProvider>
       </AuthProvider>
     </Router>
   );

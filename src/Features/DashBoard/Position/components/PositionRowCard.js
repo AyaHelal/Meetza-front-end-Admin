@@ -10,9 +10,18 @@ export const PositionRowCard = ({ user, position, onEdit, onDelete }) => {
     <div className="user-card position-row-card">
       <div className="user-card-body">
         <div className="user-card-header">
-          <div className="user-card-avatar user-card-avatar-placeholder">
-            <UserCheck size={28} />
-          </div>
+          {(displayUser?.user_photo || displayUser?.avatarUrl || displayUser?.avatar_url) ? (
+            <img 
+              src={displayUser.user_photo || displayUser.avatarUrl || displayUser.avatar_url} 
+              alt={`${displayUser.name} avatar`}
+              className="user-card-avatar"
+              style={{ objectFit: "cover" }}
+            />
+          ) : (
+            <div className="user-card-avatar user-card-avatar-placeholder">
+              <UserCheck size={28} />
+            </div>
+          )}
           <div className="user-card-title-wrap">
             <span className="user-card-name">{positionTitle}</span>
             {isSuperAdmin && displayUser?.name && (

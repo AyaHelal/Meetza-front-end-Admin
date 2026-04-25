@@ -1,10 +1,11 @@
 .search-input::placeholder {
-  color: #888888 !important;
+  color: var(--text-muted) !important;
   opacity: 1;
 }
 .search-input {
-  color: #000000 !important;
-  background-color: #FFFFFF !important;
+  color: var(--text-primary) !important;
+  background-color: var(--surface-color) !important;
+  border-color: var(--border-color) !important;
 }
 
 /* SearchBar wrapper: responsive width (used by Position, User, etc.) */
@@ -16,10 +17,12 @@
 /* Create Membership inline form: base + responsive */
 .create-membership-form {
   border-radius: 12px;
+  background-color: var(--surface-color);
+  color: var(--text-primary);
 }
 
 .create-membership-form__label {
-  color: #010101;
+  color: var(--text-primary);
   font-size: 16px;
 }
 

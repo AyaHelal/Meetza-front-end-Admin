@@ -53,6 +53,7 @@ export const useGroupMembershipData = (currentUser = null) => {
           id: group.group_id,
           group_id: group.group_id,
           group_name: group.group_name || null,
+          group_photo: group.group_photo || null, // Add group photo
           members: (group.members || []).map((member) => {
             let membershipId = member.id || member.membership_id || (member.membership && member.membership.id);
             if (!membershipId) {
@@ -64,7 +65,7 @@ export const useGroupMembershipData = (currentUser = null) => {
               member_id: String(member.member_id || ""),
               member_name: member.member_name || null,
               member_email: member.member_email || null,
-              member_photo: member.member_photo || null,
+              member_photo: member.member_photo || null, // Add member photo
               composite_id: membershipId || `${group.group_id}_${member.member_id}`,
             };
           }),
@@ -79,6 +80,7 @@ export const useGroupMembershipData = (currentUser = null) => {
               id: groupId,
               group_id: groupId,
               group_name: m.group?.name || m.group?.group_name || m.group_name || null,
+              group_photo: m.group?.photo || m.group_photo || null, // Add group photo
               members: [],
             };
           }
@@ -87,7 +89,7 @@ export const useGroupMembershipData = (currentUser = null) => {
             member_id: String(m.member_id || m.memberId || m.user_id || m.userId || ""),
             member_name: m.member?.name || m.user?.name || m.member_name || null,
             member_email: m.member?.email || m.user?.email || m.member_email || null,
-            member_photo: m.member?.photo || m.user?.photo || m.member_photo || null,
+            member_photo: m.member?.photo || m.user?.photo || m.member_photo || null, // Add member photo
             composite_id: m.id || `${groupId}_${m.member_id || m.memberId || m.user_id || m.userId}`,
           });
         });
@@ -395,17 +397,17 @@ export const useGroupMembershipData = (currentUser = null) => {
   // 🔍 Search memberships
   const searchMemberships = async (query) => {
     try {
-      // Search by group name or ID
+      // Search by group name or ID - get full data to include photos
       const res = await api.get(`/group-membership`, {
         params: { search: query },
       });
       const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
 
-      // Handle nested structure like in fetchData
+      // Handle nested structure like in fetchData but include all photo data
       let groupedMemberships = [];
 
       if (payload.length > 0 && payload[0].group_id && payload[0].members) {
-        // Filter by group name
+        // Filter by group name but include full data
         groupedMemberships = payload
           .filter((group) =>
             group.group_name?.toLowerCase().includes(query.toLowerCase()) ||
@@ -415,16 +417,18 @@ export const useGroupMembershipData = (currentUser = null) => {
             id: group.group_id,
             group_id: group.group_id,
             group_name: group.group_name || null,
+            group_photo: group.group_photo || null, // Add group photo
             members: (group.members || []).map((member) => ({
+              id: member.id || member.membership_id || null,
               member_id: String(member.member_id || ""),
               member_name: member.member_name || null,
               member_email: member.member_email || null,
-              member_photo: member.member_photo || null,
-              composite_id: `${group.group_id}_${member.member_id}`,
+              member_photo: member.member_photo || null, // Add member photo
+              composite_id: member.id || `${group.group_id}_${member.member_id}`,
             })),
           }));
       } else {
-        // Legacy flat structure - group by group_id
+        // Legacy flat structure - group by group_id with full data
         const groupMap = {};
         payload.forEach((m) => {
           const groupId = m.group_id || m.groupId;
@@ -441,15 +445,17 @@ export const useGroupMembershipData = (currentUser = null) => {
               id: groupId,
               group_id: groupId,
               group_name: groupName,
+              group_photo: m.group?.photo || m.group_photo || null, // Add group photo
               members: [],
             };
           }
 
           groupMap[groupId].members.push({
+            id: m.id || m.membership_id || null,
             member_id: String(m.member_id || m.memberId || m.user_id || m.userId || ""),
             member_name: m.member?.name || m.user?.name || m.member_name || null,
             member_email: m.member?.email || m.user?.email || m.member_email || null,
-            member_photo: m.member?.photo || m.user?.photo || m.member_photo || null,
+            member_photo: m.member?.photo || m.user?.photo || m.member_photo || null, // Add member photo
             composite_id: m.id || `${groupId}_${m.member_id || m.memberId || m.user_id || m.userId}`,
           });
         });

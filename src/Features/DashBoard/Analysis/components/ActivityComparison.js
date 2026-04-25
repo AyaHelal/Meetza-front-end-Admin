@@ -44,7 +44,7 @@ const ActivityComparison = ({ data }) => {
                 marginRight: 8
               }}
             />
-            <span style={{ color: '#010101', fontSize: '0.85rem', fontWeight: 600 }}>
+            <span style={{ color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: 600 }}>
               {entry.value === 'current' ? 'Current Period' : 'Previous Period'}
             </span>
           </div>
@@ -56,7 +56,7 @@ const ActivityComparison = ({ data }) => {
   return (
     <div className="activity-comparison-card w-100">
       <div className="d-flex justify-content-between align-items-start">
-        <h5 className="fw-semibold mb-4" style={{ color: '#888888', fontSize: '1.2rem' }}>Activity Comparison</h5>
+        <h4 className="fw-semibold mb-4" style={{ color: 'var(--text-muted)', fontSize: '1.2rem' }}>Activity Comparison</h4>
         <CustomLegend payload={[{ value: 'current', color: '#0076EA' }, { value: 'previous', color: '#00DC85' }]} />
       </div>
       <div style={{ width: '100%', height: 300, minHeight: 300, flex: 1 }}>
@@ -77,13 +77,13 @@ const ActivityComparison = ({ data }) => {
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#010101', fontSize: 12, fontWeight: 500 }}
+              tick={{ fill: 'var(--text-primary)', fontSize: 12, fontWeight: 500 }}
               dy={10}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#010101', fontSize: 12, fontWeight: 500 }}
+              tick={{ fill: 'var(--text-primary)', fontSize: 12, fontWeight: 500 }}
             />
             <Tooltip
               cursor={{ fill: 'transparent' }}

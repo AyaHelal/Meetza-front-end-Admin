@@ -21,6 +21,14 @@ export const PositionRow = ({
         <td className="px-4">
           {position?.user ? (
             <div className="d-flex align-items-center gap-2">
+            {(displayUser.user_photo || displayUser.avatarUrl || displayUser.avatar_url) ? (
+              <img
+                src={displayUser.user_photo || displayUser.avatarUrl || displayUser.avatar_url}
+                alt={`${displayUser.name} avatar`}
+                className="rounded-3"
+                style={{ width: 56, height: 56, objectFit: "cover" }}
+              />
+            ) : (
               <div
                 className="rounded-3 d-flex align-items-center justify-content-center"
                 style={{
@@ -34,6 +42,7 @@ export const PositionRow = ({
               >
                 <UserCheck size={28} />
               </div>
+            )}
               <div>
                 <div style={{ fontSize: 18 }}>{displayUser.name}</div>
               </div>

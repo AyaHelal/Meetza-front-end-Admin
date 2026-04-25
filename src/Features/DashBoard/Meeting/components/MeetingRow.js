@@ -92,7 +92,7 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
     const showInput = isEditing || !meeting;
     const canEdit = currentUser?.role === "Super_Admin" || currentUser?.role === "Administrator";
     const inputStyle = { fontSize: "16px", fontWeight: 500, border: "2px solid #E9ECEF", borderRadius: "8px", padding: "0.5rem", width: "100%" };
-    const textStyle = { fontSize: "16px", fontWeight: 600, padding: "8px 20px", color: "#6C757D", whiteSpace: "nowrap" };
+    const textStyle = { fontSize: "16px", fontWeight: 600, padding: "8px 20px", color: "var(--text-secondary)", whiteSpace: "nowrap" };
 
     // Try to find content in the contents array, but also fallback to meeting.content_name if available
 
@@ -174,9 +174,9 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
                             padding: '4px 8px',
                             fontSize: '12px',
                             fontWeight: '500',
-                            border: '1px solid #dee2e6',
+                            border: '1px solid var(--border-color)',
                             borderRadius: '4px',
-                            background: '#ffffff'
+                            background: 'var(--surface-color)'
                         }}
                         onClick={() => setWeeklyDropdownOpen(weeklyDropdownOpen === meeting?.id ? null : meeting?.id)}
                     >
@@ -205,10 +205,10 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
                             left: '0',
                             right: '0',
                             margin: '4px 0 0',
-                            background: '#ffffff',
-                            border: '1px solid #dee2e6',
+                            background: '#1e293b',
+                            border: '1px solid #374151',
                             borderRadius: '4px',
-                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
                             zIndex: 1000,
                             overflow: 'hidden'
                         }}>
@@ -219,21 +219,21 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
                                     width: '100%',
                                     padding: '8px 12px',
                                     border: 'none',
-                                    background: '#ffffff',
+                                    background: '#1e293b',
                                     cursor: 'pointer',
                                     fontSize: '12px',
                                     fontWeight: '500',
-                                    color: '#495057',
+                                    color: '#f3f4f6',
                                     transition: 'all 0.2s ease'
                                 }}
                                 onClick={() => handleWeeklyStatusChange(meeting?.id, 'active')}
                                 onMouseOver={(e) => {
-                                    e.target.style.background = '#f0fdf4';
-                                    e.target.style.color = '#10b981';
+                                    e.target.style.background = '#0076EA';
+                                    e.target.style.color = 'white';
                                 }}
                                 onMouseOut={(e) => {
-                                    e.target.style.background = '#ffffff';
-                                    e.target.style.color = '#495057';
+                                    e.target.style.background = '#1e293b';
+                                    e.target.style.color = '#f3f4f6';
                                 }}
                             >
                                 <CalendarPlus size={14} weight="fill" />
@@ -246,21 +246,21 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
                                     width: '100%',
                                     padding: '8px 12px',
                                     border: 'none',
-                                    background: '#ffffff',
+                                    background: '#1e293b',
                                     cursor: 'pointer',
                                     fontSize: '12px',
                                     fontWeight: '500',
-                                    color: '#495057',
+                                    color: '#f3f4f6',
                                     transition: 'all 0.2s ease'
                                 }}
                                 onClick={() => handleWeeklyStatusChange(meeting?.id, 'Inactive')}
                                 onMouseOver={(e) => {
-                                    e.target.style.background = '#fef2f2';
-                                    e.target.style.color = '#ef4444';
+                                    e.target.style.background = '#ef4444';
+                                    e.target.style.color = 'white';
                                 }}
                                 onMouseOut={(e) => {
-                                    e.target.style.background = '#ffffff';
-                                    e.target.style.color = '#495057';
+                                    e.target.style.background = '#1e293b';
+                                    e.target.style.color = '#f3f4f6';
                                 }}
                             >
                                 <CalendarX size={14} weight="fill" />

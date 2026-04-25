@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UsersThree, Trash, CaretDown, CaretUp } from "phosphor-react";
+import { UsersThree, Trash, CaretDown, CaretUp, User } from "phosphor-react";
 
 export const GroupMembershipRowCard = ({
   membership,
@@ -17,11 +17,30 @@ export const GroupMembershipRowCard = ({
     <div className="user-card group-membership-row-card">
       <div className="user-card-body">
         <div className="user-card-header">
-          <div className="user-card-avatar user-card-avatar-placeholder">
-            <UsersThree size={28} weight="bold" />
+          <div 
+            className="user-card-avatar user-card-avatar-placeholder d-flex align-items-center justify-content-center overflow-hidden"
+            style={{
+              width: 56,
+              height: 56,
+              background: membership.group_photo ? "transparent" : "linear-gradient(135deg, #0076EA, #00DC85)",
+              color: "white",
+              fontWeight: 600,
+              border: "none",
+              borderRadius: "8px",
+            }}
+          >
+            {membership.group_photo ? (
+              <img
+                src={membership.group_photo}
+                alt={membership.group_name}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+            ) : (
+              <UsersThree size={28} weight="bold" />
+            )}
           </div>
           <div className="user-card-title-wrap">
-            <span className="user-card-name">{groupName}</span>
+            <span className="user-card-name" style={{ color: "black" }}>{groupName}</span>
           </div>
         </div>
         <div className="user-card-meta">
@@ -44,10 +63,50 @@ export const GroupMembershipRowCard = ({
               <span>Email</span>
             </div>
             {members.map((member, index) => (
-              <div key={member.composite_id || index} className="membership-member-row">
-                <div className="membership-member-info">
-                  <span>{getMemberName(member.member_id, member.member_name) || "N/A"}</span>
-                  <span className="text-muted small">{getMemberEmail(member.member_id, member.member_email) || "N/A"}</span>
+              <div key={member.composite_id || index} className="membership-member-row d-flex align-items-center gap-2">
+                {/* Group Photo */}
+                <div
+                  className="d-flex align-items-center justify-content-center overflow-hidden"
+                  style={{
+                    width: 24,
+                    height: 24,
+                    background: membership.group_photo ? "transparent" : "linear-gradient(135deg, #0076EA, #00DC85)",
+                    color: "white",
+                    fontWeight: 600,
+                    fontSize: "10px",
+                    border: "none",
+                    borderRadius: "4px",
+                  }}
+                >
+                  {membership.group_photo ? (
+                    <img
+                      src={membership.group_photo}
+                      alt={membership.group_name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    />
+                  ) : (
+                    <UsersThree size={12} weight="bold" />
+                  )}
+                </div>
+                {/* Member Avatar */}
+                <div
+                  className="rounded-circle d-flex align-items-center justify-content-center overflow-hidden"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    background: member.member_photo 
+                      ? `url(${member.member_photo}) center/cover` 
+                      : "linear-gradient(135deg, #0076EA, #00DC85)",
+                    color: member.member_photo ? "transparent" : "white",
+                    fontWeight: 600,
+                    fontSize: "12px",
+                  }}
+                >
+                  {!member.member_photo && <User size={16} weight="bold" />}
+                </div>
+                <div className="membership-member-info flex-grow-1">
+                  <span style={{ color: "white" }}>{getMemberName(member.member_id, member.member_name) || "N/A"}</span>
+                  <span className="text-muted small d-block">{getMemberEmail(member.member_id, member.member_email) || "N/A"}</span>
                 </div>
                 {isAdmin && (
                   <button

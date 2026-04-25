@@ -28,18 +28,18 @@ export default function AssignGroupAdminModal({
       onClick={onClose}
     >
       <div className="modal-dialog modal-dialog-centered dashboard-form-modal__dialog" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-content rounded-4 border-0" style={{ boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
+        <div className="modal-content rounded-4 border-0" style={{ backgroundColor: "var(--card-bg)", boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
           <div className="modal-header border-0 pb-0">
-            <h5 className="modal-title fw-bold" style={{ fontSize: "22px", color: "#010101" }}>
-              Assign Admin
+            <h5 className="modal-title fw-bold" style={{ fontSize: "22px", color: "var(--text-primary)" }}>
+              Assign Leaders
             </h5>
             <button type="button" className="btn-close" onClick={onClose} aria-label="Close" style={{ fontSize: "14px" }} />
           </div>
 
-          <div className="modal-body pt-3 dashboard-form-modal__body" style={{ maxHeight: "60vh", overflowY: "auto", paddingRight: 10 }}>
+          <div className="modal-body pt-3 dashboard-form-modal__body">
             <form className="dashboard-form-modal__form" onSubmit={(e) => e.preventDefault()}>
               <div className="mb-3">
-                <label className="form-label fw-semibold" style={{ color: "#010101" }}>
+                <label className="form-label fw-semibold" style={{ color: "var(--text-primary)" }}>
                   Group
                 </label>
                 <input
@@ -47,12 +47,12 @@ export default function AssignGroupAdminModal({
                   className="form-control rounded-3"
                   value={groupName}
                   disabled
-                  style={{ border: "2px solid #E9ECEF", padding: "0.75rem", fontSize: "16px" }}
+                  style={{ border: "1px solid var(--border-color)", padding: "0.75rem", fontSize: "16px", backgroundColor: "transparent", color: "var(--text-primary)" }}
                 />
               </div>
 
               <div className="mb-3">
-                <label className="form-label fw-semibold" style={{ color: "#010101" }}>
+                <label className="form-label fw-semibold" style={{ color: "var(--text-primary)" }}>
                   Leaders emails <span style={{ color: "#FF0000" }}>*</span>
                 </label>
                 <textarea
@@ -62,28 +62,24 @@ export default function AssignGroupAdminModal({
                   value={formData.emailsText || ""}
                   onChange={handleChange}
                   placeholder="One per line, or separated by commas"
-                  style={{ border: "2px solid #E9ECEF", padding: "0.75rem", fontSize: "16px", resize: "vertical" }}
+                  style={{ border: "1px solid var(--border-color)", padding: "0.75rem", fontSize: "16px", resize: "vertical", backgroundColor: "transparent", color: "var(--text-primary)" }}
                 />
-                <div className="form-text" style={{ fontSize: "13px" }}>
+                <div className="form-text" style={{ fontSize: "13px", color: "var(--text-muted)" }}>
                   You can paste several Leaders emails at once.
                 </div>
               </div>
 
               <div className="mb-3">
-                <label className="form-label fw-semibold" style={{ color: "#010101" }}>
-                  Role (optional)
+                <label className="form-label fw-semibold" style={{ color: "var(--text-primary)" }}>
+                  Role
                 </label>
-                <div className="dashboard-form-modal__select-wrap">
-                  <Select
-                    options={ROLE_OPTIONS}
-                    value={ROLE_OPTIONS.find((o) => o.value === formData.role) || null}
-                    onChange={(opt) => setFormData((prev) => ({ ...prev, role: opt?.value || "" }))}
-                    placeholder="Select role"
-                    menuPortalTarget={document.body}
-                    styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                    isClearable
-                  />
-                </div>
+                <input
+                  type="text"
+                  className="form-control rounded-3"
+                  value="Leader"
+                  disabled
+                  style={{ border: "1px solid var(--border-color)", padding: "0.75rem", fontSize: "16px", backgroundColor: "transparent", color: "var(--text-primary)" }}
+                />
               </div>
             </form>
           </div>

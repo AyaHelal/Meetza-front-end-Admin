@@ -17,15 +17,15 @@ export const ConfirmDeleteModal = ({ show, onClose, onConfirm, title = "Delete",
             onClick={onClose}
         >
             <div className="modal-dialog modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-content rounded-4 border-0" style={{ boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
+                <div className="modal-content rounded-4 border-0" style={{ backgroundColor: "var(--card-bg)", boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
                     <div className="modal-header border-0 pb-0">
-                        <h5 className="modal-title fw-bold" style={{ fontSize: "24px", color: "#010101" }}>
+                        <h5 className="modal-title fw-bold" style={{ fontSize: "24px", color: "var(--text-primary)" }}>
                             {title}
                         </h5>
                         <button type="button" className="btn-close" onClick={onClose} aria-label="Close" style={{ fontSize: "14px" }} />
                     </div>
                     <div className="modal-body pt-3">
-                        <p style={{ fontSize: "16px", color: "#010101" }}>{message}</p>
+                        <p style={{ fontSize: "16px", color: "var(--text-primary)" }}>{message}</p>
                     </div>
                     <div className="modal-footer border-0 pt-0">
                         <button
@@ -33,8 +33,8 @@ export const ConfirmDeleteModal = ({ show, onClose, onConfirm, title = "Delete",
                             className="btn rounded-3"
                             onClick={onClose}
                             style={{
-                                backgroundColor: "#F4F6F8",
-                                color: "#010101",
+                                backgroundColor: "var(--bg-light)",
+                                color: "var(--text-primary)",
                                 border: "none",
                                 padding: "10px 24px",
                                 fontSize: "16px",

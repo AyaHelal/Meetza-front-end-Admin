@@ -42,7 +42,7 @@ export const GroupRow = ({
         <img
           src={group.group_photo}
           alt={group.group_name}
-          style={{ width: "100%", height: "100%", objectFit: "cover" ,display: 'block',border:'1px solid #ddd' }}
+          style={{ width: "100%", height: "100%", objectFit: "cover" ,display: 'block'}}
         />
       ) : (
         <UsersThree size={28} weight="bold" />
@@ -51,12 +51,12 @@ export const GroupRow = ({
           <span style={{ fontSize: "18px" }}>{group.name || group.group_name}</span>
         </div>
       </td>
-      <td className="fw-semibold" style={{ color: "#888888", fontSize: "16px" }}>
+      <td className="fw-semibold" style={{ color: "var(--text-secondary)", fontSize: "16px" }}>
         {group.admins && group.admins.length > 0
           ? group.admins.map((a) => a.name || a.email || "N/A").join(", ")
           : getAdminName(group.admin_id, group.admin_name)}
       </td>
-      <td className="fw-semibold" style={{ color: "#888888", fontSize: "16px" }}>
+      <td className="fw-semibold" style={{ color: "var(--text-secondary)", fontSize: "16px" }}>
         {contentNames}
       </td>
       <td>
@@ -67,7 +67,7 @@ export const GroupRow = ({
                 type="button"
                 className="btn btn-sm"
                 onClick={() => onAssignAdmin?.(group)}
-                title="Assign admin to group"
+                title="Assign leader to group"
                 style={{ backgroundColor: "#0076EA", borderRadius: "12px" }}
               >
                 <span style={{ color: "white" }}>
@@ -78,7 +78,7 @@ export const GroupRow = ({
                 type="button"
                 className="btn btn-sm"
                 onClick={() => onRemoveAssignAdmin?.(group)}
-                title="Remove assigned admin"
+                title="Remove assigned leader"
                 style={{ backgroundColor: "#fd7e14", borderRadius: "12px" }}
               >
                 <span style={{ color: "white" }}>

@@ -4,9 +4,7 @@
     gap: 1.5rem;
     padding-bottom: 1rem;
     -ms-overflow-style: none;
-    /* IE and Edge */
     scrollbar-width: none;
-    /* Firefox */
 }
 
 .analysis-cards-container::-webkit-scrollbar {
@@ -23,25 +21,35 @@
     background-color: white;
     border-radius: 16px;
     padding: 1.25rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     transition: transform 0.2s ease-in-out;
 }
 
+:root[data-theme="dark"] .analysis-card {
+    background: #1e293b !important;
+    border: 1px solid var(--border-color);
+}
+
 .analysis-card:hover {
     transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .analysis-card-title {
-    color: #888888;
+    color: var(--text-muted);
     font-size: 0.9rem;
     font-weight: 500;
 }
 
+:root[data-theme="dark"] .analysis-card-title {
+    color: var(--text-secondary);
+}
+
 .analysis-card-pill {
-    background: linear-gradient(180deg, #0B3DEF82 0%, #00DC85C2 100%);
+    background: var(--primary-gradient);
     color: white;
     border-radius: 12px;
     padding: 2px 8px;
@@ -52,7 +60,7 @@
 .analysis-card-value {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #010101;
+    color: var(--text-primary);
     margin-left: 0.5rem;
 }
 
@@ -65,7 +73,7 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    border: 2px solid white;
+    border: 2px solid var(--card-bg);
     object-fit: cover;
     margin-left: -8px;
 }

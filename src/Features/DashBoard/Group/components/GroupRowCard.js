@@ -48,7 +48,7 @@ export const GroupRowCard = ({
           </div>
         </div>
         <div className="user-card-meta">
-          <span className="user-card-label">Admin</span>
+          <span className="user-card-label">Leader</span>
           <span className="user-card-value">{displayAdmins || "—"}</span>
         </div>
         <div className="user-card-meta">

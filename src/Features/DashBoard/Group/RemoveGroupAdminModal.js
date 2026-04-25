@@ -22,18 +22,18 @@ export default function RemoveGroupAdminModal({
       onClick={onClose}
     >
       <div className="modal-dialog modal-dialog-centered dashboard-form-modal__dialog" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-content rounded-4 border-0" style={{ boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
+        <div className="modal-content rounded-4 border-0" style={{ backgroundColor: "var(--card-bg)", boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
           <div className="modal-header border-0 pb-0">
-            <h5 className="modal-title fw-bold" style={{ fontSize: "22px", color: "#010101" }}>
-              Remove assigned admin
+            <h5 className="modal-title fw-bold" style={{ fontSize: "22px", color: "var(--text-primary)" }}>
+              Remove assigned leader
             </h5>
             <button type="button" className="btn-close" onClick={onClose} aria-label="Close" style={{ fontSize: "14px" }} />
           </div>
 
-          <div className="modal-body pt-3 dashboard-form-modal__body" style={{ maxHeight: "60vh", overflowY: "auto", paddingRight: 10 }}>
+          <div className="modal-body pt-3 dashboard-form-modal__body">
             <form className="dashboard-form-modal__form" onSubmit={(e) => e.preventDefault()}>
               <div className="mb-3">
-                <label className="form-label fw-semibold" style={{ color: "#010101" }}>
+                <label className="form-label fw-semibold" style={{ color: "var(--text-primary)" }}>
                   Group
                 </label>
                 <input
@@ -41,13 +41,13 @@ export default function RemoveGroupAdminModal({
                   className="form-control rounded-3"
                   value={groupName}
                   disabled
-                  style={{ border: "2px solid #E9ECEF", padding: "0.75rem", fontSize: "16px" }}
+                  style={{ border: "1px solid var(--border-color)", padding: "0.75rem", fontSize: "16px", backgroundColor: "transparent", color: "var(--text-primary)" }}
                 />
               </div>
 
               <div className="mb-3">
-                <label className="form-label fw-semibold" style={{ color: "#010101" }}>
-                  Admin email(s) <span style={{ color: "#FF0000" }}>*</span>
+                <label className="form-label fw-semibold" style={{ color: "var(--text-primary)" }}>
+                  Leaders email(s) <span style={{ color: "#FF0000" }}>*</span>
                 </label>
                 <textarea
                   className="form-control rounded-3"
@@ -55,10 +55,10 @@ export default function RemoveGroupAdminModal({
                   rows={4}
                   value={formData.emailsText || ""}
                   onChange={handleChange}
-                  placeholder="e.g. admin@school.edu — or paste several at once"
-                  style={{ border: "2px solid #E9ECEF", padding: "0.75rem", fontSize: "16px", resize: "vertical" }}
+                  placeholder="e.g. leader@school.edu — or paste several at once"
+                  style={{ border: "1px solid var(--border-color)", padding: "0.75rem", fontSize: "16px", resize: "vertical", backgroundColor: "transparent", color: "var(--text-primary)" }}
                 />
-                <div className="form-text" style={{ fontSize: "13px" }}>
+                <div className="form-text" style={{ fontSize: "13px", color: "var(--text-muted)" }}>
                   One address per line or separated by commas. Multiple removals are sent together.
                 </div>
               </div>
