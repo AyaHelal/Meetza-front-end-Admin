@@ -1,0 +1,91 @@
+.branding-settings {
+    max-width: 1000px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.branding-card {
+    border: none;
+    transition: transform 0.3s ease;
+}
+
+.border-dashed {
+    border: 2px dashed #dee2e6;
+}
+
+.logo-preview {
+    width: 120px;
+    height: 120px;
+    border: 1px solid #eee;
+    overflow: hidden;
+}
+
+.logo-preview img {
+    object-fit: contain;
+}
+
+.form-control:focus {
+    border-color: #00DC85;
+    box-shadow: 0 0 0 0.25rem rgba(0, 220, 133, 0.1);
+}
+
+.form-check-input:checked {
+    background-color: #00DC85;
+    border-color: #00DC85;
+}
+
+.btn-primary {
+    background-color: #0076EA;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-success {
+    background-color: #00DC85;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #00b96f;
+}
+
+.preview-navbar {
+    border: 1px solid #eee;
+}
+
+.preview-footer {
+    border: 1px solid #333;
+}
+
+.logo-upload-container {
+    background-color: #f8f9fa;
+    transition: background-color 0.3s ease;
+}
+
+.logo-upload-container:hover {
+    background-color: #f1f3f5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .logo-upload-container {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .branding-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
