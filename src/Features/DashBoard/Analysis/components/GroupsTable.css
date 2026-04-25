@@ -3,6 +3,15 @@
     border: none;
 }
 
+:root[data-theme="dark"] .groups-table-card {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+}
+
+:root[data-theme="dark"] .groups-table thead th {
+    background: transparent !important;
+    color: var(--text-secondary) !important;
+}
+
 
 .bg-g {
     background: linear-gradient(225deg, rgba(0, 118, 234, 0.25) 0%, #ffffff 45%, #ffffff 100%) !important;
@@ -73,21 +82,21 @@
 /* ✅ Transparent Header */
 .groups-table thead th {
     background: transparent !important;
-    color: #888888;
+    color: var(--text-secondary);
     font-weight: 600;
     font-size: 0.96rem;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--divider-color);
 }
 
 .groups-table td {
-    color: #010101;
+    color: var(--text-primary);
     font-weight: 600;
     font-size: 0.9rem;
     background: transparent !important;
 }
 
 .groups-table tbody tr {
-    border-bottom: 1px solid #e0e0e0 !important;
+    border-bottom: 1px solid var(--divider-color) !important;
     background: transparent !important;
 }
 

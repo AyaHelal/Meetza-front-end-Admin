@@ -31,14 +31,14 @@ export const UserRow = ({ user, onEdit, onDelete, isAdmin }) => {
           <span style={{ fontSize: "18px" }}>{user.name}</span>
         </div>
       </td>
-      <td className="fw-semibold" style={{ color: "#888888" }}>
+      <td className="fw-semibold" style={{ color: "var(--text-secondary)" }}>
         {user.email}
       </td>
       <td>
         <span
           className="badge"
           style={{
-            color: "#888888",
+            color: "var(--text-secondary)",
             fontSize: "14px",
             paddingLeft: "0%"
           }}

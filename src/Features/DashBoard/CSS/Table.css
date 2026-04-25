@@ -20,6 +20,7 @@
 }
 
 @media (max-width: 768px) {
+
   .user-table-desktop,
   .position-table-desktop,
   .group-table-desktop,
@@ -46,13 +47,14 @@
 .content-th,
 .resources-th,
 .meeting-th {
-  color: #888888 !important;
+  color: var(--text-secondary) !important;
   white-space: nowrap;
 }
 
-/* Position Management header: stack on mobile to prevent button/search overlap */
+/* Position Management header */
 .position-management-card {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
+  background-color: var(--surface-color);
 }
 
 .position-header {
@@ -62,35 +64,37 @@
   align-items: center;
   gap: 1rem;
   overflow: visible;
+  background-color: var(--surface-color);
 }
 
 .position-header-title {
-  color: #010101;
+  color: var(--text-primary);
 }
 
 .position-header-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  /* Prevent wrapping unless extremely small */
   align-items: center;
   gap: 0.75rem;
   overflow: visible;
 }
 
 .position-header-btn {
-  background: linear-gradient(to right, #0076ea, #00dc85) !important;
-  color: white !important;
+  background: var(--primary-gradient) !important;
+  color: var(--text-on-primary) !important;
   font-size: 16px !important;
-  padding: 0.75rem 1.5rem !important;
+  padding: 0.8rem 1.25rem !important;
   border: none !important;
+  white-space: nowrap;
 }
 
 .position-header-search {
-  width: 100%;
-  max-width: 260px;
+  width: 260px;
 }
 
 .position-th {
-  color: #888888 !important;
+  color: var(--text-secondary) !important;
   white-space: nowrap;
 }
 
@@ -100,14 +104,9 @@
     align-items: stretch;
   }
 
-  .position-header-title {
-    width: 100%;
-  }
-
   .position-header-actions {
+    flex-wrap: wrap;
     width: 100%;
-    flex-direction: column;
-    align-items: stretch;
   }
 
   .position-header-btn {
@@ -116,400 +115,140 @@
   }
 
   .position-header-search {
-    max-width: none;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .position-header-search .search-bar-wrap {
+    width: 100%;
     max-width: none;
   }
 }
 
-/* Search bar on mobile: prevent left clip (icon + placeholder) */
+/* Search bar on mobile */
 @media (max-width: 768px) {
   .position-header .search-bar-wrap {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    box-sizing: border-box;
-  }
-
-  .position-header .search-bar-wrap .form-control {
-    padding-right: 2.5rem;
-  }
-
-  .position-header .search-bar-wrap .search-bar-icon {
-    right: 1.25rem;
-  }
-}
-
-/* ========== Table/cards same width as header on mobile and tablet ========== */
-@media (max-width: 992px) {
-  .card > .user-table-desktop,
-  .card > .user-table-mobile,
-  .card > .position-table-desktop,
-  .card > .position-table-mobile,
-  .card > .group-table-desktop,
-  .card > .group-table-mobile,
-  .card > .membership-table-desktop,
-  .card > .membership-table-mobile,
-  .card > .content-table-desktop,
-  .card > .content-table-mobile,
-  .card > .resources-table-desktop,
-  .card > .resources-table-mobile,
-  .card > .meeting-table-desktop,
-  .card > .meeting-table-mobile {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-
-  /* Desktop table: same horizontal padding as card-body so table aligns with header */
-  .card > .user-table-desktop,
-  .card > .position-table-desktop,
-  .card > .group-table-desktop,
-  .card > .membership-table-desktop,
-  .card > .content-table-desktop,
-  .card > .resources-table-desktop,
-  .card > .meeting-table-desktop {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  .card .user-table-container,
-  .card .table-responsive {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .card .table-responsive .table {
+    padding-left: 0;
+    padding-right: 0;
     width: 100%;
   }
 }
 
-@media (max-width: 768px) {
-  .card > .user-table-desktop,
-  .card > .user-table-mobile,
-  .card > .position-table-desktop,
-  .card > .position-table-mobile,
-  .card > .group-table-desktop,
-  .card > .group-table-mobile,
-  .card > .membership-table-desktop,
-  .card > .membership-table-mobile,
-  .card > .content-table-desktop,
-  .card > .content-table-mobile,
-  .card > .resources-table-desktop,
-  .card > .resources-table-mobile,
-  .card > .meeting-table-desktop,
-  .card > .meeting-table-mobile {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-
-  /* Desktop table (hidden on mobile but keep rules for consistency): padding to match header */
-  .card > .user-table-desktop,
-  .card > .position-table-desktop,
-  .card > .group-table-desktop,
-  .card > .membership-table-desktop,
-  .card > .content-table-desktop,
-  .card > .resources-table-desktop,
-  .card > .meeting-table-desktop {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  /* Mobile cards: same horizontal padding as header (card-body); overrides the container's own padding so total = 1rem */
-  .card > .user-table-mobile .user-cards-container,
-  .card > .position-table-mobile .user-cards-container,
-  .card > .group-table-mobile .user-cards-container,
-  .card > .membership-table-mobile .user-cards-container,
-  .card > .content-table-mobile .user-cards-container,
-  .card > .resources-table-mobile .user-cards-container,
-  .card > .meeting-table-mobile .user-cards-container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-}
-
-/* ========== Mobile user cards ========== */
-.user-cards-container,
-.position-table-mobile.user-cards-container,
-.group-table-mobile.user-cards-container,
-.membership-table-mobile.user-cards-container,
-.content-table-mobile.user-cards-container,
-.resources-table-mobile.user-cards-container,
-.meeting-table-mobile.user-cards-container {
-  max-height: 700px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 0 1rem 1rem;
-}
-
-.position-table-mobile.user-cards-container,
-.group-table-mobile.user-cards-container,
-.membership-table-mobile.user-cards-container,
-.content-table-mobile.user-cards-container,
-.resources-table-mobile.user-cards-container,
-.meeting-table-mobile.user-cards-container {
-  padding-top: 0.5rem;
-}
-
-/* Group Membership card: expandable members list */
-.membership-toggle-btn {
-  color: #212529;
-}
-
-.membership-toggle-btn:hover {
-  color: #0076ea;
-}
-
-.membership-members-list {
-  margin-top: 0.5rem;
-  padding: 0.75rem;
-  background: #f8f9fa;
-  border-radius: 10px;
-  border: 1px solid #e9ecef;
-}
-
-.membership-members-list-header {
-  display: flex;
-  gap: 0.5rem;
-  padding-bottom: 0.5rem;
-  margin-bottom: 0.5rem;
-  border-bottom: 1px solid #e9ecef;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #888;
-}
-
-.membership-member-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.4rem 0;
-  border-bottom: 1px solid #eee;
-}
-
-.membership-member-row:last-child {
-  border-bottom: none;
-}
-
-.membership-member-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  min-width: 0;
-}
-
-.membership-member-info span:first-child {
-  font-weight: 500;
-  color: #212529;
-}
-
-.membership-delete-btn {
-  flex-shrink: 0;
-}
-
-.user-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  margin-bottom: 0.75rem;
-  overflow: hidden;
-}
-
-.user-card:last-child {
-  margin-bottom: 0;
-}
-
-.user-card-placeholder {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.user-card-body {
-  padding: 1rem;
-}
-
-.user-card-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-
-.user-card-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.user-card-avatar-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #0076ea, #00dc85);
-  color: #fff;
-  font-weight: 600;
-}
-
-.user-card-title-wrap {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.user-card-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #212529;
-  word-break: break-word;
-}
-
-.user-card-role {
-  font-size: 0.8rem;
-  color: #888;
-  text-transform: capitalize;
-}
-
-.user-card-meta {
-  margin-bottom: 0.75rem;
-}
-
-.user-card-label {
-  display: block;
-  font-size: 0.75rem;
-  color: #888;
-  margin-bottom: 0.2rem;
-}
-
-.user-card-email {
-  font-size: 0.9rem;
-  color: #0076ea;
-  word-break: break-all;
-  text-decoration: none;
-}
-
-.user-card-email:hover {
-  text-decoration: underline;
-}
-
-.user-card-value {
-  font-size: 0.9rem;
-  color: #212529;
-}
-
-.user-card-value-wrap {
-  word-break: break-word;
-}
-
-.user-card-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid #f4f4f4;
-}
-
-.user-card-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  border: none;
-  border-radius: 10px;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.user-card-btn-edit {
-  background: #00dc85;
-  color: #fff;
-}
-
-.user-card-btn-delete {
-  background: #ff0000;
-  color: #fff;
-}
-
-.user-table-container {
-  max-height: 700px;
-}
-
-@media (max-height: 900px) {
-  .user-table-container {
-    max-height: 415px !important;
-  }
-}
-
-/* 1440x900 screens - align table bottom with navbar/sidebar bottom */
-@media (width: 1440px) and (height: 900px) {
-  .user-table-container {
-    height: 580px !important;
-    max-height: 580px !important;
-  }
-}
-
-.user-table-container::-webkit-scrollbar-button {
-  display: none;
-}
-
-.user-table-container::-webkit-scrollbar {
-  width: 10px;
-}
-
-.user-table-container::-webkit-scrollbar-track {
-  border-radius: 10px;
-}
-
-.user-table-container::-webkit-scrollbar-thumb {
-  background: #c5c6c6;
-
-  border-radius: 10px;
-}
-
-.user-table-container::-webkit-scrollbar-thumb:hover {
-  background: #c5c6c6;
-}
-
-.user-th {
-  color: #888888 !important;
-  white-space: nowrap;
+/* ========== Table/cards compatibility ========== */
+.card {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
 }
 
 .table-header-sticky th {
   position: sticky;
   top: 0;
-  background: white;
+  background: var(--surface-color) !important;
   z-index: 10;
-  border-bottom: 2px solid #f4f4f4;
+  border-bottom: 2px solid var(--divider-color) !important;
+  color: var(--text-secondary) !important;
 }
 
-tbody tr,
-tbody td {
+/* Dark Theme Table Specifics */
+:root[data-theme="dark"] .table {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .table td {
+  border-color: var(--divider-color) !important;
+  background: transparent !important;
+  color: var(--text-primary);
+}
+
+.table-header-sticky th {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #ffffff !important;
+}
+
+:root[data-theme="dark"] .table-header-sticky th {
+  background: #1e293b !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .user-card {
+  border: 1px solid var(--border-color);
+}
+
+:root[data-theme="dark"] .user-card-name {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .user-card-value {
+  color: var(--text-secondary) !important;
+}
+
+.user-th {
+  color: var(--text-secondary) !important;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--divider-color) !important;
+}
+
+tbody tr:last-child {
   border-bottom: none !important;
 }
 
-/* Make tables responsive: allow horizontal scroll and keep text on one line */
-.user-table-container table {
-  width: 100%;
-  table-layout: auto;
-  min-width: 1000px; /* Force a minimum width to trigger scroll if needed */
+.membership-members-list {
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
 }
 
-.user-table-container td,
-.user-table-container th {
-  white-space: nowrap !important;
-  word-break: normal;
+.membership-member-row {
+  border-bottom: 1px solid var(--divider-color);
 }
 
-.user-table-container td a {
-  word-break: break-all;
-  white-space: normal;
-  display: inline-block;
+.user-card {
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
+}
+
+.user-card-name {
+  color: var(--text-primary);
+}
+
+.user-card-email {
+  color: var(--primary-color);
+}
+
+.user-card-value {
+  color: var(--text-primary);
+}
+
+.user-card-actions {
+  border-top: 1px solid var(--divider-color);
+}
+
+.user-table-container {
+  max-height: 500px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.user-table-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Light Mode Group Membership Specific Styles */
+.group-name-column {
+  color: white !important;
+}
+
+.group-name-column * {
+  color: white !important;
+}
+
+.group-name-text {
+  color: black !important;
+  font-size: 18px;
+}
+
+.group-member-name {
+  color: white !important;
+  font-weight: semi-bold;
 }

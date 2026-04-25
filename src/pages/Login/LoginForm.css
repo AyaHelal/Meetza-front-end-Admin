@@ -96,6 +96,16 @@ margin-top: 5rem;
 /* Ensure input text is readable and visible - Only for login form */
 .form input.form-control {
   color: #212529 !important;
+  background-color: transparent !important;
+}
+
+/* Force the input container to be white to avoid black inputs in dark mode */
+.form .d-flex.border {
+  background-color: #ffffff !important;
+}
+
+.form .d-flex.border svg {
+  color: #888888 !important;
 }
 
 /* Remove focus border/outline - Only for login form inputs */

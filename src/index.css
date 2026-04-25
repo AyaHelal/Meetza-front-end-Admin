@@ -1,11 +1,170 @@
+:root {
+  /* Brand Colors */
+  --primary-color: #0076ea;
+  --primary-hover: #1565c0;
+  --secondary-color: #00dc85;
+  --secondary-hover: #00b86d;
+
+  /* Background & Surface */
+  --bg-color: #f8f9fa;
+  --bg-alt: #f4f4f4;
+  --bg-light: #f5f5f5;
+  --surface-color: #ffffff;
+  --card-bg: #ffffff;
+
+  /* Text Colors */
+  --text-primary: #1a1a1a;
+  --text-dark: #333333;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --text-on-primary: #ffffff;
+
+  /* Status Colors */
+  --success: var(--secondary-color);
+  --error: #FF0000;
+  --warning: #ff9800;
+  --info: var(--primary-color);
+
+  /* Borders & Dividers */
+  --border-color: #e0e0e0;
+  --divider-color: #f0f0f0;
+
+  /* Gradients */
+  --primary-gradient: linear-gradient(135deg, #0076ea 0%, #00dc85 100%);
+
+  /* Shadows */
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 2px 4px var(--shadow-color);
+  --shadow-md: 0 4px 12px var(--shadow-color);
+  --shadow-lg: 0 8px 24px var(--shadow-color);
+}
+
+:root[data-theme="dark"] {
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --secondary-color: #22c55e;
+  --secondary-hover: #16a34a;
+
+  --bg-color: #0f172a;
+  --bg-alt: #1e293b;
+  --bg-light: #1e293b;
+  --surface-color: #1e293b;
+  --card-bg: #1e293b;
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-dark: #ffffff;
+  --text-muted: #64748b;
+  --border-color: #334155;
+  --divider-color: #334155;
+  --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #22c55e 100%);
+  --shadow-color: rgba(0, 0, 0, 0.4);
+}
+
+
+
 body {
   margin: 0;
   font-family: "poppins", sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+/* Global Branded Background Utility */
+.branded-card-bg {
+  background: white !important;
+}
+
+:root[data-theme="dark"] .branded-card-bg {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+
+
+
+
+/* Flatpickr Dark Mode Customization */
+:root[data-theme='dark'] .flatpickr-calendar,
+:root[data-theme='dark'] .flatpickr-calendar * {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  border-color: #334155 !important;
+}
+
+:root[data-theme='dark'] .flatpickr-calendar {
+  border: 1px solid #334155 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4) !important;
+}
+
+:root[data-theme='dark'] .flatpickr-day.selected,
+:root[data-theme='dark'] .flatpickr-day.startRange,
+:root[data-theme='dark'] .flatpickr-day.endRange {
+  background: #0f172a !important;
+  border-color: #0f172a !important;
+}
+
+:root[data-theme='dark'] .flatpickr-day.inRange {
+  background: rgba(15, 23, 42, 0.6) !important;
+  box-shadow: -5px 0 0 rgba(15, 23, 42, 0.6), 5px 0 0 rgba(15, 23, 42, 0.6) !important;
+}
+
+:root[data-theme='dark'] .flatpickr-day.prevMonthDay,
+:root[data-theme='dark'] .flatpickr-day.nextMonthDay {
+  color: #64748b !important;
+}
+
+:root[data-theme='dark'] .flatpickr-day:hover {
+  background: #334155 !important;
+}
+
+/* Custom File Input Styling */
+input[type="file"]::file-selector-button {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 6px 12px;
+  margin-right: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="file"].form-control:hover:not(:disabled):not([readonly])::file-selector-button,
+input[type="file"]::file-selector-button:hover {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme='dark'] input[type="file"].form-control:hover:not(:disabled):not([readonly])::file-selector-button,
+:root[data-theme='dark'] input[type="file"]::file-selector-button:hover {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+/* Utility to hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
+}
+
+/* Ensure native input UI elements like spin buttons adapt to dark mode */
+:root[data-theme='dark'] input,
+:root[data-theme='dark'] select,
+:root[data-theme='dark'] textarea {
+  color-scheme: dark;
 }

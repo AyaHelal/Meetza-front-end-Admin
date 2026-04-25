@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UsersThree, Trash, CaretDown, CaretUp } from "phosphor-react";
+import { UsersThree, Trash, CaretDown, CaretUp, User } from "phosphor-react";
 
 export const GroupMembershipRow = ({
   membership,
@@ -19,26 +19,36 @@ export const GroupMembershipRow = ({
 
   return (
     <tr className="align-middle">
-      <td className="px-4">
+      <td className="px-4 group-name-column">
         <div className="d-flex align-items-center gap-2">
           <div
-            className="rounded-3 d-flex align-items-center justify-content-center"
+            className="d-flex align-items-center justify-content-center overflow-hidden"
             style={{
               width: 56,
               height: 56,
-              background: "linear-gradient(135deg, #0076EA, #00DC85)",
+              background: membership.group_photo ? "transparent" : "linear-gradient(135deg, #0076EA, #00DC85)",
               color: "white",
               fontWeight: 600,
+              border: "none",
+              borderRadius: "8px",
             }}
           >
-            <UsersThree size={28} weight="bold" />
+            {membership.group_photo ? (
+              <img
+                src={membership.group_photo}
+                alt={membership.group_name}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+            ) : (
+              <UsersThree size={28} weight="bold" />
+            )}
           </div>
-          <span style={{ fontSize: "18px" }}>
+          <span className="group-name-text">
             {getGroupName(membership.group_id, membership.group_name)}
           </span>
         </div>
       </td>
-      <td className="fw-semibold" style={{ color: "#888888", fontSize: "16px" }}>
+      <td className="fw-semibold" style={{ color: "var(--text-secondary)", fontSize: "16px" }}>
         <div style={{ maxWidth: "400px" }}>
           {members.length > 0 ? (
             <div style={{ width: "600px" }}>
@@ -50,7 +60,7 @@ export const GroupMembershipRow = ({
                   border: isExpanded ? "none" : "none",
                   borderRadius: "8px",
                   padding: "6px 12px",
-                  color: "#888888",
+                  color: "var(--text-secondary)",
                   fontSize: "14px",
                   width: "100%",
                   justifyContent: "flex-start",
@@ -88,7 +98,7 @@ export const GroupMembershipRow = ({
                       marginBottom: "8px",
                       borderBottom: "2px solid #E9ECEF",
                       fontWeight: "bold",
-                      color: "#888888",
+                      color: "var(--text-secondary)",
                     }}
                   >
                     <div style={{ flex: 1 }}>Name</div>
@@ -107,12 +117,54 @@ export const GroupMembershipRow = ({
                         position: "relative",
                       }}
                     >
-                      <div className="d-flex" style={{ flex: 1 }}>
-                        <div style={{ flex: 1, color: "black", fontWeight: "semi-bold" }}>
-                          {getMemberName(member.member_id, member.member_name) || "N/A"}
+                      <div className="d-flex align-items-center gap-2" style={{ flex: 1 }}>
+                        {/* Group Photo */}
+                        <div
+                          className="d-flex align-items-center justify-content-center overflow-hidden"
+                          style={{
+                            width: 24,
+                            height: 24,
+                            background: membership.group_photo ? "transparent" : "linear-gradient(135deg, #0076EA, #00DC85)",
+                            color: "white",
+                            fontWeight: 600,
+                            fontSize: "10px",
+                            border: "none",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          {membership.group_photo ? (
+                            <img
+                              src={membership.group_photo}
+                              alt={membership.group_name}
+                              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                            />
+                          ) : (
+                            <UsersThree size={12} weight="bold" />
+                          )}
                         </div>
-                        <div style={{ flex: 1, color: "black", wordBreak: "break-word", fontWeight: "semi-bold" }}>
-                          {getMemberEmail(member.member_id, member.member_email) || "N/A"}
+                        {/* Member Avatar */}
+                        <div
+                          className="rounded-circle d-flex align-items-center justify-content-center overflow-hidden"
+                          style={{
+                            width: 32,
+                            height: 32,
+                            background: member.member_photo 
+                              ? `url(${member.member_photo}) center/cover` 
+                              : "linear-gradient(135deg, #0076EA, #00DC85)",
+                            color: member.member_photo ? "transparent" : "white",
+                            fontWeight: 600,
+                            fontSize: "12px",
+                          }}
+                        >
+                          {!member.member_photo && <User size={16} weight="bold" />}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div className="group-member-name">
+                            {getMemberName(member.member_id, member.member_name) || "N/A"}
+                          </div>
+                          <div style={{ color: "var(--text-secondary)", fontSize: "14px" }}>
+                            {getMemberEmail(member.member_id, member.member_email) || "N/A"}
+                          </div>
                         </div>
                       </div>
                       {isAdmin && (

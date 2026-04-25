@@ -24,7 +24,7 @@ export const GroupContentTable = ({
 
   return (
     <div className="m-4 rounded-3" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
-      <div className="card shadow-sm rounded-3 border-0">
+      <div className="card shadow-sm rounded-3 border-0 branded-card-bg">
         <div className="card-body p-3 mb-4 position-header">
           <h2 className="h4 m-0 fw-semibold position-header-title">Group Content Management</h2>
           <div className="position-header-actions">

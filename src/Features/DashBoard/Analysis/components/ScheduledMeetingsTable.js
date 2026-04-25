@@ -13,7 +13,7 @@ const ScheduledMeetingsTable = ({ meetingsData = [] }) => {
 
     return (
         <div className="scheduled-meetings-container mt-2 mb-4">
-            <h4 className="scheduled-meetings-title">Scheduled Meetings</h4>
+            <h4 className="scheduled-meetings-title" style={{ color: 'var(--text-primary)' }}>Scheduled Meetings</h4>
 
             <div className="scheduled-meetings-card">
                 <div className="scheduled-meetings-header-wrapper" ref={headerRef}>
@@ -73,7 +73,7 @@ const ScheduledMeetingsTable = ({ meetingsData = [] }) => {
                                         <td>{row.startDate}</td>
                                         <td>{row.duration}</td>
                                         <td>
-                                            <span className="fw-semibold text-dark">
+                                            <span className="fw-semibold" style={{ color: 'var(--text-primary)' }}>
                                                 {row.attendeeCount ?? 0}
                                             </span>
                                         </td>

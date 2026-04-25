@@ -13,7 +13,7 @@ const GroupsTable = ({ groupsData = [] }) => {
     return (
         <div className="px-4 mt-2 mb-4">
             <div className="mb-3">
-                <h4 className="fw-semibold mb-0" style={{ color: "#010101" }}>Groups</h4>
+                <h4 className="fw-semibold mb-0 mt-4" style={{ color: "var(--text-primary)" }}>Groups</h4>
             </div>
 
             <div className="bg-g activity-comparison-card groups-table-card p-0 overflow-hidden position-relative">

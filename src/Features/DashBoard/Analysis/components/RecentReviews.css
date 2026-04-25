@@ -1,3 +1,7 @@
+.recent-reviews-title {
+    color: var(--text-primary);
+}
+
 .reviews-list {
     display: flex;
     flex-direction: column;
@@ -5,17 +9,17 @@
 }
 
 .review-card {
-    background: white;
+    background: var(--card-bg);
     border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.02);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
     transition: transform 0.2s ease-in-out;
 }
 
 .review-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md);
 }
 
 .review-header {
@@ -30,8 +34,8 @@
     height: 44px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid var(--surface-color);
+    box-shadow: var(--shadow-sm);
 }
 
 .reviewer-info {
@@ -42,18 +46,18 @@
 
 .reviewer-name {
     font-weight: 700;
-    color: #010101;
+    color: var(--text-primary);
     font-size: 1rem;
 }
 
 .review-date {
     font-size: 0.85rem;
-    color: #888888;
+    color: var(--text-muted);
     font-weight: 500;
 }
 
 .review-comment {
-    color: #333333;
+    color: var(--text-secondary);
     font-size: 0.95rem;
     line-height: 1.6;
     margin-bottom: 1.25rem;
@@ -65,7 +69,7 @@
     align-items: center;
     gap: 2rem;
     padding-top: 1rem;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--divider-color);
 }
 
 .footer-item {
@@ -76,24 +80,10 @@
 
 .footer-item span {
     font-size: 0.9rem;
-    color: #010101;
+    color: var(--text-primary);
 }
 
-/* Dark mode adjustments if needed */
-[data-theme='dark'] .review-card {
-    background: #1a1a1a;
-    border-color: rgba(255, 255, 255, 0.05);
-}
-
-[data-theme='dark'] .reviewer-name,
-[data-theme='dark'] .footer-item span {
-    color: #ffffff;
-}
-
-[data-theme='dark'] .review-comment {
-    color: #cccccc;
-}
-
-[data-theme='dark'] .review-footer {
-    border-color: rgba(255, 255, 255, 0.05);
+/* Dark mode overrides for consistency */
+:root[data-theme='dark'] .review-card {
+    background: #1e293b !important;
 }

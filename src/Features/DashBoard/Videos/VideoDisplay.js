@@ -422,8 +422,8 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
 
                 {/* Videos Sidebar */}
                 <div className="mt-4 video-sidebar-wrap">
-                    <div className={`card border-0 bg-white video-sidebar-card ${showUploadModal ? 'video-sidebar-card--upload-open' : ''}`}>
-                        <div className="card-header border-0 d-flex justify-content-between align-items-center p-3 bg-white video-sidebar-header">
+                    <div className={`card border-0 branded-card-bg video-sidebar-card ${showUploadModal ? 'video-sidebar-card--upload-open' : ''}`}>
+                        <div className="card-header border-0 d-flex justify-content-between align-items-center p-3 branded-card-bg video-sidebar-header">
                             <h5 className="mb-0 fw-semibold me-1">Videos</h5>
                             <div className="d-flex align-items-center gap-2 video-sidebar-search-wrap">
                                 <div
@@ -503,7 +503,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                                     }}
                                                 >
                                                     <span className="video-icon-edit-span">
-                                                        <PencilSimpleLine size={20} color="#000000" />
+                                                        <PencilSimpleLine size={20} style={{ color: "var(--text-primary)" }} />
                                                     </span>
                                                 </button>
 

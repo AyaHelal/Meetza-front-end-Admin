@@ -100,15 +100,15 @@ const UserMainContent = ({ currentUser }) => {
     const handleSearchChange = (query) => {
         if (!isSuperAdmin) return; // Prevent search if not super admin
         setSearchQuery(query);
-        if (query.trim() === "") {
-            fetchData();
-        } else {
-            if (query.trim().length > 2)
-                searchUsers(query).catch((err) => {
-                    toast.error(err?.response?.data?.message || "Failed to search users");
-                });
-        }
     };
+
+    const filteredUsers = users.filter((u) => {
+        const q = searchQuery.toLowerCase();
+        return (
+            (u.name && u.name.toLowerCase().includes(q)) ||
+            (u.email && u.email.toLowerCase().includes(q))
+        );
+    });
 
 
     return (
@@ -116,23 +116,24 @@ const UserMainContent = ({ currentUser }) => {
             <UserHeader currentUser={currentUser} />
 
             <div className=" rounded-3" >
-                <div className="card m-4 shadow-sm rounded-3 border-0" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
-                    <div className="card-body p-3 mb-4 d-flex justify-content-between align-items-center">
+                <div className="card m-4 shadow-sm rounded-3 border-0 branded-card-bg" style={{ color: 'var(--text-primary)' }}>
+                    <div className="card-body p-3 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div className="d-flex gap-3 align-items-center">
-                            <h2 className="h5 mb-0 fw-semibold" style={{ fontSize: "24px" }}>User Management</h2>
-
+                            <h2 className="h5 mb-0 fw-semibold" style={{ color: 'var(--text-primary)' , fontSize: "24px"}}>User Management</h2>
                         </div>
-                        {isSuperAdmin && (
-                            <SearchBar
-                                value={searchQuery}
-                                onChange={handleSearchChange}
-                                placeholder="Search by name..."
-                            />
-                        )}
+                        <div className="d-flex align-items-center gap-3 flex-grow-1 justify-content-end">
+                            {isSuperAdmin && (
+                                <SearchBar
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    placeholder="Search by name..."
+                                />
+                            )}
+                        </div>
                     </div>
 
                     <UserTable
-                        users={users}
+                        users={filteredUsers}
                         loading={loading}
                         error={error}
                         onEdit={openEditModal}

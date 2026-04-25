@@ -10,6 +10,7 @@ import {
     List,
     CirclesFour,
     Palette,
+    GearSix,
 } from "phosphor-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Dashboard.css";
@@ -26,18 +27,21 @@ import VideoDisplay from "../../Features/DashBoard/Videos/VideoDisplay";
 import ResourcesPage from "../../Features/DashBoard/Resources/ResourcesPage";
 import BrandingSettings from "../../Features/DashBoard/Branding/BrandingSettings";
 import { useBranding } from "../../context/BrandingContext";
+import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const UserDashboard = () => {
     const { user: currentUser, logoutUser } = useAuth();
     const { systemName, logoUrl } = useBranding();
+    const { theme, setTheme } = useTheme();
     
     const userRole = (currentUser?.role || "").toString().trim().toLowerCase();
     const isSuperAdmin = userRole.includes("super_admin") || userRole.includes("super admin");
     const navigate = useNavigate();
     const [activeMenu, setActiveMenu] = useState("dashboard");
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [showThemePicker, setShowThemePicker] = useState(false);
 
     // Close sidebar when route/content changes (e.g. on mobile after menu click)
     const handleMenuClick = (id) => {
@@ -139,15 +143,39 @@ const UserDashboard = () => {
                     })}
                 </nav>
 
-                <div className="dashboard-sidebar-footer">
-                    <button
-                        type="button"
-                        className="btn d-flex align-items-center rounded-5"
-                        onClick={handleLogout}
-                        aria-label="Log out"
-                    >
-                        <SignOut size={24} className="dashboard-sidebar-logout" />
-                    </button>
+                <div className="dashboard-sidebar-footer position-relative">
+                    <div className="d-flex gap-2 px-2">
+                        <button
+                            type="button"
+                            className="btn d-flex align-items-center rounded-5"
+                            onClick={handleLogout}
+                            aria-label="Log out"
+                            title="Logout"
+                        >
+                            <SignOut size={24} className="dashboard-sidebar-logout" />
+                        </button>
+                        <button
+                            type="button"
+                            className={`btn d-flex align-items-center rounded-5 ${showThemePicker ? 'active-settings' : ''}`}
+                            onClick={() => setShowThemePicker(!showThemePicker)}
+                            aria-label="Theme Settings"
+                            title="Theme Settings"
+                        >
+                            <GearSix size={24} className="dashboard-sidebar-settings" />
+                        </button>
+                    </div>
+
+                    {showThemePicker && (
+                        <div className="theme-picker-dropdown shadow-lg rounded-4 p-2">
+                            <div className="theme-option" onClick={() => { setTheme('light'); setShowThemePicker(false); }}>
+                                <div className="theme-circle light"></div> <span>Light</span>
+                            </div>
+                            <div className="theme-option" onClick={() => { setTheme('dark'); setShowThemePicker(false); }}>
+                                <div className="theme-circle dark"></div> <span>Dark</span>
+                            </div>
+
+                        </div>
+                    )}
                 </div>
             </aside>
 

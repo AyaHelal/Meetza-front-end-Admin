@@ -151,11 +151,11 @@ const GroupMembershipContent = ({ currentUser }) => {
             <GroupMembershipHeader currentUser={currentUser} />
 
             <div className=" rounded-3" >
-                <div className="card shadow-sm m-4 rounded-3 border-0" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+                <div className="card shadow-sm m-4 rounded-3 border-0 branded-card-bg" style={{ color: 'var(--text-primary)' }}>
                     {!showForm ? (
                         <>
                             <div className="card-body p-3 mb-4 position-header">
-                                <h2 className="h5 mb-0 fw-semibold position-header-title" style={{ fontSize: "24px" }}>Group Membership Management</h2>
+                                <h2 className="h4 mb-0 fw-semibold position-header-title">Group Membership Management</h2>
                                 <div className="position-header-actions">
                                     <button
                                         type="button"
@@ -213,7 +213,7 @@ const GroupMembershipContent = ({ currentUser }) => {
 
                                 <div className="row justify-content-center">
                                     <div className="col-lg-7">
-                                        <div className="create-membership-form bg-white border-0 p-4" style={{ border: "2px solid #E9ECEF" }}>
+                                        <div className="create-membership-form border-0 p-4" style={{ backgroundColor: 'var(--surface-color)', color: 'var(--text-primary)', border: "1px solid var(--border-color)" }}>
                                             <div className="mb-4">
                                                 <label className="form-label fw-semibold create-membership-form__label">
                                                     Group <span style={{ color: "#FF0000" }}>*</span>
@@ -247,7 +247,14 @@ const GroupMembershipContent = ({ currentUser }) => {
                                                         onChange={(opt) => setFormData({ ...formData, group_id: opt?.value ?? '' })}
                                                         placeholder="Select a group"
                                                         menuPortalTarget={document.body}
-                                                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                                        styles={{ 
+                                                            menuPortal: base => ({ ...base, zIndex: 9999 }),
+                                                            control: (base) => ({ ...base, backgroundColor: 'transparent', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }),
+                                                            menu: (base) => ({ ...base, backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)', zIndex: 9999 }),
+                                                            option: (base, state) => ({ ...base, backgroundColor: state.isFocused ? 'var(--bg-light)' : 'transparent', color: 'var(--text-primary)', cursor: 'pointer' }),
+                                                            singleValue: (base) => ({ ...base, color: 'var(--text-primary)' }),
+                                                            input: (base) => ({ ...base, color: 'var(--text-primary)' })
+                                                        }}
                                                         isClearable
                                                     />
                                                 </div>
@@ -264,7 +271,7 @@ const GroupMembershipContent = ({ currentUser }) => {
                                                     value={formData.member_email}
                                                     onChange={handleFormChange}
                                                     placeholder="Enter member email address"
-                                                    style={{ border: "2px solid #E9ECEF", fontSize: "16px" }}
+                                                    style={{ border: "1px solid var(--border-color)", padding: "0.75rem", fontSize: "16px", backgroundColor: 'transparent', color: 'var(--text-primary)' }}
                                                 />
                                             </div>
 

@@ -48,7 +48,8 @@ export const usePositionData = (userId, authUser = null) => {
               id: user.id,
               name: user.name || user.fullName || 'Unknown User',
               email: user.email,
-              role: user.role
+              role: user.role,
+              avatarUrl: user.user_photo || user.avatarUrl || user.avatar_url
             }
           };
         });
@@ -154,6 +155,14 @@ const createPosition = async (title, selectedUser) => {
       const res = await api.get(`/position?title=${query}`);
       let payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
 
+      if (query && query.trim() !== "") {
+        payload = payload.filter(p => p.title && p.title.toLowerCase().includes(query.toLowerCase()));
+      }
+
+      if (authUser?.role !== 'Super_Admin') {
+        payload = payload.filter(pos => pos.administrator_id === userId);
+      }
+
       if (payload.length > 0) {
         const usersRes = await api.get('/user');
         const allUsers = Array.isArray(usersRes.data) ? usersRes.data : usersRes.data?.data || [];
@@ -166,7 +175,8 @@ const createPosition = async (title, selectedUser) => {
               id: user.id,
               name: user.name || user.fullName || 'Unknown User',
               email: user.email,
-              role: user.role
+              role: user.role,
+              avatarUrl: user.user_photo || user.avatarUrl || user.avatar_url
             } : null
           };
         });

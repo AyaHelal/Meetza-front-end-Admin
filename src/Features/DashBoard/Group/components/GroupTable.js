@@ -25,7 +25,7 @@ export const GroupTable = ({
           <thead className="table-header-sticky">
             <tr>
               <th className="fw-semibold px-4 group-th">Name</th>
-              <th className="fw-semibold group-th">Admin</th>
+              <th className="fw-semibold group-th">Leader</th>
               <th className="fw-semibold group-th">Group Content</th>
               <th className="fw-semibold group-th">Actions</th>
             </tr>

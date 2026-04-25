@@ -203,14 +203,15 @@ const GroupMainContent = ({ currentUser }) => {
 
     const handleSearchChange = (query) => {
         setSearchQuery(query);
-        if (query.trim() === "") {
-            fetchData();
-        } else {
-            searchGroups(query).catch((err) => {
-                toast.error(err?.response?.data?.message || "Failed to search groups");
-            });
-        }
     };
+
+    const filteredGroups = groups.filter((group) => {
+        const q = searchQuery.toLowerCase();
+        return (
+            (group.name && group.name.toLowerCase().includes(q)) ||
+            (group.group_name && group.group_name.toLowerCase().includes(q))
+        );
+    });
 
     // Helper function to get admin name by ID
     const getAdminName = (adminId, adminName = null) => {
@@ -222,7 +223,7 @@ const GroupMainContent = ({ currentUser }) => {
 
     const openAssignAdmin = (group) => {
         setAssignTargetGroup(group);
-        setAssignAdminForm({ emailsText: "", role: "" });
+        setAssignAdminForm({ emailsText: "", role: "ADMIN" });
         setShowAssignAdminModal(true);
     };
 
@@ -302,7 +303,7 @@ const GroupMainContent = ({ currentUser }) => {
     const handleAssignAdmin = async () => {
         const gid = assignTargetGroup?.id;
         const emails = parseEmailsInput(assignAdminForm.emailsText || "");
-        const role = (assignAdminForm.role || "").trim();
+        const role = "ADMIN";
 
         if (!gid) {
             toast.error("Please select a group");
@@ -352,11 +353,11 @@ const GroupMainContent = ({ currentUser }) => {
             <GroupHeader currentUser={currentUser} />
 
             <div className="rounded-3" >
-                <div className="card shadow-sm m-4  rounded-3 border-0" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+                <div className="card shadow-sm m-4  rounded-3 border-0 branded-card-bg" style={{ color: 'var(--text-primary)' }}>
                     {!showForm ? (
                         <>
                             <div className="card-body p-3 mb-4 position-header">
-                                <h2 className="h5 mb-0 fw-semibold position-header-title" style={{ fontSize: "24px" }}>Group Management</h2>
+                                <h2 className="h4 mb-0 fw-bold position-header-title">Group Management</h2>
                                 <div className="position-header-actions">
                                     <button
                                         type="button"
@@ -379,7 +380,7 @@ const GroupMainContent = ({ currentUser }) => {
                             </div>
 
                             <GroupTable
-                                groups={groups}
+                                groups={filteredGroups}
                                 users={users}
                                 loading={loading}
                                 error={error}
@@ -395,7 +396,7 @@ const GroupMainContent = ({ currentUser }) => {
                         </>
                     ) : (
                         <>
-                            <div className="card-body p-4 form-scroll-container" style={{ overflowY: 'auto' }}>
+                            <div className="card-body p-4 form-scroll-container hide-scrollbar" style={{ overflowY: 'auto' }}>
                                 <div className="d-flex align-items-center gap-3 mb-4">
                                     <button
                                         className="btn btn-sm d-flex align-items-center gap-2"
@@ -414,9 +415,9 @@ const GroupMainContent = ({ currentUser }) => {
                                     </h2>
                                 </div>
 
-                                <div className="row justify-content-center">
+                                 <div className="row justify-content-center">
                                     <div className="col-lg-7">
-                                        <div className="create-group-form bg-white border-0 p-4" style={{ border: "2px solid #E9ECEF" }}>
+                                        <div className="create-group-form border-0 p-4" style={{ backgroundColor: 'var(--surface-color)', color: 'var(--text-primary)', border: "1px solid var(--border-color)" }}>
                                             <div className="mb-4">
                                                 <label className="form-label fw-semibold create-group-form__label">
                                                     Group Name <span style={{ color: "#FF0000" }}>*</span>
@@ -426,16 +427,16 @@ const GroupMainContent = ({ currentUser }) => {
                                                     className="form-control rounded-3 create-group-form__input"
                                                     name="group_name"
                                                     value={formData.group_name || ''}
-                                                    onChange={handleContentChange}
+                                                     onChange={handleContentChange}
                                                     placeholder="Enter group name"
-                                                    style={{ border: "2px solid #E9ECEF", fontSize: "16px" }}
+                                                    style={{ border: "1px solid var(--border-color)", fontSize: "16px", backgroundColor: 'var(--bg-light)', color: 'var(--text-primary)' }}
                                                 />
                                             </div>
 
                                             {isSuperAdmin && (
                                                 <div className="mb-4">
                                                     <label className="form-label fw-semibold create-group-form__label">
-                                                        Group admins <span style={{ color: "#FF0000" }}>*</span>
+                                                        Group leaders <span style={{ color: "#FF0000" }}>*</span>
                                                     </label>
                                                     <div className="create-group-form__field rounded-3 dashboard-form-modal__select-wrap">
                                                         <Select
@@ -453,7 +454,16 @@ const GroupMainContent = ({ currentUser }) => {
                                                             }
                                                             placeholder="Select Leaders…"
                                                             menuPortalTarget={document.body}
-                                                            styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                                                            styles={{ 
+                                                                menuPortal: base => ({ ...base, zIndex: 9999 }),
+                                                                control: (base) => ({ ...base, backgroundColor: 'transparent', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }),
+                                                                menu: (base) => ({ ...base, backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)', zIndex: 9999 }),
+                                                                option: (base, state) => ({ ...base, backgroundColor: state.isFocused ? 'var(--bg-light)' : 'transparent', color: 'var(--text-primary)', cursor: 'pointer' }),
+                                                                singleValue: (base) => ({ ...base, color: 'var(--text-primary)' }),
+                                                                multiValue: (base) => ({ ...base, backgroundColor: 'var(--bg-light)' }),
+                                                                multiValueLabel: (base) => ({ ...base, color: 'var(--text-primary)' }),
+                                                                input: (base) => ({ ...base, color: 'var(--text-primary)' })
+                                                            }}
                                                         />
                                                     </div>
                                                 </div>
@@ -470,9 +480,9 @@ const GroupMainContent = ({ currentUser }) => {
                                                         name="year"
                                                         min={1}
                                                         value={formData.year || ''}
-                                                        onChange={handleContentChange}
+                                                         onChange={handleContentChange}
                                                         placeholder="Enter year"
-                                                        style={{ border: "2px solid #E9ECEF", fontSize: "16px" }}
+                                                        style={{ border: "1px solid var(--border-color)", fontSize: "16px", backgroundColor: 'var(--bg-light)', color: 'var(--text-primary)' }}
                                                     />
                                                 </div>
 
@@ -487,7 +497,14 @@ const GroupMainContent = ({ currentUser }) => {
                                                             onChange={(opt) => setFormData({ ...formData, semester: opt?.value ?? '' })}
                                                             placeholder="Select semester"
                                                             menuPortalTarget={document.body}
-                                                            styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                                            styles={{ 
+                                                                menuPortal: base => ({ ...base, zIndex: 9999 }),
+                                                                control: (base) => ({ ...base, backgroundColor: 'transparent', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }),
+                                                                menu: (base) => ({ ...base, backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)', zIndex: 9999 }),
+                                                                option: (base, state) => ({ ...base, backgroundColor: state.isFocused ? 'var(--bg-light)' : 'transparent', color: 'var(--text-primary)', cursor: 'pointer' }),
+                                                                singleValue: (base) => ({ ...base, color: 'var(--text-primary)' }),
+                                                                input: (base) => ({ ...base, color: 'var(--text-primary)' })
+                                                            }}
                                                         />
                                                     </div>
                                                 </div>
@@ -502,9 +519,9 @@ const GroupMainContent = ({ currentUser }) => {
                                                     className="form-control rounded-3 create-group-form__input"
                                                     name="group_content_name"
                                                     value={formData.group_content_name || ''}
-                                                    onChange={handleContentChange}
+                                                     onChange={handleContentChange}
                                                     placeholder="Enter content name"
-                                                    style={{ border: "2px solid #E9ECEF", fontSize: "16px" }}
+                                                    style={{ border: "1px solid var(--border-color)", fontSize: "16px", backgroundColor: 'var(--bg-light)', color: 'var(--text-primary)' }}
                                                 />
                                             </div>
 
@@ -516,9 +533,9 @@ const GroupMainContent = ({ currentUser }) => {
                                                     className="form-control rounded-3 create-group-form__input create-group-form__textarea"
                                                     name="content_description"
                                                     value={formData.content_description || ''}
-                                                    onChange={handleContentChange}
+                                                     onChange={handleContentChange}
                                                     placeholder="Enter content description (optional)"
-                                                    style={{ border: "2px solid #E9ECEF", fontSize: "16px", minHeight: 90 }}
+                                                    style={{ border: "1px solid var(--border-color)", fontSize: "16px", minHeight: 90, backgroundColor: 'var(--bg-light)', color: 'var(--text-primary)' }}
                                                 />
                                             </div>
 
@@ -530,9 +547,9 @@ const GroupMainContent = ({ currentUser }) => {
                                                     className="form-control rounded-3 create-group-form__input create-group-form__textarea"
                                                     name="description"
                                                     value={formData.description || ''}
-                                                    onChange={handleContentChange}
+                                                     onChange={handleContentChange}
                                                     placeholder="Enter group description (optional)"
-                                                    style={{ border: "2px solid #E9ECEF", fontSize: "16px", minHeight: 90 }}
+                                                    style={{ border: "1px solid var(--border-color)", fontSize: "16px", minHeight: 90, backgroundColor: 'var(--bg-light)', color: 'var(--text-primary)' }}
                                                 />
                                             </div>
 

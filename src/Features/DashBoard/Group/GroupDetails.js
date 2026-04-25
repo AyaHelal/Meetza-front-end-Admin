@@ -176,7 +176,7 @@ const GroupDetails = ({ group, onClose }) => {
                             {/* Admins Section */}
                             <div className="col-12 mt-4">
                                 <h6 className="fw-bold mb-3" style={{ color: "#010101", fontSize: "18px" }}>
-                                    Group Administrators
+                                    Group Leaders
                                 </h6>
                                 <div className="row g-3">
                                     {group.admins && group.admins.length > 0 ? (
@@ -225,7 +225,7 @@ const GroupDetails = ({ group, onClose }) => {
                                         ))
                                     ) : (
                                         <div className="col-12">
-                                            <p className="text-muted italic">No administrators listed.</p>
+                                            <p className="text-muted italic">No leaders listed.</p>
                                         </div>
                                     )}
                                 </div>

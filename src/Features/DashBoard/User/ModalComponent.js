@@ -25,6 +25,7 @@ const ModalComponent = ({ mode, formData, setFormData, onSave, onClose }) => {
                     <label className="form-label" style={{ fontSize: 13, color: "#6c757d" }}>Name</label>
                     <input
                         className="form-control mb-3 rounded-3"
+                        style={{ backgroundColor: "transparent", color: "var(--text-primary)" }}
                         placeholder="Farida Emad"
                         value={formData.name || ""}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -37,6 +38,7 @@ const ModalComponent = ({ mode, formData, setFormData, onSave, onClose }) => {
                                 type="file"
                                 accept="image/*"
                                 className="form-control mb-3 rounded-3"
+                                style={{ backgroundColor: "transparent", color: "var(--text-primary)" }}
                                 onChange={(e) => setFormData({ ...formData, photo: e.target.files?.[0] || null })}
                             />
                             {formData.photo && (
@@ -50,6 +52,7 @@ const ModalComponent = ({ mode, formData, setFormData, onSave, onClose }) => {
                             <label className="form-label" style={{ fontSize: 13, color: "#6c757d" }}>Email</label>
                             <input
                                 className="form-control mb-3 rounded-3"
+                                style={{ backgroundColor: "transparent", color: "var(--text-primary)" }}
                                 placeholder="Faridaemad@gmail.com"
                                 value={formData.email || ""}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -58,6 +61,7 @@ const ModalComponent = ({ mode, formData, setFormData, onSave, onClose }) => {
                             <input
                                 type="password"
                                 className="form-control mb-3 rounded-3"
+                                style={{ backgroundColor: "transparent", color: "var(--text-primary)" }}
                                 placeholder="***********"
                                 value={formData.password || ""}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -65,6 +69,7 @@ const ModalComponent = ({ mode, formData, setFormData, onSave, onClose }) => {
                             <label className="form-label" style={{ fontSize: 13, color: "#6c757d" }}>Role</label>
                             <select
                                 className="form-select mb-3 rounded-3"
+                                style={{ backgroundColor: "transparent", color: "var(--text-primary)" }}
                                 value={formData.role || ""}
                                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                             >

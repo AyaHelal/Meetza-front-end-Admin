@@ -15,19 +15,19 @@ const GroupMembershipModal = ({ currentUser, mode, formData, setFormData, groups
     return (
         <div className="modal show d-block dashboard-form-modal" style={{ backgroundColor: "rgba(0,0,0,0.5)" }} onClick={onClose}>
             <div className="modal-dialog modal-dialog-centered dashboard-form-modal__dialog" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-content rounded-4 border-0" style={{ boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
+                <div className="modal-content rounded-4 border-0" style={{ backgroundColor: "var(--card-bg)", boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
                     <div className="modal-header border-0 pb-0">
-                        <h5 className="modal-title fw-bold" style={{ fontSize: "24px", color: "#010101" }}>
+                        <h5 className="modal-title fw-bold" style={{ fontSize: "24px", color: "var(--text-primary)" }}>
                             {mode === "create" ? "Create New Membership" : "Edit Membership"}
                         </h5>
                         <button type="button" className="btn-close" onClick={onClose} aria-label="Close" style={{ fontSize: "14px" }}>
                         </button>
                     </div>
 
-                    <div className="modal-body pt-3 dashboard-form-modal__body" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: 10 }}>
+                    <div className="modal-body pt-3 dashboard-form-modal__body hide-scrollbar" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: 10 }}>
                         <form className="dashboard-form-modal__form">
                             <div className="mb-3">
-                                <label className="form-label fw-semibold" style={{ color: "#010101" }}>
+                                <label className="form-label fw-semibold" style={{ color: "var(--text-primary)" }}>
                                     Group <span style={{ color: "#FF0000" }}>*</span>
                                 </label>
                                 <div className="dashboard-form-modal__select-wrap">
@@ -37,14 +37,21 @@ const GroupMembershipModal = ({ currentUser, mode, formData, setFormData, groups
                                         onChange={(opt) => setFormData({ ...formData, group_id: opt?.value ?? '' })}
                                         placeholder="Select a group"
                                         menuPortalTarget={document.body}
-                                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                        styles={{ 
+                                            menuPortal: base => ({ ...base, zIndex: 9999 }),
+                                            control: (base) => ({ ...base, backgroundColor: 'transparent', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }),
+                                            menu: (base) => ({ ...base, backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)', zIndex: 9999 }),
+                                            option: (base, state) => ({ ...base, backgroundColor: state.isFocused ? 'var(--bg-light)' : 'transparent', color: 'var(--text-primary)', cursor: 'pointer' }),
+                                            singleValue: (base) => ({ ...base, color: 'var(--text-primary)' }),
+                                            input: (base) => ({ ...base, color: 'var(--text-primary)' })
+                                        }}
                                         isClearable
                                     />
                                 </div>
                             </div>
 
                             <div className="mb-3">
-                                <label className="form-label fw-semibold" style={{ color: "#010101" }}>
+                                <label className="form-label fw-semibold" style={{ color: "var(--text-primary)" }}>
                                     Member Email <span style={{ color: "#FF0000" }}>*</span>
                                 </label>
                                 <input
@@ -54,7 +61,7 @@ const GroupMembershipModal = ({ currentUser, mode, formData, setFormData, groups
                                     value={formData.member_email}
                                     onChange={handleChange}
                                     placeholder="Enter member email address"
-                                    style={{ border: "2px solid #E9ECEF", padding: "0.75rem", fontSize: "16px" }}
+                                    style={{ border: "1px solid var(--border-color)", padding: "0.75rem", fontSize: "16px", backgroundColor: "transparent", color: "var(--text-primary)" }}
                                 />
                             </div>
                         </form>

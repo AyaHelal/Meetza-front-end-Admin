@@ -93,9 +93,9 @@ const ResourcesPage = () => {
 
         {/* If Super Admin allow selecting content to attach to */}
 {currentUser?.role === 'Super_Admin' && (
-    <div className="m-4 p-4 bg-white rounded-3 shadow-sm">
+    <div className="m-4 p-4 rounded-3 shadow-sm" style={{ backgroundColor: "var(--surface-color)" }}>
         <div className="mb-2">
-            <label className="form-label fw-semibold" style={{color: "#888888"}}>Select Group Content</label>
+            <label className="form-label fw-semibold" style={{color: "var(--text-secondary)"}}>Select Group Content</label>
             <div className="d-flex gap-3 align-items-center">
                 <div className="flex-grow-1">
                     <Select
@@ -107,13 +107,37 @@ const ResourcesPage = () => {
                         menuPortalTarget={document.body}
                         styles={{
                             menuPortal: base => ({ ...base, zIndex: 9999 }),
-                            control: (provided) => ({
+                            control: (provided, state) => ({
                                 ...provided,
-                                border: '1px solid #dee2e6',
+                                border: '1px solid var(--border-color)',
                                 boxShadow: 'none',
+                                backgroundColor: 'var(--surface-color)',
+                                color: 'var(--text-primary)',
                                 '&:hover': {
-                                    borderColor: '#86b7fe',
+                                    borderColor: 'var(--primary-color)',
                                 }
+                            }),
+                            menu: (provided) => ({
+                                ...provided,
+                                backgroundColor: 'var(--surface-color)',
+                                border: '1px solid var(--border-color)',
+                            }),
+                            option: (provided, state) => ({
+                                ...provided,
+                                backgroundColor: state.isFocused ? 'var(--primary-color)' : 'transparent',
+                                color: state.isFocused ? 'white' : 'var(--text-primary)',
+                                '&:hover': {
+                                    backgroundColor: 'var(--primary-color)',
+                                    color: 'white',
+                                }
+                            }),
+                            singleValue: (provided) => ({
+                                ...provided,
+                                color: 'var(--text-primary)',
+                            }),
+                            placeholder: (provided) => ({
+                                ...provided,
+                                color: 'var(--text-secondary)',
                             })
                         }}
                     />
@@ -127,9 +151,9 @@ const ResourcesPage = () => {
 {currentUser?.role === 'Administrator' && (
     <>
         {contents.length > 0 ? (
-            <div className="m-4 p-4 bg-white rounded-3 shadow-sm">
+            <div className="m-4 p-4 rounded-3 shadow-sm" style={{ backgroundColor: "var(--surface-color)" }}>
                 <div className="mb-2">
-                    <label className="form-label fw-semibold" style={{color: "#888888"}}>Select Your Group Content</label>
+                    <label className="form-label fw-semibold" style={{color: "var(--text-secondary)"}}>Select Your Group Content</label>
                     <div className="d-flex gap-3 align-items-center">
                         <div className="flex-grow-1">
                             <Select
@@ -141,13 +165,37 @@ const ResourcesPage = () => {
                                 menuPortalTarget={document.body}
                                 styles={{
                                     menuPortal: base => ({ ...base, zIndex: 9999 }),
-                                    control: (provided) => ({
+                                    control: (provided, state) => ({
                                         ...provided,
-                                        border: '1px solid #dee2e6',
+                                        border: '1px solid var(--border-color)',
                                         boxShadow: 'none',
+                                        backgroundColor: 'var(--surface-color)',
+                                        color: 'var(--text-primary)',
                                         '&:hover': {
-                                            borderColor: '#86b7fe',
+                                            borderColor: 'var(--primary-color)',
                                         }
+                                    }),
+                                    menu: (provided) => ({
+                                        ...provided,
+                                        backgroundColor: 'var(--surface-color)',
+                                        border: '1px solid var(--border-color)',
+                                    }),
+                                    option: (provided, state) => ({
+                                        ...provided,
+                                        backgroundColor: state.isFocused ? 'var(--primary-color)' : 'transparent',
+                                        color: state.isFocused ? 'white' : 'var(--text-primary)',
+                                        '&:hover': {
+                                            backgroundColor: 'var(--primary-color)',
+                                            color: 'white',
+                                        }
+                                    }),
+                                    singleValue: (provided) => ({
+                                        ...provided,
+                                        color: 'var(--text-primary)',
+                                    }),
+                                    placeholder: (provided) => ({
+                                        ...provided,
+                                        color: 'var(--text-secondary)',
                                     })
                                 }}
                             />

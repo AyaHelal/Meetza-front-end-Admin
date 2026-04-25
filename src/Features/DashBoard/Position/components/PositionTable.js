@@ -25,7 +25,7 @@ export const PositionTable = ({
 
   return (
     <div className="m-4 rounded-3 position-management-card">
-      <div className="card shadow-sm rounded-3 border-0">
+      <div className="card shadow-sm rounded-3 border-0 branded-card-bg">
         <div className="position-header p-4">
           <h2 className="position-header-title h4 m-0 fw-semibold">Position Management</h2>
           <div className="position-header-actions">

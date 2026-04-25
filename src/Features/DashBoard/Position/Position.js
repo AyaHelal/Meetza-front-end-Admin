@@ -71,11 +71,14 @@ export default function Position() {
     setModalOpen(true);
   };
 
-  const handleSearch = async (query) => {
+  const handleSearch = (query) => {
     setSearchQuery(query);
-    if (query.trim() === "") return fetchData();
-    if (query.trim().length > 2) searchPositions(query).catch(() => smartToast.error("Failed to search positions"));
   };
+
+  const filteredPositions = positions.filter((pos) => {
+    const q = searchQuery.toLowerCase();
+    return pos.title && pos.title.toLowerCase().includes(q);
+  });
 
   const handleDelete = (id) => {
     setPositionToDelete(id);
@@ -96,7 +99,7 @@ export default function Position() {
 
       <PositionTable
         currentUser={currentUser}
-        positions={positions}
+        positions={filteredPositions}
         users={users}
         loading={loading}
         error={error}
