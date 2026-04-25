@@ -9,6 +9,7 @@ import {
     SignOut,
     List,
     CirclesFour,
+    Palette,
 } from "phosphor-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Dashboard.css";
@@ -23,11 +24,17 @@ import GroupMainContent from "../../Features/DashBoard/Group/GroupMainContent";
 import GroupMembershipContent from "../../Features/DashBoard/GroupMembership/GroupMembershipContent";
 import VideoDisplay from "../../Features/DashBoard/Videos/VideoDisplay";
 import ResourcesPage from "../../Features/DashBoard/Resources/ResourcesPage";
+import BrandingSettings from "../../Features/DashBoard/Branding/BrandingSettings";
+import { useBranding } from "../../context/BrandingContext";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const UserDashboard = () => {
     const { user: currentUser, logoutUser } = useAuth();
+    const { systemName, logoUrl } = useBranding();
+    
+    const userRole = (currentUser?.role || "").toString().trim().toLowerCase();
+    const isSuperAdmin = userRole.includes("super_admin") || userRole.includes("super admin");
     const navigate = useNavigate();
     const [activeMenu, setActiveMenu] = useState("dashboard");
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -70,6 +77,8 @@ const UserDashboard = () => {
         { id: "resources", icon: File, label: "Resources" },
         { id: "meeting", icon: VideoCamera, label: "Meeting" },
         { id: "videos", icon: VideoCamera, label: "Videos" },
+        ...(isSuperAdmin ? [{ id: "branding", icon: Palette, label: "Branding" }] : []),
+
         // { id: "likes", icon: Heart, label: "Likes" },
         // { id: "comments", icon: ChatCircleDots, label: "Comments" },
     ];
@@ -110,7 +119,7 @@ const UserDashboard = () => {
             {/* SIDEBAR */}
             <aside className={`dashboard-sidebar ${sidebarOpen ? "is-open" : ""}`}>
                 <div className="dashboard-sidebar-logo">
-                    <img src="/assets/MeetzaLogo.png" alt="Meetza Logo" />
+                    <img src={logoUrl || "/assets/MeetzaLogo.png"} alt={systemName} style={{ maxHeight: '45px', objectFit: 'contain' }} />
                 </div>
 
                 <nav className="dashboard-sidebar-nav">
@@ -171,8 +180,11 @@ const UserDashboard = () => {
                 {activeMenu === "videos" && (
                     <VideoDisplay currentUser={currentUser} />
                 )}
+                {activeMenu === "branding" && (
+                    <BrandingSettings />
+                )}
 
-                {activeMenu !== "dashboard" && activeMenu !== "user" && activeMenu !== "position" && activeMenu !== "content" && activeMenu !== "resources" && activeMenu !== "meeting" && activeMenu !== "group" && activeMenu !== "membership" && activeMenu !== "videos" && (
+                {activeMenu !== "dashboard" && activeMenu !== "user" && activeMenu !== "position" && activeMenu !== "content" && activeMenu !== "resources" && activeMenu !== "meeting" && activeMenu !== "group" && activeMenu !== "membership" && activeMenu !== "videos" && activeMenu !== "branding" && (
                     <div className="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
                         <h4 className="mb-2">{getMenuLabel(activeMenu)}</h4>
                         <p className="mb-0">Main component for {getMenuLabel(activeMenu)} goes here.</p>
