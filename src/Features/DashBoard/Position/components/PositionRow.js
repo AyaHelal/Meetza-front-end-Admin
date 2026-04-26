@@ -72,14 +72,13 @@ export const PositionRow = ({
                 </span>
               </button>
               <button
-                className="btn btn-sm"
-                style={{ backgroundColor: "#FF0000", borderRadius: 12 }}
+                type="button"
+                className="btn btn-sm user-card-btn-delete"
+                style={{ borderRadius: 12 }}
                 onClick={() => onDelete(position.id, user.id)}
                 title="Delete position"
               >
-                <span style={{ color: "white" }}>
-                  <Trash size={18} />
-                </span>
+                <Trash size={18} />
               </button>
             </>
           ) : null}

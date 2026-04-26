@@ -56,12 +56,9 @@ export const ResourcesRow = ({ resource, onDelete, contentId }) => {
 
                 <td className="px-5">
                     <button
-                        className="btn btn-sm btn-outline-danger"
-                        style={{
-                            backgroundColor: "#FF0000",
-                            borderRadius: 12,
-                            color: "#fff",
-                        }}
+                        type="button"
+                        className="btn btn-sm user-card-btn-delete"
+                        style={{ borderRadius: 12 }}
                         onClick={() => onDelete(contentId, id)}
                         title="Delete"
                     >

@@ -166,12 +166,123 @@
   border: 2px solid rgba(0, 118, 234, 0.3);
 }
 
-.custom-date-picker-day.selected {
-  background: linear-gradient(135deg, #0076ea 0%, #0056b3 100%);
-  color: #ffffff;
-  font-weight: 700;
-  box-shadow: 0 4px 12px rgba(0, 118, 234, 0.3);
-  transform: scale(1.05);
+/* Force blue selected day with highest specificity */
+.custom-date-picker-days .custom-date-picker-day.selected,
+div.custom-date-picker-day.selected,
+button.custom-date-picker-day.selected {
+  background: linear-gradient(135deg, #0076ea 0%, #0056b3 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 12px rgba(0, 118, 234, 0.3) !important;
+  transform: scale(1.05) !important;
+  border: none !important;
+}
+
+/* Force all orange/amber colors to blue in light mode */
+.custom-date-picker-day[style*="orange"],
+.custom-date-picker-day[style*="#ff"],
+.custom-date-picker-day[style*="amber"],
+.custom-date-picker-day[style*="rgb(255"],
+.custom-date-picker-day[style*="rgb(254"],
+.custom-date-picker-dropdown[style*="orange"],
+.custom-date-picker-dropdown[style*="#ff"],
+.custom-date-picker-dropdown[style*="amber"],
+.custom-date-picker-header[style*="orange"],
+.custom-date-picker-header[style*="#ff"],
+.custom-date-picker-header[style*="amber"],
+.custom-date-picker-nav-btn[style*="orange"],
+.custom-date-picker-nav-btn[style*="#ff"],
+.custom-date-picker-nav-btn[style*="amber"],
+.custom-date-picker-today-btn[style*="orange"],
+.custom-date-picker-today-btn[style*="#ff"],
+.custom-date-picker-today-btn[style*="amber"] {
+  background: #0076ea !important;
+  color: #ffffff !important;
+  border-color: #0076ea !important;
+}
+
+/* Override any element with orange background in CustomDatePicker */
+.custom-date-picker * [style*="orange"],
+.custom-date-picker * [style*="#ff"],
+.custom-date-picker * [style*="amber"],
+.custom-date-picker * [style*="rgb(255"],
+.custom-date-picker * [style*="rgb(254"] {
+  background: #0076ea !important;
+  color: #ffffff !important;
+  border-color: #0076ea !important;
+}
+
+/* Force blue for any hover effects with orange */
+.custom-date-picker *:hover[style*="orange"],
+.custom-date-picker *:hover[style*="#ff"],
+.custom-date-picker *:hover[style*="amber"],
+.custom-date-picker *:hover[style*="rgb(255"],
+.custom-date-picker *:hover[style*="rgb(254"] {
+  background: rgba(0, 118, 234, 0.1) !important;
+  color: #0076ea !important;
+  border-color: rgba(0, 118, 234, 0.3) !important;
+}
+
+/* ULTIMATE OVERRIDE - Force blue for ANYTHING with orange */
+div[class*="date-picker"] [style*="orange"],
+div[class*="date-picker"] [style*="#ff"],
+div[class*="date-picker"] [style*="amber"],
+div[class*="date-picker"] [style*="rgb(255"],
+div[class*="date-picker"] [style*="rgb(254"],
+button[class*="date-picker"] [style*="orange"],
+button[class*="date-picker"] [style*="#ff"],
+button[class*="date-picker"] [style*="amber"],
+*[class*="date-picker"][style*="orange"],
+*[class*="date-picker"][style*="#ff"],
+*[class*="date-picker"][style*="amber"],
+*[class*="date-picker"][style*="rgb(255"],
+*[class*="date-picker"][style*="rgb(254"] {
+  background: #0076ea !important;
+  color: #ffffff !important;
+  border-color: #0076ea !important;
+  box-shadow: none !important;
+}
+
+/* Force blue background for any element with orange background */
+[style*="background"][style*="orange"],
+[style*="background"][style*="#ff"],
+[style*="background"][style*="amber"],
+[style*="background-color"][style*="orange"],
+[style*="background-color"][style*="#ff"],
+[style*="background-color"][style*="amber"] {
+  background: #0076ea !important;
+  color: #ffffff !important;
+}
+
+/* FINAL OVERRIDE - Exact style matching */
+[style*="background: orange"],
+[style*="background:#ff"],
+[style*="background: #ff"],
+[style*="background-color: orange"],
+[style*="background-color:#ff"],
+[style*="background-color: #ff"],
+[style*="background:amber"],
+[style*="background:#amber"],
+[style*="background: #amber"],
+[style*="background-color:amber"],
+[style*="background-color:#amber"],
+[style*="background-color: #amber"],
+[style*="rgb(255"],
+[style*="rgb(254"] {
+  background: #0076ea !important;
+  color: #ffffff !important;
+  border-color: #0076ea !important;
+}
+
+/* Force blue for any button or element with background orange */
+button[style*="background: orange"],
+button[style*="background:#ff"],
+button[style*="background-color: orange"],
+div[style*="background: orange"],
+div[style*="background:#ff"],
+div[style*="background-color: orange"] {
+  background: #0076ea !important;
+  color: #ffffff !important;
 }
 
 .custom-date-picker-day.selected:hover {

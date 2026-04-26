@@ -100,13 +100,12 @@ export const GroupRow = ({
           )}
           {canManageGroup && (
             <button
-              className="btn btn-sm"
+              type="button"
+              className="btn btn-sm user-card-btn-delete"
               onClick={() => onDelete(group.id)}
-              style={{ backgroundColor: "#FF0000", borderRadius: "12px" }}
+              style={{ borderRadius: "12px" }}
             >
-              <span style={{ color: "white" }}>
-                <Trash size={24} />
-              </span>
+              <Trash size={24} />
             </button>
           )}
         </div>

@@ -234,21 +234,13 @@ tbody tr:last-child {
   display: none;
 }
 
-/* Light Mode Group Membership Specific Styles */
-.group-name-column {
-  color: white !important;
-}
-
-.group-name-column * {
-  color: white !important;
-}
-
+/* Group Membership: group & member names follow theme (light: dark text, dark: light text) */
 .group-name-text {
-  color: black !important;
+  color: var(--text-primary) !important;
   font-size: 18px;
 }
 
 .group-member-name {
-  color: white !important;
-  font-weight: semi-bold;
+  color: var(--text-primary) !important;
+  font-weight: 600;
 }

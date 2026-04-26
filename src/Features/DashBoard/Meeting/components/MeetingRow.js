@@ -287,13 +287,13 @@ export const MeetingRow = ({ meeting, groups = [], isEditing, onSave, onEdit, on
         <td className="d-flex gap-2 mt-3">
             {showInput ? (
             <div className="d-flex gap-2">
-                <button className="btn btn-sm" style={{ backgroundColor: "#00DC85", borderRadius: 12, color: "#fff" }} onClick={handleSave}><CheckCircle size={20} /></button>
+                <button type="button" className="btn btn-sm user-card-btn-edit" style={{ borderRadius: 12 }} onClick={handleSave}><CheckCircle size={20} /></button>
                 <button className="btn btn-sm" style={{ backgroundColor: "#6c757d", borderRadius: 12, color: "white" }} onClick={handleCancel}>×</button>
             </div>
             ) : canEdit ? (
             <>
-                <button className="btn btn-sm" style={{ backgroundColor: "#00DC85", borderRadius: 12, color: "#fff" }} onClick={() => onEdit(meeting.id)}><PencilSimpleLine size={18} /></button>
-                <button className="btn btn-sm" style={{ backgroundColor: "#FF0000", borderRadius: 12, color: "#fff" }} onClick={() => onDelete(meeting.id)}> <Trash size={18} /> </button>
+                <button type="button" className="btn btn-sm user-card-btn-edit" style={{ borderRadius: 12 }} onClick={() => onEdit(meeting.id)}><PencilSimpleLine size={18} /></button>
+                <button type="button" className="btn btn-sm user-card-btn-delete" style={{ borderRadius: 12 }} onClick={() => onDelete(meeting.id)}><Trash size={18} /></button>
             </>
             ) : null}
         </td>

@@ -40,7 +40,7 @@ export const GroupMembershipRowCard = ({
             )}
           </div>
           <div className="user-card-title-wrap">
-            <span className="user-card-name" style={{ color: "black" }}>{groupName}</span>
+            <span className="user-card-name group-name-text">{groupName}</span>
           </div>
         </div>
         <div className="user-card-meta">
@@ -64,30 +64,6 @@ export const GroupMembershipRowCard = ({
             </div>
             {members.map((member, index) => (
               <div key={member.composite_id || index} className="membership-member-row d-flex align-items-center gap-2">
-                {/* Group Photo */}
-                <div
-                  className="d-flex align-items-center justify-content-center overflow-hidden"
-                  style={{
-                    width: 24,
-                    height: 24,
-                    background: membership.group_photo ? "transparent" : "linear-gradient(135deg, #0076EA, #00DC85)",
-                    color: "white",
-                    fontWeight: 600,
-                    fontSize: "10px",
-                    border: "none",
-                    borderRadius: "4px",
-                  }}
-                >
-                  {membership.group_photo ? (
-                    <img
-                      src={membership.group_photo}
-                      alt={membership.group_name}
-                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                    />
-                  ) : (
-                    <UsersThree size={12} weight="bold" />
-                  )}
-                </div>
                 {/* Member Avatar */}
                 <div
                   className="rounded-circle d-flex align-items-center justify-content-center overflow-hidden"
@@ -105,13 +81,13 @@ export const GroupMembershipRowCard = ({
                   {!member.member_photo && <User size={16} weight="bold" />}
                 </div>
                 <div className="membership-member-info flex-grow-1">
-                  <span style={{ color: "white" }}>{getMemberName(member.member_id, member.member_name) || "N/A"}</span>
+                  <span className="group-member-name">{getMemberName(member.member_id, member.member_name) || "N/A"}</span>
                   <span className="text-muted small d-block">{getMemberEmail(member.member_id, member.member_email) || "N/A"}</span>
                 </div>
                 {isAdmin && (
                   <button
                     type="button"
-                    className="btn btn-sm p-1 text-danger membership-delete-btn"
+                    className="btn btn-sm user-card-btn-delete p-1"
                     onClick={() => onDelete(member.composite_id || `${membership.group_id}_${member.member_id}`)}
                     aria-label="Remove member"
                   >
