@@ -89,7 +89,6 @@ export default function LoginForm() {
         }
     }, [showCaptcha]);
 
-    // Submit login. When backend asked for captcha (429), we only send token from callback — لا نعتمد على state.
     const submitLogin = async (recaptchaTokenToSend = null) => {
         if (!validateForm()) return;
 

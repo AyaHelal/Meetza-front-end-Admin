@@ -8,8 +8,6 @@ const WeeklyDeleteModal = ({ show, onClose, onConfirmThisWeek, onConfirmAllWeeks
     const buttonTextColor = isDarkMode ? 'white' : '#010101';
     const cancelBgColor = isDarkMode ? '#374151' : 'rgb(244, 246, 248)';
     const hoverBgColor = isDarkMode ? '#374151' : '#f8f9fa';
-    const dangerHoverBgColor = isDarkMode ? '#7f1d1d' : '#fef2f2';
-
     return (
         <div className="modal d-block" style={{ background: 'rgba(0,0,0,0.45)' }}>
             <div className="card p-4 mx-auto" style={{ maxWidth: 500, borderRadius: 12, marginTop: '6rem' }}>
@@ -56,28 +54,13 @@ const WeeklyDeleteModal = ({ show, onClose, onConfirmThisWeek, onConfirmAllWeeks
                         </button>
                         <button
                             type="button"
-                            className="btn rounded-3 d-flex align-items-center gap-3"
+                            className="btn rounded-3 d-flex align-items-center gap-3 btn-dashboard-confirm-delete w-100"
                             onClick={onConfirmAllWeeks}
                             disabled={confirming}
                             style={{
-                                backgroundColor: "transparent",
-                                color: "#dc2626",
-                                border: "1px solid transparent",
                                 padding: "12px 20px",
                                 fontSize: "16px",
-                                fontWeight: "600",
                                 textAlign: "left",
-                                transition: "all 0.2s ease"
-                            }}
-                            onMouseOver={(e) => {
-                                e.target.style.backgroundColor = dangerHoverBgColor;
-                                e.target.style.transform = "translateY(-1px)";
-                                e.target.style.boxShadow = "0 2px 8px rgba(220, 38, 38, 0.1)";
-                            }}
-                            onMouseOut={(e) => {
-                                e.target.style.backgroundColor = "transparent";
-                                e.target.style.transform = "translateY(0)";
-                                e.target.style.boxShadow = "none";
                             }}
                         >
                             🗑️ Delete all weekly meetings

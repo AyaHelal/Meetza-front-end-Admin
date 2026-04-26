@@ -1052,6 +1052,14 @@ small {
   object-fit: cover;
 }
 
+.video-sidebar-thumb--placeholder {
+  width: 70px;
+  height: 70px;
+  min-width: 70px;
+  flex-shrink: 0;
+  border: 1px solid #dee2e6;
+}
+
 .video-upload-cta-wrap {
   width: 367px;
   margin-bottom: 0;
@@ -1113,16 +1121,6 @@ small {
   padding: 10px 24px;
   font-size: 16px;
   font-weight: 600;
-}
-
-.video-modal-btn-danger {
-  background-color: #ff0000;
-  color: #ffffff;
-  border: none;
-  padding: 10px 24px;
-  font-size: 16px;
-  font-weight: 600;
-  margin-left: 12px;
 }
 
 .video-edit-form-label {

@@ -19,8 +19,8 @@ import {
     deleteVideoApi,
     deleteCommentApi,
     uploadVideoApi,
-    summarizeVideo,
     formatRelativeTime,
+    getDefaultPosterFile,
 } from '../services/videoService';
 
 const initialUploadFormData = {
@@ -409,7 +409,11 @@ export function useVideoDisplay(currentUserProp) {
             formData.append('group_id', uploadFormData.group_id);
             formData.append('description', uploadFormData.description || '');
             formData.append('duration', durationSeconds || 0);
-            if (uploadFormData.poster_file) formData.append('poster_file', uploadFormData.poster_file);
+            const posterFile =
+                uploadFormData.poster_file instanceof File
+                    ? uploadFormData.poster_file
+                    : await getDefaultPosterFile();
+            formData.append('poster_file', posterFile);
             setUploadProgress(0);
             const response = await uploadVideoApi(formData, (progressEvent) => {
                 if (progressEvent.total) {
@@ -418,16 +422,6 @@ export function useVideoDisplay(currentUserProp) {
                 }
             });
             toast.success('Video uploaded successfully!');
-            const videoData = response?.data?.data || response?.data;
-            if (videoData?.id && videoData?.video_url) {
-                const fullUrl = buildFileUrl(videoData.video_url);
-                summarizeVideo(videoData.id, fullUrl, 'en').catch((err) =>
-                    console.warn('Background summary EN failed:', err)
-                );
-                summarizeVideo(videoData.id, fullUrl, 'ar').catch((err) =>
-                    console.warn('Background summary AR failed:', err)
-                );
-            }
             setShowUploadModal(false);
             setUploadFormData(initialUploadFormData);
             setUploadProgress(0);
@@ -461,26 +455,6 @@ export function useVideoDisplay(currentUserProp) {
     const resetUploadForm = () => {
         setUploadFormData(initialUploadFormData);
         setUploadProgress(0);
-    };
-
-    const handleSummarizeVideo = async (video) => {
-        const videoId = video?._id || video?.id;
-        const videoUrl = buildFileUrl(video?.video_url);
-        if (!videoId || !videoUrl) {
-            toast.error('Video ID or URL missing');
-            return;
-        }
-        try {
-            toast.info('Generating summary…');
-            await Promise.all([
-                summarizeVideo(videoId, videoUrl, 'en'),
-                summarizeVideo(videoId, videoUrl, 'ar'),
-            ]);
-            toast.success('Summary generated');
-        } catch (err) {
-            console.error('Summary failed:', err);
-            toast.error(err?.response?.data?.message || err?.message || 'Summary failed');
-        }
     };
 
     return {
@@ -530,7 +504,6 @@ export function useVideoDisplay(currentUserProp) {
         handleEditPosterFileChange,
         handleUploadVideo,
         resetUploadForm,
-        handleSummarizeVideo,
         setShowEditModal,
         setShowDeleteModal,
         setVideoToDelete,

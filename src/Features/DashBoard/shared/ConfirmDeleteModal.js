@@ -45,17 +45,8 @@ export const ConfirmDeleteModal = ({ show, onClose, onConfirm, title = "Delete",
                         </button>
                         <button
                             type="button"
-                            className="btn rounded-3"
+                            className="btn rounded-3 btn-dashboard-confirm-delete"
                             onClick={onConfirm}
-                            style={{
-                                backgroundColor: "#FF0000",
-                                color: "#FFFFFF",
-                                border: "none",
-                                padding: "10px 24px",
-                                fontSize: "16px",
-                                fontWeight: "600",
-                                marginLeft: "12px",
-                            }}
                         >
                             Delete
                         </button>

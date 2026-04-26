@@ -18,9 +18,10 @@ const ResourcesPage = () => {
     const [resourceToDelete, setResourceToDelete] = useState(null);
 
     const { contents, fetchContents } = useGroupContentData();
-    const { addResource, addLinkResource, deleteResource } = useResourcesData(fetchContents);
+    const { addResource, addLinkResource, deleteResource, fileUploadPending, loading: resourcesLoading } = useResourcesData(fetchContents);
 
     const onUploadClick = () => {
+        if (resourcesLoading) return;
         // If super admin, require selecting a group content first
         if (currentUser?.role === 'Super_Admin' && !selectedContent) {
         smartToast.error('Please select a group content before uploading');
@@ -215,7 +216,16 @@ const ResourcesPage = () => {
 
         <input ref={fileInputRef} type="file" style={{ display: 'none' }} onChange={handleFileChange} />
 
-        <ResourcesTable contents={contents} currentUser={currentUser} onUploadClick={onUploadClick} onLinksClick={onLinksClick} onDelete={handleDelete} selectedContentId={selectedContent} />
+        <ResourcesTable
+            contents={contents}
+            currentUser={currentUser}
+            onUploadClick={onUploadClick}
+            onLinksClick={onLinksClick}
+            onDelete={handleDelete}
+            selectedContentId={selectedContent}
+            pendingFileUpload={fileUploadPending}
+            uploadDisabled={!!fileUploadPending || resourcesLoading}
+        />
 
         <ResourcesLinksModal isOpen={isLinksModalOpen} onClose={() => setIsLinksModalOpen(false)} onSubmit={handleLinkSubmit} loading={false} />
 

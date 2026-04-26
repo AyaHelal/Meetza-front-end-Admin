@@ -2,8 +2,9 @@ import { PlusCircle } from "phosphor-react";
 import "../../CSS/Table.css";
 import ResourcesRow from "./ResourcesRow";
 import { ResourcesRowCard } from "./ResourcesRowCard";
+import { ResourcesTableRowUploading, ResourcesCardUploading } from "./ResourcesUploadingRow";
 
-const ResourcesTable = ({ contents = [], onUploadClick, onLinksClick, onDelete, selectedContentId = null }) => {
+const ResourcesTable = ({ contents = [], onUploadClick, onLinksClick, onDelete, selectedContentId = null, pendingFileUpload = null, uploadDisabled = false }) => {
   const selectedContent = contents.find((c) => c.id === selectedContentId);
   const visibleResources = selectedContent?.resources || [];
 
@@ -29,9 +30,10 @@ const ResourcesTable = ({ contents = [], onUploadClick, onLinksClick, onDelete, 
               type="button"
               className="btn rounded-4 d-flex align-items-center gap-2 position-header-btn"
               onClick={onUploadClick}
+              disabled={uploadDisabled}
             >
               <PlusCircle size={20} weight="bold" />
-              <span className="fw-semibold">Upload Files</span>
+              <span className="fw-semibold">{pendingFileUpload ? "Uploading…" : "Upload Files"}</span>
             </button>
             <button
               type="button"
@@ -57,7 +59,10 @@ const ResourcesTable = ({ contents = [], onUploadClick, onLinksClick, onDelete, 
               </tr>
             </thead>
             <tbody>
-              {visibleResources.length === 0 ? (
+              {pendingFileUpload && (
+                <ResourcesTableRowUploading fileName={pendingFileUpload.fileName} />
+              )}
+              {visibleResources.length === 0 && !pendingFileUpload ? (
                 <tr>
                   <td colSpan={6} className="text-center py-4">
                     No resources found
@@ -78,7 +83,8 @@ const ResourcesTable = ({ contents = [], onUploadClick, onLinksClick, onDelete, 
         </div>
 
         <div className="resources-table-mobile user-cards-container">
-          {visibleResources.length === 0 ? (
+          {pendingFileUpload && <ResourcesCardUploading fileName={pendingFileUpload.fileName} />}
+          {visibleResources.length === 0 && !pendingFileUpload ? (
             <div className="user-card user-card-placeholder text-center py-4 text-muted">
               No resources found
             </div>
