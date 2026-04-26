@@ -32,6 +32,10 @@ export const MeetingRowCard = ({
     String(recording).trim() === "1" ||
     recording === "Recording";
 
+  const w = meeting?.weekly ?? meeting?.weekly_option ?? meeting?.is_weekly;
+  const isWeeklyActive =
+    w === true || w === 1 || w === "1" || String(w).trim() === "1" || w === "Active";
+
   const formatDate = (value) => {
     if (!value) return "—";
     return new Date(value).toLocaleString();
@@ -40,7 +44,7 @@ export const MeetingRowCard = ({
   return (
     <div className="user-card meeting-row-card">
       <div className="user-card-body">
-        <div className="user-card-header">
+        <div className="user-card-header user-card-header--icon-only">
           {meeting.poster_url ? (
             <img
               src={meeting.poster_url}
@@ -52,22 +56,30 @@ export const MeetingRowCard = ({
               <CalendarBlank size={28} weight="bold" />
             </div>
           )}
-          <div className="user-card-title-wrap">
-            <span className="user-card-name">{meeting.title || "—"}</span>
-            <span className="user-card-role">{getGroupName()}</span>
-          </div>
         </div>
         <div className="user-card-meta">
-          <span className="user-card-label">Start</span>
+          <span className="user-card-label">Title</span>
+          <span className="user-card-value">{meeting.title || "—"}</span>
+        </div>
+        <div className="user-card-meta">
+          <span className="user-card-label">Group</span>
+          <span className="user-card-value">{getGroupName()}</span>
+        </div>
+        <div className="user-card-meta">
+          <span className="user-card-label">Start_Time</span>
           <span className="user-card-value">{formatDate(meeting.start_time)}</span>
         </div>
         <div className="user-card-meta">
-          <span className="user-card-label">End</span>
+          <span className="user-card-label">End_Time</span>
           <span className="user-card-value">{formatDate(meeting.end_time)}</span>
         </div>
         <div className="user-card-meta">
           <span className="user-card-label">Recording</span>
           <span className="user-card-value">{isRecording ? "Yes" : "No"}</span>
+        </div>
+        <div className="user-card-meta">
+          <span className="user-card-label">Weekly</span>
+          <span className="user-card-value">{isWeeklyActive ? "Active" : "Inactive"}</span>
         </div>
         <div className="user-card-meta">
           <span className="user-card-label">Status</span>

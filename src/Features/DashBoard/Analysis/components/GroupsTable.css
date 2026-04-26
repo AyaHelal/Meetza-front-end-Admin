@@ -75,7 +75,7 @@
 .groups-table {
     width: 100%;
     min-width: 1000px;
-    table-layout: fixed;
+    table-layout: auto;
     border-collapse: collapse;
 }
 
@@ -102,4 +102,13 @@
 
 .groups-table tbody tr:last-child {
     border-bottom: none;
+}
+
+@media (max-width: 768px) {
+    .groups-table th,
+    .groups-table td {
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
 }
