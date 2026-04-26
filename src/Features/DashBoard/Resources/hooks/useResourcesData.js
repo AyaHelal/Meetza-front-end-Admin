@@ -5,9 +5,13 @@ import { smartToast } from "../../../../utils/toastManager";
 export default function useResourcesData(fetchContents) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  /** While a file is uploading: show a pending row in the table until the request finishes. */
+  const [fileUploadPending, setFileUploadPending] = useState(null);
 
   const addResource = useCallback(async (meetingContentId, file) => {
+    const fileName = file instanceof File ? file.name : (file?.file?.name || "File");
     try {
+      setFileUploadPending({ fileName });
       setLoading(true);
       const form = new FormData();
       // Append file with 'files' field name (backend expects this)
@@ -33,6 +37,7 @@ export default function useResourcesData(fetchContents) {
       throw err;
     } finally {
       setLoading(false);
+      setFileUploadPending(null);
     }
   }, [fetchContents]);
 
@@ -87,6 +92,7 @@ export default function useResourcesData(fetchContents) {
   return {
     loading,
     error,
+    fileUploadPending,
     addResource,
     addLinkResource,
     deleteResource,

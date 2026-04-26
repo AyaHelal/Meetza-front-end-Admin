@@ -1,9 +1,10 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { ThumbsDown, HeartStraight, ChatTeardropDots, PencilSimpleLine, Trash, MagnifyingGlass, ArrowLeft, UploadSimple, FileText, DownloadSimple } from 'phosphor-react';
+import { ThumbsDown, HeartStraight, ChatTeardropDots, PencilSimpleLine, Trash, MagnifyingGlass, ArrowLeft, UploadSimple, DownloadSimple } from 'phosphor-react';
 import { downloadVideo } from '../../../utils/videoUtils';
 import './VideoDisplay.css';
 import { useVideoDisplay } from './hooks/useVideoDisplay';
+import { getVideoSidebarBadge, getDefaultPosterPublicUrl } from './services/videoService';
 
 const VideoDisplay = ({ currentUser: currentUserProp }) => {
     const {
@@ -44,7 +45,6 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
         handleEditPosterFileChange,
         handleUploadVideo,
         resetUploadForm,
-        handleSummarizeVideo,
         setShowEditModal,
         setShowDeleteModal,
         setVideoToDelete,
@@ -195,7 +195,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                                     {/* Poster File */}
                                                     <div className="mb-3">
                                                         <label className="form-label fw-semibold video-form-label">
-                                                            Poster Image <span className="video-form-required">*</span>
+                                                            Poster Image <span className="text-muted fw-normal">(optional)</span>
                                                         </label>
                                                         <input
                                                             type="file"
@@ -215,7 +215,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                                             </div>
                                                         )}
                                                         <small className="text-muted mt-1 d-block">
-                                                            Maximum file size: 10MB
+                                                            Maximum file size: 10MB. If omitted, the default poster is used.
                                                         </small>
                                                     </div>
 
@@ -308,7 +308,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                 <div className="position-relative rounded-3">
                                     <video
                                         src={buildFileUrl(currentVideo.video_url) || undefined}
-                                        poster={buildFileUrl(currentVideo.poster_url) || undefined}
+                                        poster={buildFileUrl(currentVideo.poster_url) || getDefaultPosterPublicUrl()}
                                         controls
                                         className="w-100 px-3 video-player-el"
                                     />
@@ -459,11 +459,38 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                             </div>
                         </div>
                         <div className="card-body p-2 videos-sidebar-scroll">
+                            {uploading && showUploadModal && (
+                                <div
+                                    className="d-flex align-items-center shadow-sm p-2 mb-2 rounded video-sidebar-item video-sidebar-item--uploading"
+                                >
+                                    <div className="rounded video-sidebar-thumb d-flex align-items-center justify-content-center bg-light video-sidebar-thumb--placeholder">
+                                        <div className="spinner-border spinner-border-sm text-primary" role="status">
+                                            <span className="visually-hidden">Uploading</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex-grow-1 ms-3 min-w-0">
+                                        <h6 className="mb-1 small video-sidebar-item-title text-truncate">
+                                            {uploadFormData.title || '—'}
+                                        </h6>
+                                        {(() => {
+                                            const g = groups.find(
+                                                (gr) => String(gr.id) === String(uploadFormData.group_id)
+                                            );
+                                            const gn = g?.name || g?.group_name;
+                                            return gn ? (
+                                                <p className="mb-0 small video-sidebar-item-group text-truncate">{gn}</p>
+                                            ) : null;
+                                        })()}
+                                    </div>
+                                    <span className="badge rounded-pill text-bg-warning flex-shrink-0 align-self-center">In progress</span>
+                                </div>
+                            )}
                             {videos.length > 0 ? (
                                 videos.map((video) => {
                                     const videoId = video._id || video.id;
                                     const currentVideoId = currentVideo?._id || currentVideo?.id;
                                     const isSelected = currentVideo && videoId === currentVideoId;
+                                    const stateBadge = getVideoSidebarBadge(video);
 
                                     return (
                                         <div
@@ -475,7 +502,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleVideoSelect(video); }}
                                         >
                                             <img
-                                                src={buildFileUrl(video.poster_url) || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'60\'%3E%3Crect fill=\'%23e0e0e0\' width=\'80\' height=\'60\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23999\' font-size=\'10\' font-family=\'sans-serif\'%3ENo poster%3C/text%3E%3C/svg%3E'}
+                                                src={buildFileUrl(video.poster_url) || getDefaultPosterPublicUrl()}
                                                 alt={video.title}
                                                 className="rounded video-sidebar-thumb"
                                             />
@@ -491,6 +518,11 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                                     {formatDuration(getVideoDuration(video))}
                                                 </p>
                                             </div>
+                                            {stateBadge && (
+                                                <span className={`badge rounded-pill ${stateBadge.className} flex-shrink-0 align-self-center me-1`}>
+                                                    {stateBadge.label}
+                                                </span>
+                                            )}
                                             <div className="d-flex gap-1">
 
 
@@ -594,7 +626,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                 </button>
                                 <button
                                     type="button"
-                                    className="btn rounded-3 video-modal-btn-danger"
+                                    className="btn rounded-3 btn-dashboard-confirm-delete"
                                     onClick={confirmDeleteVideo}
                                 >
                                     Delete
@@ -652,7 +684,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                 </button>
                                 <button
                                     type="button"
-                                    className="btn rounded-3 video-modal-btn-danger"
+                                    className="btn rounded-3 btn-dashboard-confirm-delete"
                                     onClick={confirmDeleteComment}
                                 >
                                     Delete

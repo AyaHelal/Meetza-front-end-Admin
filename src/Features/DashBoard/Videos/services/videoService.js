@@ -1,5 +1,20 @@
-import axios from 'axios';
 import api from '../../../../utils/api';
+
+/** Static asset used when no poster is uploaded; place file at `public/assets/video-standard.png`. */
+export function getDefaultPosterPublicUrl() {
+    const p = (typeof process !== 'undefined' && process.env && process.env.PUBLIC_URL) || '';
+    if (!p) return '/assets/video-standard.png';
+    return `${p.replace(/\/$/, '')}/assets/video-standard.png`;
+}
+
+/** File used in upload FormData when the user does not select a poster image. */
+export async function getDefaultPosterFile() {
+    const url = getDefaultPosterPublicUrl();
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Default poster not found (${url})`);
+    const blob = await res.blob();
+    return new File([blob], 'video-standard.png', { type: blob.type || 'image/png' });
+}
 
 /**
  * Normalize duration from API to seconds.
@@ -243,28 +258,30 @@ export async function uploadVideoApi(formData, onUploadProgress) {
     }
 }
 
-/**
- * Generate AI summary and transcript for a video.
- * Same API as meetza: POST http://localhost:8000/summarize_video/:video_id with video file + URL.
- */
-export async function summarizeVideo(videoId, videoUrl, language = 'en') {
-    if (!videoId) throw new Error('video ID is required');
-    if (!videoUrl) throw new Error('video URL is required');
+/** Label + Bootstrap badge class for video moderation / pipeline state (if API sends fields). */
+export function getVideoSidebarBadge(video) {
+    if (!video) return null;
+    if (video.is_rejected === true || video.is_rejected === 1 || (video.rejection_reason && String(video.rejection_reason).trim())) {
+        return { label: 'Rejected', className: 'text-bg-danger' };
+    }
+    if (video.is_approved === 0) {
+        return { label: 'In progress', className: 'text-bg-warning' };
+    }
+    if (video.is_approved === 1) return null;
 
-    const formData = new FormData();
-    formData.append('url', videoUrl);
-
-    const res = await api.post(
-        `/video/summarize_video/${encodeURIComponent(videoId)}`,
-        formData,
-        {
-            timeout: 1800000,
-            headers: {
-                'X-Localization': language,
-            },
-        }
-    );
-
-    const root = res?.data;
-    return root;
+    const raw = String(video.status ?? video.approval_status ?? video.video_status ?? '').trim();
+    if (!raw) return null;
+    const lower = raw.toLowerCase();
+    if (['rejected', 'denied', 'refused'].some((k) => lower === k) || lower.startsWith('reject')) {
+        return { label: 'Rejected', className: 'text-bg-danger' };
+    }
+    if (
+        ['pending', 'processing', 'in_progress', 'in review', 'awaiting', 'in_review', 'submitted', 'queue', 'uploading'].some(
+            (k) => lower === k || lower.includes(k)
+        )
+    ) {
+        return { label: 'In progress', className: 'text-bg-warning' };
+    }
+    if (['approved', 'published', 'active', 'live', 'completed', 'accepted'].some((k) => lower === k)) return null;
+    return null;
 }
