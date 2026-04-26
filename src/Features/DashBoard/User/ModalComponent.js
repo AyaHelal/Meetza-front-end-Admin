@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
+import { Eye, EyeSlash } from "phosphor-react";
 
 const ModalComponent = ({ mode, formData, setFormData, onSave, onClose }) => {
+    const [showPassword, setShowPassword] = useState(false);
     const isEdit = mode === "edit";
 
     return (
@@ -26,7 +28,7 @@ const ModalComponent = ({ mode, formData, setFormData, onSave, onClose }) => {
                     <input
                         className="form-control mb-3 rounded-3"
                         style={{ backgroundColor: "transparent", color: "var(--text-primary)" }}
-                        placeholder="Farida Emad"
+                        placeholder="John doe"
                         value={formData.name || ""}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
@@ -53,19 +55,29 @@ const ModalComponent = ({ mode, formData, setFormData, onSave, onClose }) => {
                             <input
                                 className="form-control mb-3 rounded-3"
                                 style={{ backgroundColor: "transparent", color: "var(--text-primary)" }}
-                                placeholder="Faridaemad@gmail.com"
+                                placeholder="johndoe@gmail.com"
                                 value={formData.email || ""}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             />
                             <label className="form-label" style={{ fontSize: 13, color: "#6c757d" }}>Password</label>
-                            <input
-                                type="password"
-                                className="form-control mb-3 rounded-3"
-                                style={{ backgroundColor: "transparent", color: "var(--text-primary)" }}
-                                placeholder="***********"
-                                value={formData.password || ""}
-                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            />
+                            <div className="position-relative mb-3">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    className="form-control rounded-3"
+                                    style={{ backgroundColor: "transparent", color: "var(--text-primary)", paddingRight: "40px" }}
+                                    placeholder="••••••••"
+                                    value={formData.password || ""}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                />
+                                <button
+                                    type="button"
+                                    className="btn position-absolute top-50 translate-middle-y end-0 border-0"
+                                    style={{ background: "transparent", paddingRight: "15px" }}
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeSlash size={20} color="#6c757d" /> : <Eye size={20} color="#6c757d" />}
+                                </button>
+                            </div>
                             <label className="form-label" style={{ fontSize: 13, color: "#6c757d" }}>Role</label>
                             <select
                                 className="form-select mb-3 rounded-3"
@@ -74,7 +86,8 @@ const ModalComponent = ({ mode, formData, setFormData, onSave, onClose }) => {
                                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                             >
                                 <option value="">Choose</option>
-                                <option value="administrator">Administrator</option>
+                                <option value="administrator">Leader</option>
+                                <option value="Super_Admin">Super Admin</option>
                                 <option value="member">Member</option>
                             </select>
                         </>

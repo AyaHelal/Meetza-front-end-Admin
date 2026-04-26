@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { useUserData } from "./hooks/useUserData";
 import { UserHeader } from "./components/UserHeader";
 import { UserTable } from "./components/UserTable";
+import { PlusCircle } from "phosphor-react";
 import { SearchBar } from "../shared/SearchBar";
 import { ConfirmDeleteModal } from "../shared/ConfirmDeleteModal";
 import ModalComponent from "./ModalComponent";
@@ -37,6 +38,12 @@ const UserMainContent = ({ currentUser }) => {
         setModalMode("edit");
         setFormData({ name: user.name, email: user.email, password: "", role: user.role });
         setSelectedUser(user);
+        setShowModal(true);
+    };
+
+    const handleAdd = () => {
+        setModalMode("create");
+        setFormData({ name: "", email: "", password: "", role: "member", photo: null });
         setShowModal(true);
     };
 
@@ -123,11 +130,21 @@ const UserMainContent = ({ currentUser }) => {
                         </div>
                         <div className="d-flex align-items-center gap-3 flex-grow-1 justify-content-end">
                             {isSuperAdmin && (
-                                <SearchBar
-                                    value={searchQuery}
-                                    onChange={handleSearchChange}
-                                    placeholder="Search by name..."
-                                />
+                                <>
+                                    <button
+                                        type="button"
+                                        className="btn rounded-4 d-flex align-items-center gap-2 position-header-btn"
+                                        onClick={handleAdd}
+                                    >
+                                        <PlusCircle size={20} weight="bold" />
+                                        <span className="fw-semibold">Create User</span>
+                                    </button>
+                                    <SearchBar
+                                        value={searchQuery}
+                                        onChange={handleSearchChange}
+                                        placeholder="Search by name..."
+                                    />
+                                </>
                             )}
                         </div>
                     </div>
