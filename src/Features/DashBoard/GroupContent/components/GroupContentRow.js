@@ -1,6 +1,6 @@
 // In GroupContentRow.js
 import React from "react";
-import { Trash, PencilSimpleLine } from "phosphor-react";
+import { PencilSimpleLine } from "phosphor-react";
 
 export const GroupContentRow = ({ content, onEdit, onDelete, currentUser, isSuperAdmin }) => {
     if (!content) return null;
@@ -37,12 +37,11 @@ export const GroupContentRow = ({ content, onEdit, onDelete, currentUser, isSupe
                     {canEdit && (
                         <>
                             <button
-                                className="btn btn-sm"
+                                type="button"
+                                className="btn btn-sm user-card-btn-edit"
                                 style={{
-                                    backgroundColor: "#00DC85",
                                     borderRadius: 12,
-                                    color: "#fff",
-                                    padding: '4px 8px'
+                                    padding: '4px 8px',
                                 }}
                                 onClick={() => onEdit(content.id)}
                             >

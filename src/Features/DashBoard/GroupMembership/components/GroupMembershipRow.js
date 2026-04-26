@@ -118,30 +118,6 @@ export const GroupMembershipRow = ({
                       }}
                     >
                       <div className="d-flex align-items-center gap-2" style={{ flex: 1 }}>
-                        {/* Group Photo */}
-                        <div
-                          className="d-flex align-items-center justify-content-center overflow-hidden"
-                          style={{
-                            width: 24,
-                            height: 24,
-                            background: membership.group_photo ? "transparent" : "linear-gradient(135deg, #0076EA, #00DC85)",
-                            color: "white",
-                            fontWeight: 600,
-                            fontSize: "10px",
-                            border: "none",
-                            borderRadius: "4px",
-                          }}
-                        >
-                          {membership.group_photo ? (
-                            <img
-                              src={membership.group_photo}
-                              alt={membership.group_name}
-                              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                            />
-                          ) : (
-                            <UsersThree size={12} weight="bold" />
-                          )}
-                        </div>
                         {/* Member Avatar */}
                         <div
                           className="rounded-circle d-flex align-items-center justify-content-center overflow-hidden"
@@ -169,25 +145,18 @@ export const GroupMembershipRow = ({
                       </div>
                       {isAdmin && (
                         <button
-                          className="btn btn-sm"
+                          type="button"
+                          className="btn btn-sm user-card-btn-delete"
                           onClick={(e) => {
                             e.stopPropagation();
                             onDelete(member.composite_id || `${membership.group_id}_${member.member_id}`);
                           }}
                           style={{
-                            backgroundColor: "transparent",
-                            border: "none",
-                            padding: "4px",
-                            color: "#FF0000",
+                            padding: "4px 8px",
                             marginLeft: "8px",
+                            borderRadius: 8,
                           }}
                           title={`Delete ${member.member_name || member.member_email}`}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.color = "#FF0000";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.color = "#FF0000";
-                          }}
                         >
                           <Trash size={16} weight="regular" />
                         </button>
