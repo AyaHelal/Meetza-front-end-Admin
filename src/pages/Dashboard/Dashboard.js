@@ -35,13 +35,12 @@ const UserDashboard = () => {
     const { user: currentUser, logoutUser } = useAuth();
     const { systemName, logoUrl } = useBranding();
     const { theme, setTheme } = useTheme();
-    
+
     const userRole = (currentUser?.role || "").toString().trim().toLowerCase();
     const isSuperAdmin = userRole.includes("super_admin") || userRole.includes("super admin");
     const navigate = useNavigate();
     const [activeMenu, setActiveMenu] = useState("dashboard");
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [showThemePicker, setShowThemePicker] = useState(false);
 
     // Close sidebar when route/content changes (e.g. on mobile after menu click)
     const handleMenuClick = (id) => {
@@ -81,10 +80,6 @@ const UserDashboard = () => {
         { id: "resources", icon: File, label: "Resources" },
         { id: "meeting", icon: VideoCamera, label: "Meeting" },
         { id: "videos", icon: VideoCamera, label: "Videos" },
-        ...(isSuperAdmin ? [{ id: "branding", icon: Palette, label: "Branding" }] : []),
-
-        // { id: "likes", icon: Heart, label: "Likes" },
-        // { id: "comments", icon: ChatCircleDots, label: "Comments" },
     ];
 
     const getMenuLabel = (id) => {
@@ -144,7 +139,16 @@ const UserDashboard = () => {
                 </nav>
 
                 <div className="dashboard-sidebar-footer position-relative">
-                    <div className="d-flex gap-2 px-2">
+                    <div className="d-flex flex-column gap-2 px-2">
+                        <button
+                            type="button"
+                            className={`btn d-flex align-items-center rounded-5 ${activeMenu === 'branding' ? 'active-settings' : ''}`}
+                            onClick={() => setActiveMenu('branding')}
+                            aria-label="Settings"
+                            title="Settings"
+                        >
+                            <GearSix size={24} className="dashboard-sidebar-settings" />
+                        </button>
                         <button
                             type="button"
                             className="btn d-flex align-items-center rounded-5"
@@ -154,28 +158,7 @@ const UserDashboard = () => {
                         >
                             <SignOut size={24} className="dashboard-sidebar-logout" />
                         </button>
-                        <button
-                            type="button"
-                            className={`btn d-flex align-items-center rounded-5 ${showThemePicker ? 'active-settings' : ''}`}
-                            onClick={() => setShowThemePicker(!showThemePicker)}
-                            aria-label="Theme Settings"
-                            title="Theme Settings"
-                        >
-                            <GearSix size={24} className="dashboard-sidebar-settings" />
-                        </button>
                     </div>
-
-                    {showThemePicker && (
-                        <div className="theme-picker-dropdown shadow-lg rounded-4 p-2">
-                            <div className="theme-option" onClick={() => { setTheme('light'); setShowThemePicker(false); }}>
-                                <div className="theme-circle light"></div> <span>Light</span>
-                            </div>
-                            <div className="theme-option" onClick={() => { setTheme('dark'); setShowThemePicker(false); }}>
-                                <div className="theme-circle dark"></div> <span>Dark</span>
-                            </div>
-
-                        </div>
-                    )}
                 </div>
             </aside>
 
