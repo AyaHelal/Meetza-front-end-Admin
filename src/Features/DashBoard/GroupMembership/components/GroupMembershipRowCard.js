@@ -16,8 +16,8 @@ export const GroupMembershipRowCard = ({
   return (
     <div className="user-card group-membership-row-card">
       <div className="user-card-body">
-        <div className="user-card-header">
-          <div 
+        <div className="user-card-header user-card-header--icon-only">
+          <div
             className="user-card-avatar user-card-avatar-placeholder d-flex align-items-center justify-content-center overflow-hidden"
             style={{
               width: 56,
@@ -39,12 +39,13 @@ export const GroupMembershipRowCard = ({
               <UsersThree size={28} weight="bold" />
             )}
           </div>
-          <div className="user-card-title-wrap">
-            <span className="user-card-name group-name-text">{groupName}</span>
-          </div>
         </div>
         <div className="user-card-meta">
-          <span className="user-card-label">Membership</span>
+          <span className="user-card-label">Group</span>
+          <span className="user-card-value group-name-text">{groupName}</span>
+        </div>
+        <div className="user-card-meta user-card-meta--membership-info">
+          <span className="user-card-label">Membership Info</span>
           <button
             type="button"
             className="btn btn-sm p-0 border-0 bg-transparent text-start d-flex align-items-center gap-1 membership-toggle-btn"
@@ -57,49 +58,62 @@ export const GroupMembershipRowCard = ({
           </button>
         </div>
         {isExpanded && members.length > 0 && (
-          <div className="membership-members-list">
-            <div className="membership-members-list-header">
-              <span>Name</span>
-              <span>Email</span>
-            </div>
+          <div className="membership-members-list membership-members-list--mobile">
             {members.map((member, index) => (
-              <div key={member.composite_id || index} className="membership-member-row d-flex align-items-center gap-2">
-                {/* Member Avatar */}
-                <div
-                  className="rounded-circle d-flex align-items-center justify-content-center overflow-hidden"
-                  style={{
-                    width: 32,
-                    height: 32,
-                    background: member.member_photo 
-                      ? `url(${member.member_photo}) center/cover` 
-                      : "linear-gradient(135deg, #0076EA, #00DC85)",
-                    color: member.member_photo ? "transparent" : "white",
-                    fontWeight: 600,
-                    fontSize: "12px",
-                  }}
-                >
-                  {!member.member_photo && <User size={16} weight="bold" />}
-                </div>
-                <div className="membership-member-info flex-grow-1">
-                  <span className="group-member-name">{getMemberName(member.member_id, member.member_name) || "N/A"}</span>
-                  <span className="text-muted small d-block">{getMemberEmail(member.member_id, member.member_email) || "N/A"}</span>
+              <div
+                key={member.composite_id || index}
+                className="membership-member-card"
+              >
+                <div className="membership-member-card-inner">
+                  <div
+                    className="membership-member-avatar rounded-circle d-flex align-items-center justify-content-center overflow-hidden flex-shrink-0"
+                    style={{
+                      width: 40,
+                      height: 40,
+                      background: member.member_photo
+                        ? `url(${member.member_photo}) center/cover`
+                        : "linear-gradient(135deg, #0076EA, #00DC85)",
+                      color: member.member_photo ? "transparent" : "white",
+                    }}
+                  >
+                    {!member.member_photo && <User size={18} weight="bold" />}
+                  </div>
+                  <div className="membership-member-fields min-w-0 flex-grow-1">
+                    <div className="user-card-meta user-card-meta--nested">
+                      <span className="user-card-label">Name</span>
+                      <span className="user-card-value group-member-name">
+                        {getMemberName(member.member_id, member.member_name) || "N/A"}
+                      </span>
+                    </div>
+                    <div className="user-card-meta user-card-meta--nested">
+                      <span className="user-card-label">Email</span>
+                      <span className="user-card-value text-muted small">
+                        {getMemberEmail(member.member_id, member.member_email) || "N/A"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 {isAdmin && (
-                  <button
-                    type="button"
-                    className="btn btn-sm user-card-btn-delete p-1"
-                    onClick={() => onDelete(member.composite_id || `${membership.group_id}_${member.member_id}`)}
-                    aria-label="Remove member"
-                  >
-                    <Trash size={16} weight="regular" />
-                  </button>
+                  <div className="membership-member-card-actions">
+                    <button
+                      type="button"
+                      className="btn btn-sm user-card-btn-delete w-100 d-flex align-items-center justify-content-center gap-1"
+                      onClick={() =>
+                        onDelete(member.composite_id || `${membership.group_id}_${member.member_id}`)
+                      }
+                      aria-label="Remove member"
+                    >
+                      <Trash size={16} weight="regular" />
+                      <span>Remove</span>
+                    </button>
+                  </div>
                 )}
               </div>
             ))}
           </div>
         )}
         {isExpanded && members.length === 0 && (
-          <p className="small text-muted mb-0">No members</p>
+          <p className="small text-muted mb-0 membership-empty-msg">No members</p>
         )}
       </div>
     </div>

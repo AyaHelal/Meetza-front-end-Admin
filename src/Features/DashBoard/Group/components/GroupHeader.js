@@ -5,7 +5,7 @@ export const GroupHeader = ({ currentUser }) => (
   >
     <div className="d-flex justify-content-between align-items-start">
       <div>
-        <h1 className="h4 pt-3 fw-bold" style={{ color: "var(--text-primary)" }}>
+        <h1 className="h4 pt-3 fw-semibold" style={{ color: "var(--text-primary)" }}>
           Hello, {currentUser?.name || "User"}
         </h1>
         <p style={{ color: "var(--text-secondary)", fontSize: "18px" }}>

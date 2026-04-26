@@ -179,6 +179,18 @@
     }
 }
 
+/* Tablet adjustments */
+@media (max-width: 1024px) {
+    .logo-actions .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        white-space: center;
+        padding: 0.5rem 1rem;
+    }
+}
+
 /* Appearance Section Styles */
 .appearance-card {
     background-color: var(--card-bg) !important;

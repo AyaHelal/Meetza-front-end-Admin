@@ -26,26 +26,14 @@ export const ResourcesRowCard = ({ resource, onDelete, contentId }) => {
   return (
     <div className="user-card resources-row-card">
       <div className="user-card-body">
-        <div className="user-card-header">
+        <div className="user-card-header user-card-header--icon-only">
           <div className="user-card-avatar user-card-avatar-placeholder">
             {isLink ? <LinkIcon size={28} weight="bold" /> : <File size={28} weight="bold" />}
           </div>
-          <div className="user-card-title-wrap">
-            <span className="user-card-name">{isLink ? "External Link" : file_name || "—"}</span>
-            <span className="user-card-role">{isLink ? "Link" : file_type || "—"}</span>
-          </div>
         </div>
         <div className="user-card-meta">
-          <span className="user-card-label">Size</span>
-          <span className="user-card-value">{file_size || "—"}</span>
-        </div>
-        <div className="user-card-meta">
-          <span className="user-card-label">Created</span>
-          <span className="user-card-value">{formatCreatedAt(created_at)}</span>
-        </div>
-        {file_url && (
-          <div className="user-card-meta">
-            <span className="user-card-label">URL</span>
+          <span className="user-card-label">File URL</span>
+          {file_url ? (
             <a
               href={file_url}
               target="_blank"
@@ -54,8 +42,26 @@ export const ResourcesRowCard = ({ resource, onDelete, contentId }) => {
             >
               {file_url}
             </a>
-          </div>
-        )}
+          ) : (
+            <span className="user-card-value">—</span>
+          )}
+        </div>
+        <div className="user-card-meta">
+          <span className="user-card-label">File Name</span>
+          <span className="user-card-value">{isLink ? "External Link" : file_name || "—"}</span>
+        </div>
+        <div className="user-card-meta">
+          <span className="user-card-label">File Type</span>
+          <span className="user-card-value">{isLink ? "Link" : file_type || "—"}</span>
+        </div>
+        <div className="user-card-meta">
+          <span className="user-card-label">File Size</span>
+          <span className="user-card-value">{file_size || "—"}</span>
+        </div>
+        <div className="user-card-meta">
+          <span className="user-card-label">Created At</span>
+          <span className="user-card-value">{formatCreatedAt(created_at)}</span>
+        </div>
         <div className="user-card-actions">
           <button
             type="button"

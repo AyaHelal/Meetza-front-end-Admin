@@ -6,7 +6,7 @@ export const UserRowCard = ({ user, onEdit, onDelete, isAdmin }) => {
   return (
     <div className="user-card">
       <div className="user-card-body">
-        <div className="user-card-header">
+        <div className="user-card-header user-card-header--icon-only">
           {user.avatarUrl ? (
             <img
               src={user.avatarUrl}
@@ -18,14 +18,20 @@ export const UserRowCard = ({ user, onEdit, onDelete, isAdmin }) => {
               <UserCheck size={28} />
             </div>
           )}
-          <div className="user-card-title-wrap">
-            <span className="user-card-name">{user.name}</span>
-            <span className="user-card-role">{user.role || "member"}</span>
-          </div>
+        </div>
+        <div className="user-card-meta">
+          <span className="user-card-label">Name</span>
+          <span className="user-card-value">{user.name || "—"}</span>
         </div>
         <div className="user-card-meta">
           <span className="user-card-label">Email</span>
-          <a href={`mailto:${user.email}`} className="user-card-email">{user.email}</a>
+          <a href={`mailto:${user.email}`} className="user-card-email user-card-value">
+            {user.email || "—"}
+          </a>
+        </div>
+        <div className="user-card-meta">
+          <span className="user-card-label">Role</span>
+          <span className="user-card-value">{user.role || "member"}</span>
         </div>
         <div className="user-card-actions">
           <button

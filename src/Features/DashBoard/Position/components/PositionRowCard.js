@@ -9,10 +9,10 @@ export const PositionRowCard = ({ user, position, onEdit, onDelete }) => {
   return (
     <div className="user-card position-row-card">
       <div className="user-card-body">
-        <div className="user-card-header">
+        <div className="user-card-header user-card-header--icon-only">
           {(displayUser?.user_photo || displayUser?.avatarUrl || displayUser?.avatar_url) ? (
-            <img 
-              src={displayUser.user_photo || displayUser.avatarUrl || displayUser.avatar_url} 
+            <img
+              src={displayUser.user_photo || displayUser.avatarUrl || displayUser.avatar_url}
               alt={`${displayUser.name} avatar`}
               className="user-card-avatar"
               style={{ objectFit: "cover" }}
@@ -22,12 +22,16 @@ export const PositionRowCard = ({ user, position, onEdit, onDelete }) => {
               <UserCheck size={28} />
             </div>
           )}
-          <div className="user-card-title-wrap">
-            <span className="user-card-name">{positionTitle}</span>
-            {isSuperAdmin && displayUser?.name && (
-              <span className="user-card-role">{displayUser.name}</span>
-            )}
+        </div>
+        {isSuperAdmin && displayUser?.name && (
+          <div className="user-card-meta">
+            <span className="user-card-label">User</span>
+            <span className="user-card-value">{displayUser.name}</span>
           </div>
+        )}
+        <div className="user-card-meta">
+          <span className="user-card-label">Position</span>
+          <span className="user-card-value">{positionTitle}</span>
         </div>
         <div className="user-card-actions">
           <button

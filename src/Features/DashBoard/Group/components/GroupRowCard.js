@@ -31,7 +31,7 @@ export const GroupRowCard = ({
   return (
     <div className="user-card group-row-card">
       <div className="user-card-body">
-        <div className="user-card-header">
+        <div className="user-card-header user-card-header--icon-only">
           {group.group_photo ? (
             <img
               src={group.group_photo}
@@ -43,9 +43,10 @@ export const GroupRowCard = ({
               <UsersThree size={28} weight="bold" />
             </div>
           )}
-          <div className="user-card-title-wrap">
-            <span className="user-card-name">{name}</span>
-          </div>
+        </div>
+        <div className="user-card-meta">
+          <span className="user-card-label">Name</span>
+          <span className="user-card-value">{name || "—"}</span>
         </div>
         <div className="user-card-meta">
           <span className="user-card-label">Leader</span>

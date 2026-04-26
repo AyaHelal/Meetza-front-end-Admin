@@ -357,7 +357,7 @@ const GroupMainContent = ({ currentUser }) => {
                     {!showForm ? (
                         <>
                             <div className="card-body p-3 mb-4 position-header">
-                                <h2 className="h4 mb-0 fw-bold position-header-title">Group Management</h2>
+                                <h2 className="h4 mb-0 fw-semibold position-header-title">Group Management</h2>
                                 <div className="position-header-actions">
                                     <button
                                         type="button"
