@@ -30,7 +30,9 @@ export const useUserData = () => {
                         ? "Leader"
                         : u.role === "Member"
                             ? "member"
-                            : (u.role || "").toString().toLowerCase(),
+                            : (u.role === "Super_Admin" || u.role === "Super Admin")
+                                ? "Super Admin"
+                                : (u.role || "").toString().toLowerCase(),
                 avatarUrl: u.user_photo || u.avatarUrl || u.avatar_url,
             }));
 
@@ -47,11 +49,16 @@ export const useUserData = () => {
     // ➕ Create new user
     const createUser = async (name, email, password, role) => {
         try {
-            const res = await api.post("/register", {
+            const res = await api.post("/user", {
                 name,
                 email,
                 password,
-                role: role === "administrator" ? "Administrator" : "Member",
+                role:
+                    role === "Super_Admin"
+                        ? "Super_Admin"
+                        : role === "administrator"
+                            ? "Administrator"
+                            : "Member",
             });
 
             const newUser = res.data;

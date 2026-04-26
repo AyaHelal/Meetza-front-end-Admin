@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Envelope, Password, Eye, EyeSlash } from "phosphor-react";
+import { Envelope, Password, Eye, EyeSlash, WarningCircle } from "phosphor-react";
 import { motion } from "framer-motion";
 import api from "../../utils/api";
 import { FormInput, LogoSection } from "../../Features";
@@ -230,8 +230,14 @@ export default function LoginForm() {
 
                 <form className="form" onSubmit={handleSubmit} onKeyPress={handleKeyPress} noValidate>
                     {apiError && (
-                        <motion.div className="alert alert-danger mt-3" role="alert" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
-                            {apiError}
+                        <motion.div className="login-error-container mt-3" role="alert" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+                            <div className="login-error-icon">
+                                <WarningCircle size={24} weight="fill" />
+                            </div>
+                            <div className="login-error-text">
+                                <div className="login-error-title">{apiError}</div>
+                                <div className="login-error-message">Please check your credentials and try again.</div>
+                            </div>
                         </motion.div>
                     )}
 
