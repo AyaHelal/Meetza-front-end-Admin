@@ -178,3 +178,112 @@
         width: 100%;
     }
 }
+
+/* Appearance Section Styles */
+.appearance-card {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color);
+}
+
+:root[data-theme="dark"] .appearance-card {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border-color: #4b5563;
+}
+
+.theme-preview-card {
+    cursor: pointer;
+    border: 2px solid #e2e8f0;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.2s ease-in-out;
+    background: #f8f9fa;
+}
+
+.theme-preview-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.theme-preview-card.active {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 1px #0d6efd;
+}
+
+:root[data-theme="dark"] .theme-preview-card {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+:root[data-theme="dark"] .theme-preview-card.active {
+    border-color: #0d6efd;
+}
+
+.theme-mockup {
+    height: 140px;
+    padding: 1.25rem;
+    background-color: #ffffff;
+}
+
+.theme-mockup.dark {
+    background-color: #0f172a;
+}
+
+.mock-sidebar {
+    width: 45px;
+    height: 100%;
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.theme-mockup.dark .mock-sidebar {
+    background: #1e293b;
+}
+
+.mock-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 4px;
+}
+
+.mock-line {
+    height: 6px;
+    border-radius: 3px;
+    background: #e2e8f0;
+}
+
+.theme-mockup.dark .mock-line {
+    background: #334155;
+}
+
+.theme-label-bar {
+    padding: 0.85rem 1.25rem;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+}
+
+:root[data-theme="dark"] .theme-label-bar {
+    background: #1e293b;
+    border-top-color: #334155;
+}
+
+:root[data-theme="dark"] .theme-label-bar span {
+    color: #ffffff;
+}
+
+.check-placeholder {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+    background-color: #f8f9fa;
+}
+
+:root[data-theme="dark"] .check-placeholder {
+    border-color: #4b5563;
+    background-color: #1e293b;
+}
+

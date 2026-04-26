@@ -126,7 +126,7 @@ export default function VerifyEmailCode() {
                         {email ? (
                             <>We've sent a verification code to <b>{email}</b>. Please enter it below.</>
                         ) : (
-                            <>No email found. Please <a href="/signup">sign up again</a>.</>
+                        <>No email found. Please contact support or try again.</>
                         )}
                     </p>
 

@@ -19,6 +19,7 @@ export function extractUserFromToken() {
             role: payload.role ?? null,
             name: payload.name ?? payload.full_name ?? payload.user_name ?? payload.username ?? null,
             photo: payload.photo ?? payload.picture ?? payload.avatar ?? payload.image ?? payload.user_photo ?? payload.profile_image ?? null,
+            theme: payload.theme ?? null,
         };
     } catch {
         return null;

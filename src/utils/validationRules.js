@@ -36,10 +36,3 @@ export const loginValidationRules = {
     email: emailValidation,
     password: passwordValidation
 };
-
-export const signupValidationRules = {
-    name: nameValidation,
-    email: emailValidation,
-    password: passwordValidation,
-    confirmPassword: confirmPasswordValidation
-};

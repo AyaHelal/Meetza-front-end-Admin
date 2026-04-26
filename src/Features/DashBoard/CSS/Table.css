@@ -224,7 +224,7 @@ tbody tr:last-child {
 }
 
 .user-table-container {
-  max-height: 500px;
+  max-height: 435px;
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
