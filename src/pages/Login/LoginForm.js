@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Envelope, Password, Eye, EyeSlash } from "phosphor-react";
 import { motion } from "framer-motion";
 import api from "../../utils/api";
-import { FormInput, ToggleButton, LogoSection } from "../../Features";
+import { FormInput, LogoSection } from "../../Features";
 import SocialLoginButtons from "../../Features/common/SocialLoginButtons";
 import { useFormValidation, usePasswordVisibility } from "../../hooks";
 import { loginValidationRules } from "../../utils";
@@ -12,7 +12,6 @@ import { useAuth } from "../../context/AuthContext";
 import "./LoginForm.css";
 
 export default function LoginForm() {
-    const [isLogin, setIsLogin] = useState(true);
     const navigate = useNavigate();
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(false);
@@ -36,11 +35,7 @@ export default function LoginForm() {
 
     const { showPassword, togglePasswordVisibility } = usePasswordVisibility();
 
-    const handleToggleChange = (value) => {
-        const isLoginMode = value === 'login';
-        setIsLogin(isLoginMode);
-        navigate(isLoginMode ? "/login" : "/signup", { replace: true });
-    };
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -196,10 +191,7 @@ export default function LoginForm() {
         }
     };
 
-    const toggleOptions = [
-        { value: 'login', label: 'Sign In' },
-        { value: 'signup', label: 'Sign Up' }
-    ];
+
 
     // Handle browser back button to redirect to landing page
     useEffect(() => {
@@ -231,75 +223,71 @@ export default function LoginForm() {
                     Welcome Back
                 </motion.h2>
                 <motion.span className="text-888888" style={{ fontSize: "20px" }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
-                    Please enter your Details as administrator
+                    Please enter your Details as Super Admin or Leader
                 </motion.span>
 
-                <div className="justify-content-center">
-                    <div className="mt-4 d-flex justify-content-center">
-                        <ToggleButton options={toggleOptions} activeOption={isLogin ? 'login' : 'signup'} onOptionChange={handleToggleChange} />
+
+
+                <form className="form" onSubmit={handleSubmit} onKeyPress={handleKeyPress} noValidate>
+                    {apiError && (
+                        <motion.div className="alert alert-danger mt-3" role="alert" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+                            {apiError}
+                        </motion.div>
+                    )}
+
+                    {remainingAttempts !== undefined && (
+                        <div className="mb-3 text-center">
+                            <small className="text-warning">
+                                {remainingAttempts === 0 ? "No attempts remaining" : `${remainingAttempts} attempt(s) remaining`}
+                            </small>
+                        </div>
+                    )}
+
+                    <FormInput name="email" value={formData.email} onChange={handleChange} placeholder="johndoe@email.com" type="email" label="Email" error={errors.email} touched={touched.email} icon={Envelope} />
+                    <FormInput
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder="●●●●●●●●"
+                        type={showPassword ? "text" : "password"}
+                        label="Password"
+                        error={errors.password}
+                        touched={touched.password}
+                        icon={Password}
+                        toggleIcon={showPassword ? EyeSlash : Eye}
+                        showPasswordToggle={true}
+                        onTogglePassword={togglePasswordVisibility}
+                        showPassword={showPassword}
+                    />
+
+                    <div className="d-flex justify-content-between align-items-center mt-2">
+                        <div className="form-check">
+                            <input className="form-check-input" type="checkbox" id="rememberMe" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
+                            <label className="form-check-label" htmlFor="rememberMe" style={{ fontSize: "12px" }}>Remember me</label>
+                        </div>
+
+                        <a href="/forgot-password" className="text-decoration-none text-888888" style={{ fontSize: "12px" }}>Forgot Password?</a>
                     </div>
 
-                    <form className="form" onSubmit={handleSubmit} onKeyPress={handleKeyPress} noValidate>
-                        {apiError && (
-                            <motion.div className="alert alert-danger mt-3" role="alert" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
-                                {apiError}
-                            </motion.div>
-                        )}
+                    {showCaptcha && (
+                        <motion.div id="recaptcha-container" className="g-recaptcha mt-3 mb-3 d-flex justify-content-center" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} />
+                    )}
 
-                        {remainingAttempts !== undefined && (
-                            <div className="mb-3 text-center">
-                                <small className="text-warning">
-                                    {remainingAttempts === 0 ? "No attempts remaining" : `${remainingAttempts} attempt(s) remaining`}
-                                </small>
-                            </div>
-                        )}
-
-                        <FormInput name="email" value={formData.email} onChange={handleChange} placeholder="johndoe@email.com" type="email" label="Email" error={errors.email} touched={touched.email} icon={Envelope} />
-                        <FormInput
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            placeholder="●●●●●●●●"
-                            type={showPassword ? "text" : "password"}
-                            label="Password"
-                            error={errors.password}
-                            touched={touched.password}
-                            icon={Password}
-                            toggleIcon={showPassword ? EyeSlash : Eye}
-                            showPasswordToggle={true}
-                            onTogglePassword={togglePasswordVisibility}
-                            showPassword={showPassword}
-                        />
-
-                        <div className="d-flex justify-content-between align-items-center mt-2">
-                            <div className="form-check">
-                                <input className="form-check-input" type="checkbox" id="rememberMe" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
-                                <label className="form-check-label" htmlFor="rememberMe" style={{ fontSize: "12px" }}>Remember me</label>
-                            </div>
-
-                            <a href="/forgot-password" className="text-decoration-none text-888888" style={{ fontSize: "12px" }}>Forgot Password?</a>
-                        </div>
-
-                        {showCaptcha && (
-                            <motion.div id="recaptcha-container" className="g-recaptcha mt-3 mb-3 d-flex justify-content-center" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} />
-                        )}
-
-                        <motion.button type="submit" className="btn btn-primary w-100 py-3 mt-3 mb-3 rounded-4 d-inline-flex align-items-center justify-content-center" whileHover={!isLoading && !(captchaRequiredByBackend && !captchaToken) ? { scale: 1.02 } : {}} whileTap={!isLoading && !(captchaRequiredByBackend && !captchaToken) ? { scale: 0.98 } : {}} disabled={isLoading || (captchaRequiredByBackend && !captchaToken)}>
-                            {isLoading ? (
-                                <>
-                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                    Signing in...
-                                </>
-                            ) : 'Continue'}
-                        </motion.button>
+                    <motion.button type="submit" className="btn btn-primary w-100 py-3 mt-3 mb-3 rounded-4 d-inline-flex align-items-center justify-content-center" whileHover={!isLoading && !(captchaRequiredByBackend && !captchaToken) ? { scale: 1.02 } : {}} whileTap={!isLoading && !(captchaRequiredByBackend && !captchaToken) ? { scale: 0.98 } : {}} disabled={isLoading || (captchaRequiredByBackend && !captchaToken)}>
+                        {isLoading ? (
+                            <>
+                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Signing in...
+                            </>
+                        ) : 'Continue'}
+                    </motion.button>
 
 
 
-                        <div className="mt-2">
-                            <SocialLoginButtons redirectUrl={`${window.location.origin}/dashboard`} />
-                        </div>
-                    </form>
-                </div>
+                    <div className="mt-2">
+                        <SocialLoginButtons redirectUrl={`${window.location.origin}/dashboard`} />
+                    </div>
+                </form>
             </div>
         </motion.div>
     );

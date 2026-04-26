@@ -4,7 +4,7 @@
 }
 
 .p-8 {
-  padding-top: 28%;
+  padding-top: 30%;
 }
 
 .forgot-password-container1 {
@@ -16,7 +16,7 @@ margin-top: 5rem;
 /* Medium laptops (1025px - 1440px) - Reduce padding to prevent scroll */
 @media (min-width: 1025px) and (max-width: 1440px) {
   .p-8 {
-    padding-top: 3% !important;
+    padding-top: 10% !important;
     margin-top: 3.5rem !important; /* Add space between logo and Welcome Back */
   }
 
@@ -44,7 +44,7 @@ margin-top: 5rem;
 
 @media (min-width: 1441px) {
   .p-8 {
-    padding-top: 0%;
+    padding-top: 12%;
   }
   .ff {
     width: 543px;
