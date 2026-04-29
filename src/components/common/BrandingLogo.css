@@ -137,7 +137,7 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 12px;
+  gap: 0px;
 }
 
 /* Default Meetza layout */
@@ -183,19 +183,19 @@ div[class*="branding-logo"] {
   .branding-logo {
     gap: 8px;
   }
-  
+
   .branding-logo img {
     max-width: 80px;
   }
-  
+
   .branding-system-name {
     font-size: 1.2rem;
   }
-  
+
   .branding-powered-by {
     font-size: 0.7rem;
   }
-  
+
   .branding-powered-by img {
     height: 14px;
   }
@@ -205,21 +205,20 @@ div[class*="branding-logo"] {
   .branding-logo {
     gap: 6px;
   }
-  
+
   .branding-logo img {
     max-width: 60px;
   }
-  
+
   .branding-system-name {
     font-size: 1rem;
   }
-  
+
   .branding-powered-by {
     font-size: 0.6rem;
   }
-  
+
   .branding-powered-by img {
     height: 12px;
   }
 }
-
