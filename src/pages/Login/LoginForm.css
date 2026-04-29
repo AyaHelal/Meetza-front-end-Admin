@@ -10,7 +10,14 @@
 .forgot-password-container1 {
   justify-content: center;
   align-items: center;
-margin-top: 5rem;
+  margin-top: 2rem;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.forgot-password-container {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Medium laptops (1025px - 1440px) - Reduce padding to prevent scroll */
@@ -18,6 +25,12 @@ margin-top: 5rem;
   .p-8 {
     padding-top: 10% !important;
     margin-top: 3.5rem !important; /* Add space between logo and Welcome Back */
+  }
+
+  /* Reduce padding when custom branding is present in login */
+  .custom-branding-login {
+    padding-top: 2vh !important;
+    margin-top: 1rem !important;
   }
 
   /* Remove ALL padding and spacing on image container like large screens */
@@ -54,6 +67,12 @@ margin-top: 5rem;
   }
   .custom-button-group {
     max-width: 543px !important;
+  }
+
+  /* Reduce padding when custom branding is present in login */
+  .custom-branding-login {
+    padding-top: 2vh !important;
+    margin-top: 1rem !important;
   }
 }
 
@@ -493,6 +512,31 @@ input[type="password"]::-webkit-contacts-auto-fill-button {
     padding-left: 1rem;
     padding-right: 1rem;
     margin-top: 1.5rem !important; /* Add space between logo and Welcome Back */
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Reduce padding when custom branding is present in login */
+  .custom-branding-login {
+    padding-top: 1vh !important;
+    margin-top: 0.5rem !important;
+  }
+
+  /* Prevent horizontal scroll on all containers */
+  .forgot-password-container1,
+  .forgot-password-container {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .container-fluid {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .row {
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 
   /* Ensure container and row have full height for vertical centering - MOBILE ONLY */

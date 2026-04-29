@@ -5,6 +5,10 @@
     color: var(--text-primary);
 }
 
+.branding-settings.no-branding-margin {
+    margin: 7rem;
+}
+
 /* Dark mode support */
 :root[data-theme="dark"] .branding-settings {
     color: #ffffff;
