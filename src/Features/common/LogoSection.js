@@ -1,14 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import BrandingLogo from '../../components/common/BrandingLogo';
 
 const LogoSection = ({
-    logoPath = "/assets/MeetzaLogo.png",
-    wordPath = "/assets/MeetzaWord.png",
-    logoAlt = "Logo picture",
-    wordAlt = "Logo picture",
     className = "",
     logoClassName = "",
-    wordClassName = ""
+    wordClassName = "",
+    showSystemName = true
 }) => {
     return (
         <motion.div
@@ -17,15 +15,11 @@ const LogoSection = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
         >
-            <img
-                src={logoPath}
-                alt={logoAlt}
+            <BrandingLogo 
                 className={logoClassName}
-            />
-            <img
-                src={wordPath}
-                alt={wordAlt}
-                className={wordClassName}
+                showSystemName={showSystemName}
+                systemNameClassName={` ${wordClassName}`}
+                style={{ maxWidth: '120px', height: 'auto' }}
             />
         </motion.div>
     );

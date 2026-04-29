@@ -8,6 +8,7 @@ import SocialLoginButtons from "../../Features/common/SocialLoginButtons";
 import { useFormValidation, usePasswordVisibility } from "../../hooks";
 import { loginValidationRules } from "../../utils";
 import { useAuth } from "../../context/AuthContext";
+import { useBranding } from "../../context/BrandingContext";
 
 import "./LoginForm.css";
 
@@ -17,6 +18,7 @@ export default function LoginForm() {
     const [isLoading, setIsLoading] = useState(false);
     const [apiError, setApiError] = useState("");
     const { loginUser } = useAuth();
+    const { systemName } = useBranding();
     const [rememberMe, setRememberMe] = useState(false);
     const [showCaptcha, setShowCaptcha] = useState(false);
     const [captchaToken, setCaptchaToken] = useState('');
@@ -217,7 +219,7 @@ export default function LoginForm() {
         <motion.div className="align-items-center text-center" initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
             <LogoSection />
 
-            <div className="justify-content-center p-8 ff">
+            <div className={`justify-content-center p-8 ff ${systemName !== 'Meetza' ? 'custom-branding-login' : ''}`}>
                 <motion.h2 className="fw-semibold" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
                     Welcome Back
                 </motion.h2>

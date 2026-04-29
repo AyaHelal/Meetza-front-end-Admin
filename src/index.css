@@ -256,7 +256,7 @@ input[type="file"]:hover:not(:disabled)::-webkit-file-upload-button {
 }
 
 /* Ensure native input UI elements like spin buttons adapt to dark mode */
-:root[data-theme='dark'] input,
+:root[data-theme='dark'] input:not(.form-control):not([class*="form"]),
 :root[data-theme='dark'] select,
 :root[data-theme='dark'] textarea {
   color-scheme: dark;

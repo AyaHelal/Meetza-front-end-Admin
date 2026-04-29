@@ -1,0 +1,225 @@
+.branding-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.branding-logo-horizontal {
+  flex-direction: row;
+}
+
+.branding-logo-vertical {
+  flex-direction: column;
+}
+
+.branding-logo-center {
+  justify-content: center;
+  align-items: center;
+}
+
+.branding-logo-start {
+  justify-content: flex-start;
+}
+
+.branding-logo-end {
+  justify-content: flex-end;
+}
+
+.branding-logo img {
+  max-width: 50px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.branding-logo img.branding-logo-large {
+  max-width: 150px;
+}
+
+.branding-logo img.branding-logo-small {
+  max-width: 80px;
+}
+
+.branding-logo img.branding-logo-extra-small {
+  max-width: 60px;
+}
+
+.branding-system-name {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.branding-system-name.branding-system-name-large {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.branding-system-name.branding-system-name-small {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.branding-system-name.branding-system-name-extra-small {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.branding-system-name.branding-system-name-light {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.branding-system-name.branding-system-name-muted {
+  background: linear-gradient(135deg, #6c757d 0%, #868e96 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.branding-powered-by {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin: 0;
+  line-height: 1;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.branding-powered-by img {
+  height: 16px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.branding-logo-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.branding-logo-loading img {
+  max-width: 120px;
+  height: auto;
+}
+
+/* Custom branding layout */
+.branding-logo-custom {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px;
+}
+
+.branding-logo-custom .branding-logo-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px;
+}
+
+/* Default Meetza layout */
+.branding-logo-default {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px;
+}
+
+/* Ensure all branding logos are centered */
+.branding-logo {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+}
+
+.branding-logo-center {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+}
+
+/* Force center for all branding containers */
+div[class*="branding-logo"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .branding-logo {
+    gap: 8px;
+  }
+  
+  .branding-logo img {
+    max-width: 80px;
+  }
+  
+  .branding-system-name {
+    font-size: 1.2rem;
+  }
+  
+  .branding-powered-by {
+    font-size: 0.7rem;
+  }
+  
+  .branding-powered-by img {
+    height: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .branding-logo {
+    gap: 6px;
+  }
+  
+  .branding-logo img {
+    max-width: 60px;
+  }
+  
+  .branding-system-name {
+    font-size: 1rem;
+  }
+  
+  .branding-powered-by {
+    font-size: 0.6rem;
+  }
+  
+  .branding-powered-by img {
+    height: 12px;
+  }
+}
+
