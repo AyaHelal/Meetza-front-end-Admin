@@ -82,8 +82,8 @@ const BrandingLogo = ({
       baseStyle.color = systemNameColor;
       // Remove gradient and use solid color
       baseStyle.background = 'none';
-      baseStyle.webkitBackgroundClip = 'initial';
-      baseStyle.webkitTextFillColor = systemNameColor;
+      baseStyle.WebkitBackgroundClip = 'initial';
+      baseStyle.WebkitTextFillColor = systemNameColor;
       baseStyle.backgroundClip = 'initial';
     }
     
