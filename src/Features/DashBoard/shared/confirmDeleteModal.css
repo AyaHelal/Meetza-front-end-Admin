@@ -1,0 +1,26 @@
+/* Delete button — shared by ConfirmDeleteModal, Video modals, WeeklyDeleteModal, etc. */
+
+.btn.btn-dashboard-confirm-delete,
+button.btn-dashboard-confirm-delete {
+  background-color: #dc3545 !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 10px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-left: 12px;
+}
+
+.btn.btn-dashboard-confirm-delete:hover,
+.btn.btn-dashboard-confirm-delete:focus,
+button.btn-dashboard-confirm-delete:hover,
+button.btn-dashboard-confirm-delete:focus {
+  background-color: #bb2d3b !important;
+  color: #ffffff !important;
+}
+
+/* Full-width / stacked delete actions (e.g. weekly “delete all”) */
+.btn.btn-dashboard-confirm-delete.w-100,
+.btn.btn-dashboard-confirm-delete.me-0 {
+  margin-left: 0 !important;
+}

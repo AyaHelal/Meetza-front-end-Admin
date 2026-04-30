@@ -1,0 +1,462 @@
+import { useState, useEffect, useCallback, useRef } from "react";
+import { dedupeById } from "../../../../utils/dedupeById";
+import { groupIsManagedByUser } from "../../../../utils/groupIsManagedByUser";
+import * as groupMembershipService from "../service/groupMembershipService";
+
+export const useGroupMembershipData = (currentUser = null) => {
+  const cacheKey = `admin_membership_cache_${currentUser?.id || 'guest'}`;
+
+  const [memberships, setMemberships] = useState(() => {
+    const cached = localStorage.getItem(cacheKey);
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [groups, setGroups] = useState(() => {
+    const cached = localStorage.getItem(`${cacheKey}_groups`);
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [users, setUsers] = useState(() => {
+    const cached = localStorage.getItem(`${cacheKey}_users`);
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [loading, setLoading] = useState(memberships.length === 0);
+  const [error, setError] = useState(null);
+  // Store a mapping of group_id + member_id -> membership_id for quick lookup
+  const membershipIdMapRef = useRef(new Map());
+
+  // 🟩 Fetch all memberships
+  const fetchData = useCallback(async () => {
+    const hasCache = memberships.length > 0;
+    try {
+      if (!hasCache) setLoading(true);
+      setError(null);
+
+      const resData = await groupMembershipService.getMemberships();
+      const payload = Array.isArray(resData) ? resData : resData?.data || [];
+      const membershipIdMap = new Map();
+
+      try {
+        const flatResData = await groupMembershipService.getMemberships();
+        const flatData = Array.isArray(flatResData) ? flatResData : flatResData?.data || [];
+        flatData.forEach((membership) => {
+          const key = `${membership.group_id}_${membership.member_id || membership.memberId}`;
+          membershipIdMap.set(key, membership.id || membership.membership_id);
+        });
+      } catch (e1) { }
+
+      membershipIdMapRef.current = membershipIdMap;
+      let groupedMemberships = [];
+
+      if (payload.length > 0 && payload[0].group_id && payload[0].members) {
+        groupedMemberships = payload.map((group) => ({
+          id: group.group_id,
+          group_id: group.group_id,
+          group_name: group.group_name || null,
+          group_photo: group.group_photo || null, // Add group photo
+          members: (group.members || []).map((member) => {
+            let membershipId = member.id || member.membership_id || (member.membership && member.membership.id);
+            if (!membershipId) {
+              const key = `${group.group_id}_${member.member_id}`;
+              membershipId = membershipIdMap.get(key);
+            }
+            return {
+              id: membershipId || null,
+              member_id: String(member.member_id || ""),
+              member_name: member.member_name || null,
+              member_email: member.member_email || null,
+              member_photo: member.member_photo || null, // Add member photo
+              composite_id: membershipId || `${group.group_id}_${member.member_id}`,
+            };
+          }),
+        }));
+      } else {
+        const groupMap = {};
+        payload.forEach((m) => {
+          const groupId = m.group_id || m.groupId;
+          if (!groupId) return;
+          if (!groupMap[groupId]) {
+            groupMap[groupId] = {
+              id: groupId,
+              group_id: groupId,
+              group_name: m.group?.name || m.group?.group_name || m.group_name || null,
+              group_photo: m.group?.photo || m.group_photo || null, // Add group photo
+              members: [],
+            };
+          }
+          groupMap[groupId].members.push({
+            id: m.id || m.membership_id || null,
+            member_id: String(m.member_id || m.memberId || m.user_id || m.userId || ""),
+            member_name: m.member?.name || m.user?.name || m.member_name || null,
+            member_email: m.member?.email || m.user?.email || m.member_email || null,
+            member_photo: m.member?.photo || m.user?.photo || m.member_photo || null, // Add member photo
+            composite_id: m.id || `${groupId}_${m.member_id || m.memberId || m.user_id || m.userId}`,
+          });
+        });
+        groupedMemberships = Object.values(groupMap);
+      }
+
+      setMemberships(groupedMemberships);
+      localStorage.setItem(cacheKey, JSON.stringify(groupedMemberships));
+    } catch (err) {
+      if (!hasCache) setError("Failed to load memberships");
+    } finally {
+      setLoading(false);
+    }
+  }, [memberships.length, cacheKey]);
+
+  // 🟩 Fetch groups
+  const fetchGroups = useCallback(async () => {
+    try {
+      const resData = await groupMembershipService.getGroups();
+      let payload = Array.isArray(resData) ? resData : resData?.data || [];
+      const user = currentUser;
+      const roleNorm = String(user?.role || "").trim().toLowerCase();
+      const isSuperAdmin = roleNorm === "super_admin";
+      const isAdministrator = roleNorm === "administrator";
+
+      let filteredGroups = dedupeById(payload);
+      if (isAdministrator && !isSuperAdmin) {
+        filteredGroups = filteredGroups.filter((g) => groupIsManagedByUser(g, user?.id));
+      }
+
+      setGroups(filteredGroups);
+      localStorage.setItem(`${cacheKey}_groups`, JSON.stringify(filteredGroups));
+    } catch (err) { }
+  }, [currentUser, cacheKey]);
+
+  // 🟩 Fetch members
+  const fetchUsers = useCallback(async () => {
+    try {
+      const resData = await groupMembershipService.getUsers();
+      const payload = Array.isArray(resData) ? resData : resData?.data || [];
+      setUsers(payload);
+      localStorage.setItem(`${cacheKey}_users`, JSON.stringify(payload));
+    } catch (err) { }
+  }, [cacheKey]);
+
+
+  // ➕ Create new membership
+  const createMembership = async (group_id, member_id) => {
+    try {
+      const resData = await groupMembershipService.createMembership(group_id, member_id);
+
+      const newMembership = resData;
+
+      // Refresh data after creation (this will get the latest data including any IDs)
+      await fetchData();
+      return newMembership;
+    } catch (e) {
+      console.error("Create error:", e);
+      throw e;
+    }
+  };
+
+  // 🗑️ Delete membership
+  const deleteMembership = async (id) => {
+    // id is a composite_id (group_id_member_id) or a membership ID
+    try {
+      // Find the member in the grouped structure
+      let foundGroup = null;
+      let foundMember = null;
+
+      for (const group of memberships) {
+        foundMember = group.members?.find(
+          (member) => member.composite_id === id || `${group.group_id}_${member.member_id}` === id
+        );
+        if (foundMember) {
+          foundGroup = group;
+          break;
+        }
+      }
+
+      if (!foundGroup || !foundMember) {
+        console.error("Membership not found for ID:", id);
+        return { success: false, message: "Membership not found" };
+      }
+
+      const groupId = foundGroup.group_id;
+      const memberId = foundMember.member_id;
+      // Check if we have the actual membership database ID
+      let membershipId = foundMember.id || foundMember.membership_id;
+
+      // Since the API doesn't return membership IDs, we need to delete using group_id and member_id
+      // Try different delete approaches
+      let deleteResponseData = null;
+      let deleteSuccess = false;
+
+      // First, check if we have membership ID (from map or if API starts including it)
+      const key = `${groupId}_${memberId}`;
+      membershipId = membershipId || membershipIdMapRef.current.get(key);
+
+      if (membershipId) {
+        // Try delete with membership ID first
+        try {
+          deleteResponseData = await groupMembershipService.deleteMembershipById(membershipId);
+          deleteSuccess = true;
+        } catch (error1) {
+        }
+      }
+
+      // If membership ID delete didn't work, try deleting with group_id and member_id
+      if (!deleteSuccess) {
+        // Try DELETE with request body containing group_id and member_id
+        try {
+          deleteResponseData = await groupMembershipService.deleteMembershipByBody(groupId, memberId);
+          deleteSuccess = true;
+        } catch (error2) {
+          // Try DELETE with query parameters
+          try {
+            deleteResponseData = await groupMembershipService.deleteMembershipByQuery(groupId, memberId);
+            deleteSuccess = true;
+          } catch (error3) {
+            console.error("All delete methods failed. Backend requires membership ID but API doesn't provide it.");
+            throw new Error(
+              "Cannot delete membership: Backend requires membership ID, but the API response doesn't include it. " +
+              "Please ask backend developer to include membership IDs in the nested API response structure " +
+              `(add 'id' field to each member object in the 'members' array).`
+            );
+          }
+        }
+      }
+
+      if (deleteSuccess) {
+        // Wait a bit to ensure backend has processed the deletion
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        // Refresh data after deletion - fetch fresh data
+        // Fetch fresh data from API
+        try {
+          setLoading(true);
+          const resData = await groupMembershipService.getMemberships();
+          const payload = Array.isArray(resData) ? resData : resData?.data || [];
+
+          // Transform to grouped structure (same as fetchData)
+          let groupedMemberships = [];
+
+          if (payload.length > 0 && payload[0].group_id && payload[0].members) {
+            groupedMemberships = payload.map((group) => ({
+              id: group.group_id,
+              group_id: group.group_id,
+              group_name: group.group_name || null,
+              members: (group.members || []).map((member) => ({
+                member_id: String(member.member_id || ""),
+                member_name: member.member_name || null,
+                member_email: member.member_email || null,
+                member_photo: member.member_photo || null,
+                composite_id: `${group.group_id}_${member.member_id}`,
+              })),
+            }));
+          } else {
+            const groupMap = {};
+            payload.forEach((m) => {
+              const gId = m.group_id || m.groupId;
+              if (!gId) return;
+
+              if (!groupMap[gId]) {
+                groupMap[gId] = {
+                  id: gId,
+                  group_id: gId,
+                  group_name: m.group?.name || m.group?.group_name || m.group_name || null,
+                  members: [],
+                };
+              }
+
+              groupMap[gId].members.push({
+                member_id: String(m.member_id || m.memberId || m.user_id || m.userId || ""),
+                member_name: m.member?.name || m.user?.name || m.member_name || null,
+                member_email: m.member?.email || m.user?.email || m.member_email || null,
+                member_photo: m.member?.photo || m.user?.photo || m.member_photo || null,
+                composite_id: m.id || `${gId}_${m.member_id || m.memberId || m.user_id || m.userId}`,
+              });
+            });
+
+            groupedMemberships = Object.values(groupMap);
+          }
+
+          setMemberships(groupedMemberships);
+
+          // Verify the deletion by checking if the member still exists in fresh data
+          const stillExists = groupedMemberships.some(group =>
+            group.members?.some(member =>
+              member.composite_id === id ||
+              `${group.group_id}_${member.member_id}` === id ||
+              (member.member_id === memberId && group.group_id === groupId)
+            )
+          );
+
+          if (stillExists) {
+            console.warn("Warning: Member still exists after deletion in fresh data");
+          }
+
+          setLoading(false);
+        } catch (fetchError) {
+          console.error("Error refreshing data after deletion:", fetchError);
+          setLoading(false);
+          // Still return success since delete API call succeeded
+        }
+
+        return { success: true };
+      }
+
+      return { success: false, message: "Failed to delete membership" };
+    } catch (e) {
+      console.error("Delete error:", e);
+      const errorMessage = e.response?.data?.message || e.response?.data || e.message || "Failed to delete membership";
+      return { success: false, message: errorMessage };
+    }
+  };
+
+  // ✏️ Update membership
+  const updateMembership = async (id, group_id, member_id) => {
+    try {
+      // id can be a composite_id (group_id_member_id) or a membership ID
+      // Extract old group_id and member_id from composite ID if applicable
+      let oldGroupId = null;
+      let oldMemberId = null;
+
+      // If it's a composite ID, extract the parts
+      if (id.includes('_') && id.split('_').length >= 2) {
+        const parts = id.split('_');
+        oldGroupId = parts[0]; // First part is group_id
+        // The rest is member_id (might contain underscores, so join them)
+        oldMemberId = parts.slice(1).join('_');
+      }
+
+      // Try update by ID first
+      try {
+        const resData = await groupMembershipService.updateMembership(id, {
+          group_id,
+          member_id,
+        });
+        await fetchData();
+        return resData;
+      } catch (patchError) {
+        // If PATCH with ID doesn't work, try deleting old and creating new
+        if (patchError.response?.status === 404 || patchError.response?.status === 400) {
+          // Delete the old membership
+          if (oldGroupId && oldMemberId) {
+            try {
+              await groupMembershipService.deleteMembershipByQuery(oldGroupId, oldMemberId);
+            } catch (deleteError) {
+              // Try with composite ID as path parameter
+              try {
+                await groupMembershipService.deleteMembershipById(id);
+              } catch (e) {
+                console.error("Failed to delete old membership:", e);
+              }
+            }
+          } else {
+            // Try to find and delete by composite ID
+            try {
+              await groupMembershipService.deleteMembershipById(id);
+            } catch (e) {
+              console.error("Failed to delete old membership:", e);
+            }
+          }
+
+          // Create new membership
+          const resData = await groupMembershipService.createMembership(group_id, member_id);
+          await fetchData();
+          return resData;
+        } else {
+          throw patchError;
+        }
+      }
+    } catch (e) {
+      console.error("Update error:", e);
+      throw e;
+    }
+  };
+
+  // 🔍 Search memberships
+  const searchMemberships = async (query) => {
+    try {
+      // Search by group name or ID - get full data to include photos
+      const resData = await groupMembershipService.getMemberships(query);
+      const payload = Array.isArray(resData) ? resData : resData?.data || [];
+
+      // Handle nested structure like in fetchData but include all photo data
+      let groupedMemberships = [];
+
+      if (payload.length > 0 && payload[0].group_id && payload[0].members) {
+        // Filter by group name but include full data
+        groupedMemberships = payload
+          .filter((group) =>
+            group.group_name?.toLowerCase().includes(query.toLowerCase()) ||
+            group.group_id?.toLowerCase().includes(query.toLowerCase())
+          )
+          .map((group) => ({
+            id: group.group_id,
+            group_id: group.group_id,
+            group_name: group.group_name || null,
+            group_photo: group.group_photo || null, // Add group photo
+            members: (group.members || []).map((member) => ({
+              id: member.id || member.membership_id || null,
+              member_id: String(member.member_id || ""),
+              member_name: member.member_name || null,
+              member_email: member.member_email || null,
+              member_photo: member.member_photo || null, // Add member photo
+              composite_id: member.id || `${group.group_id}_${member.member_id}`,
+            })),
+          }));
+      } else {
+        // Legacy flat structure - group by group_id with full data
+        const groupMap = {};
+        payload.forEach((m) => {
+          const groupId = m.group_id || m.groupId;
+          if (!groupId) return;
+
+          const groupName = m.group?.name || m.group?.group_name || m.group_name || "";
+          if (!groupName.toLowerCase().includes(query.toLowerCase()) &&
+            !groupId.toLowerCase().includes(query.toLowerCase())) {
+            return;
+          }
+
+          if (!groupMap[groupId]) {
+            groupMap[groupId] = {
+              id: groupId,
+              group_id: groupId,
+              group_name: groupName,
+              group_photo: m.group?.photo || m.group_photo || null, // Add group photo
+              members: [],
+            };
+          }
+
+          groupMap[groupId].members.push({
+            id: m.id || m.membership_id || null,
+            member_id: String(m.member_id || m.memberId || m.user_id || m.userId || ""),
+            member_name: m.member?.name || m.user?.name || m.member_name || null,
+            member_email: m.member?.email || m.user?.email || m.member_email || null,
+            member_photo: m.member?.photo || m.user?.photo || m.member_photo || null, // Add member photo
+            composite_id: m.id || `${groupId}_${m.member_id || m.memberId || m.user_id || m.userId}`,
+          });
+        });
+
+        groupedMemberships = Object.values(groupMap);
+      }
+
+      setMemberships(groupedMemberships);
+    } catch (e) {
+      console.error("Search error:", e);
+      throw e;
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    fetchGroups();
+    fetchUsers();
+  }, [fetchData, fetchGroups, fetchUsers]);
+
+  return {
+    memberships,
+    groups,
+    users,
+    loading,
+    error,
+    createMembership,
+    deleteMembership,
+    updateMembership,
+    searchMemberships,
+    fetchData,
+  };
+};

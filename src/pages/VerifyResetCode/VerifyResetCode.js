@@ -1,9 +1,9 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import axios from "axios";
-import { LogoSection } from "../../components";
+import { LogoSection } from "../../Features";
 import '../Login/LoginForm.css';
+import apiCommon from "../../utils/api";
 
 export default function VerifyResetCode() {
     const [code, setCode] = useState(["", "", "", ""]);
@@ -53,7 +53,7 @@ export default function VerifyResetCode() {
         try {
             setLoading(true);
             setError("");
-            await axios.post("https://meetza-backend.vercel.app/api/auth/forgot_password", {
+            await apiCommon.post("/auth/forgot_password", {
                 email: email
             });
             alert("Verification code resent to your email.");
@@ -80,7 +80,7 @@ export default function VerifyResetCode() {
         try {
             setLoading(true);
             setError("");
-            const response = await axios.post("https://meetza-backend.vercel.app/api/auth/verify_code", {
+            const response = await apiCommon.post("/auth/verify_code", {
                 email: email,
                 code: otp
             });
@@ -105,7 +105,7 @@ export default function VerifyResetCode() {
     };
 
     return (
-        <div className="container-fluid">
+        <div className=" forgot-password-container1 forgot-password-container" >
             <div className="row py-2">
                 <motion.div
                     className="col-md d-flex justify-content-center align-items-center"

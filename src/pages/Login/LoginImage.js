@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "../../components/common/LogSignImg.css";
+import "../../Features/common/LogSignImg.css";
 
 export default function LoginImage() {
     const [imageSrc, setImageSrc] = useState("/assets/LoginImage.png");

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import axios from "axios";
-import { LogoSection } from "../../components";
+import { LogoSection } from "../../Features";
 import '../Login/LoginForm.css';
-import { FormInput } from "../../components";
+import { FormInput } from "../../Features";
 import { Envelope } from "phosphor-react";
+import apiCommon from "../../utils/api";
 
 export default function ForgotPasswordForm() {
     const [email, setEmail] = useState("");
@@ -36,7 +36,7 @@ export default function ForgotPasswordForm() {
 
         try {
             setLoading(true);
-            const response = await axios.post("https://meetza-backend.vercel.app/api/auth/forgot_password", {
+            const response = await apiCommon.post("/auth/forgot_password", {
                 email: email
             });
 
@@ -63,7 +63,7 @@ export default function ForgotPasswordForm() {
 
     return (
         <motion.div
-            className="align-items-center text-center"
+            className="forgot-password-container1 align-items-center text-center"
             initial={{ opacity: 0, x: 100 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -100 }}

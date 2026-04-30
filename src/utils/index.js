@@ -3,6 +3,5 @@ export {
     passwordValidation,
     nameValidation,
     confirmPasswordValidation,
-    loginValidationRules,
-    signupValidationRules
+    loginValidationRules
 } from './validationRules';

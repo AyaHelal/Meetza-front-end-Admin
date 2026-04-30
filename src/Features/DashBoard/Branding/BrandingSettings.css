@@ -1,0 +1,305 @@
+.branding-settings {
+    max-width: 1000px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease-out;
+    color: var(--text-primary);
+}
+
+.branding-settings.no-branding-margin {
+    margin: 7rem;
+}
+
+/* Dark mode support */
+:root[data-theme="dark"] .branding-settings {
+    color: #ffffff;
+}
+
+:root[data-theme="dark"] .branding-settings h2 {
+    color: #ffffff;
+}
+
+:root[data-theme="dark"] .branding-settings p {
+    color: #f3f4f6;
+}
+
+:root[data-theme="dark"] .branding-settings h4 {
+    color: #ffffff;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.branding-card {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color);
+}
+
+/* Dark mode support */
+:root[data-theme="dark"] .branding-card {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border-color: #4b5563;
+}
+
+:root[data-theme="dark"] .branding-card .form-label {
+    color: #ffffff;
+}
+
+:root[data-theme="dark"] .branding-card .form-control {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #ffffff;
+}
+
+:root[data-theme="dark"] .branding-card .form-control::placeholder {
+    color: #9ca3af;
+}
+
+:root[data-theme="dark"] .branding-card .form-text {
+    color: #f3f4f6;
+}
+
+:root[data-theme="dark"] .branding-card .form-check-label {
+    color: #ffffff;
+}
+
+.border-dashed {
+    border: 2px dashed var(--border-color);
+}
+
+/* Dark mode support */
+:root[data-theme="dark"] .border-dashed {
+    border-color: #4b5563;
+}
+
+.logo-preview {
+    width: 120px;
+    height: 120px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-light);
+    overflow: hidden;
+}
+
+/* Dark mode support */
+:root[data-theme="dark"] .logo-preview {
+    border-color: #4b5563;
+    background-color: #374151;
+}
+
+.logo-preview img {
+    object-fit: contain;
+}
+
+.form-control:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 0.25rem rgba(0, 220, 133, 0.1);
+}
+
+.form-check-input:checked {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-success {
+    background-color: var(--secondary-color);
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: var(--secondary-hover);
+}
+
+.preview-navbar {
+    border: 1px solid var(--border-color);
+    background-color: #ffffff !important; /* Keep navbar preview white for contrast usually */
+}
+
+/* Dark mode support */
+:root[data-theme="dark"] .preview-navbar {
+    background-color: #1e293b !important;
+    border-color: #4b5563;
+}
+
+:root[data-theme="dark"] .preview-navbar .h5 {
+    color: #ffffff;
+}
+
+:root[data-theme="dark"] .preview-navbar span {
+    color: #f3f4f6;
+}
+
+.preview-footer {
+    background-color: #343a40;
+}
+
+/* Dark mode support */
+:root[data-theme="dark"] .preview-footer {
+    background-color: #374151;
+    border-color: #4b5563;
+}
+
+:root[data-theme="dark"] .preview-footer span {
+    color: #ffffff;
+}
+
+.preview-footer {
+    border: 1px solid var(--border-color);
+}
+
+.logo-upload-container {
+    background-color: var(--bg-light);
+    transition: background-color 0.3s ease;
+}
+
+.logo-upload-container:hover {
+    background-color: var(--bg-alt);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .logo-upload-container {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .branding-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+
+/* Tablet adjustments */
+@media (max-width: 1024px) {
+    .logo-actions .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        white-space: center;
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Appearance Section Styles */
+.appearance-card {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color);
+}
+
+:root[data-theme="dark"] .appearance-card {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border-color: #4b5563;
+}
+
+.theme-preview-card {
+    cursor: pointer;
+    border: 2px solid #e2e8f0;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.2s ease-in-out;
+    background: #f8f9fa;
+}
+
+.theme-preview-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.theme-preview-card.active {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 1px #0d6efd;
+}
+
+:root[data-theme="dark"] .theme-preview-card {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+:root[data-theme="dark"] .theme-preview-card.active {
+    border-color: #0d6efd;
+}
+
+.theme-mockup {
+    height: 140px;
+    padding: 1.25rem;
+    background-color: #ffffff;
+}
+
+.theme-mockup.dark {
+    background-color: #0f172a;
+}
+
+.mock-sidebar {
+    width: 45px;
+    height: 100%;
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.theme-mockup.dark .mock-sidebar {
+    background: #1e293b;
+}
+
+.mock-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 4px;
+}
+
+.mock-line {
+    height: 6px;
+    border-radius: 3px;
+    background: #e2e8f0;
+}
+
+.theme-mockup.dark .mock-line {
+    background: #334155;
+}
+
+.theme-label-bar {
+    padding: 0.85rem 1.25rem;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+}
+
+:root[data-theme="dark"] .theme-label-bar {
+    background: #1e293b;
+    border-top-color: #334155;
+}
+
+:root[data-theme="dark"] .theme-label-bar span {
+    color: #ffffff;
+}
+
+.check-placeholder {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+    background-color: #f8f9fa;
+}
+
+:root[data-theme="dark"] .check-placeholder {
+    border-color: #4b5563;
+    background-color: #1e293b;
+}
+

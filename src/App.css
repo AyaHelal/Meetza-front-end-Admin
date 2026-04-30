@@ -41,3 +41,142 @@
 .m-10 {
   margin-top: 10%;
 }
+
+/* Mobile: center all modals/popups vertically */
+@media (max-width: 768px) {
+  .modal.show,
+  .modal.d-block {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 1rem;
+  }
+
+  .modal.show .modal-dialog,
+  .modal.d-block .modal-dialog {
+    margin: 0 auto;
+  }
+
+  /* Modals that use a card instead of modal-dialog (e.g. ResourcesLinksModal) */
+  .modal.d-block > .card,
+  .modal.show > .card {
+    margin-top: 0 !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Create Group & Create Membership form modals: responsive on tablet and mobile */
+.dashboard-form-modal__form .form-control,
+.dashboard-form-modal__form input[type="text"],
+.dashboard-form-modal__form input[type="email"],
+.dashboard-form-modal__form textarea,
+.dashboard-form-modal__form input[type="file"] {
+  box-sizing: border-box;
+}
+
+/* Tablet */
+@media (max-width: 992px) {
+  .dashboard-form-modal .dashboard-form-modal__dialog {
+    max-width: calc(100vw - 2rem);
+    width: 100%;
+    margin: 0.5rem auto;
+  }
+
+  .dashboard-form-modal .dashboard-form-modal__body {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    max-height: 55vh;
+  }
+
+  .dashboard-form-modal__form .form-control,
+  .dashboard-form-modal__form input[type="text"],
+  .dashboard-form-modal__form input[type="email"],
+  .dashboard-form-modal__form textarea,
+  .dashboard-form-modal__form input[type="file"] {
+    width: 100% !important;
+    max-width: 100%;
+  }
+
+  .dashboard-form-modal__form > div,
+  .dashboard-form-modal__form .mb-3 {
+    width: 100%;
+  }
+
+  /* React-Select: make control full width */
+  .dashboard-form-modal__form .d-flex.align-items-center.gap-2 > div:first-child,
+  .dashboard-form-modal__form > div > div {
+    width: 100% !important;
+    min-width: 0;
+  }
+
+  .dashboard-form-modal [class*="control"] {
+    min-width: 0;
+  }
+
+  .dashboard-form-modal__select-wrap {
+    width: 100% !important;
+    min-width: 0;
+  }
+
+  .dashboard-form-modal__select-wrap > div {
+    width: 100% !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .dashboard-form-modal .dashboard-form-modal__dialog {
+    max-width: calc(100vw - 1rem);
+    margin: 0.5rem auto;
+  }
+
+  .dashboard-form-modal .modal-title {
+    font-size: 1.2rem !important;
+  }
+
+  .dashboard-form-modal .dashboard-form-modal__body {
+    padding: 0.75rem 1rem;
+    max-height: 50vh;
+    padding-right: 0.75rem;
+  }
+
+  .dashboard-form-modal__form .form-control,
+  .dashboard-form-modal__form input[type="text"],
+  .dashboard-form-modal__form input[type="email"],
+  .dashboard-form-modal__form textarea,
+  .dashboard-form-modal__form input[type="file"] {
+    width: 100% !important;
+    padding: 0.65rem 0.75rem;
+    font-size: 16px; /* prevents zoom on iOS */
+  }
+
+  .dashboard-form-modal .modal-footer .btn {
+    padding: 0.65rem 1rem;
+    font-size: 1rem;
+  }
+
+  /* Group form: stack label + clear button for Group Content on small screens */
+  .dashboard-form-modal__form .d-flex.align-items-center.gap-2 {
+    flex-wrap: wrap;
+  }
+
+  .dashboard-form-modal__form .d-flex.align-items-center.gap-2 > div:first-child {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .dashboard-form-modal__form .d-flex.align-items-center.gap-2 .btn-outline-secondary {
+    flex-shrink: 0;
+  }
+
+  .dashboard-form-modal__select-wrap {
+    width: 100% !important;
+  }
+
+  .dashboard-form-modal__select-wrap > div {
+    width: 100% !important;
+  }
+}

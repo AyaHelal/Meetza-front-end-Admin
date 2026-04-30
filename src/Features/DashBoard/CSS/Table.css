@@ -1,0 +1,821 @@
+/* ========== Desktop vs Mobile: show table on large, cards on small ========== */
+.user-table-mobile,
+.position-table-mobile,
+.group-table-mobile,
+.membership-table-mobile,
+.content-table-mobile,
+.resources-table-mobile,
+.meeting-table-mobile {
+  display: none;
+}
+
+.user-table-desktop,
+.position-table-desktop,
+.group-table-desktop,
+.membership-table-desktop,
+.content-table-desktop,
+.resources-table-desktop,
+.meeting-table-desktop {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .user-table-desktop,
+  .position-table-desktop,
+  .group-table-desktop,
+  .membership-table-desktop,
+  .content-table-desktop,
+  .resources-table-desktop,
+  .meeting-table-desktop {
+    display: none !important;
+  }
+
+  .user-table-mobile,
+  .position-table-mobile,
+  .group-table-mobile,
+  .membership-table-mobile,
+  .content-table-mobile,
+  .resources-table-mobile,
+  .meeting-table-mobile {
+    display: block !important;
+  }
+
+  /* Mobile: only dashboard tables in user-table-container (hidden on mobile but avoids breaking other .table e.g. Analysis) */
+  .user-table-container .table {
+    font-size: 0.75rem;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .user-table-container .table th,
+  .user-table-container .table td {
+    padding: 0.5rem 0.25rem;
+    vertical-align: middle;
+  }
+
+  .user-table-container .table th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.7rem;
+    padding: 0.5rem 0.25rem;
+    border-bottom: 2px solid var(--border-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .user-table-container .table th:not(:first-child):not(:last-child) {
+    min-width: 80px;
+    max-width: 120px;
+  }
+
+  /* Mobile radio button spacing */
+  .form-check {
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    min-height: 30px;
+  }
+
+  .form-check-input {
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .form-check-label {
+    margin-left: 0;
+    word-wrap: break-word;
+    white-space: normal;
+    flex: 1;
+    line-height: 1.3;
+  }
+
+  .user-table-container .table td {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .user-table-container .table td:first-child {
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    padding: 0.5rem 0.25rem;
+  }
+
+  .user-table-container .table td:last-child {
+    width: auto;
+    min-width: 100px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: flex-start;
+  }
+
+  .user-table-container .table td .btn {
+    margin: 0.125rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+    min-width: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .user-table-container .table td .btn svg,
+  .user-table-container .table td svg {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+  }
+
+  .user-table-container .table td:last-child .btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .user-table-container .table td:first-child .form-check {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  /* Mobile card improvements */
+  .user-card {
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .user-card-body {
+    padding: 1rem;
+  }
+
+  .user-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .user-card-title-wrap {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .user-card-name,
+  .user-card-role,
+  .user-card-value,
+  .user-card-email,
+  .user-card-value-wrap {
+    min-width: 0;
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  a.user-card-email,
+  .user-card-value a,
+  a.user-card-value {
+    display: inline;
+    max-width: 100%;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+  }
+
+  .user-cards-container {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .user-card-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .user-card-actions .btn {
+    width: 100%;
+    justify-content: center;
+    border-radius: 10px;
+  }
+
+  /* Mobile avatar adjustments */
+  .user-card-avatar,
+  .user-card-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+  }
+
+  .user-card-avatar-placeholder svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+
+.group-th,
+.membership-th,
+.content-th,
+.resources-th,
+.meeting-th {
+  color: var(--text-secondary) !important;
+  white-space: nowrap;
+}
+
+/* Position Management header */
+.position-management-card {
+  box-shadow: var(--shadow-md);
+  background-color: var(--surface-color);
+}
+
+.position-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  overflow: visible;
+  background-color: var(--surface-color);
+}
+
+.position-header-title {
+  color: var(--text-primary);
+}
+
+.position-header-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  /* Prevent wrapping unless extremely small */
+  align-items: center;
+  gap: 0.75rem;
+  overflow: visible;
+}
+
+.position-header-btn {
+  background: var(--primary-gradient) !important;
+  color: var(--text-on-primary) !important;
+  font-size: 16px !important;
+  padding: 0.8rem 1.25rem !important;
+  border: none !important;
+  white-space: nowrap;
+}
+
+.position-header-search {
+  width: 260px;
+}
+
+.position-th {
+  color: var(--text-secondary) !important;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .position-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .position-header-actions {
+    order: 1;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .position-header-btn {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 0;
+  }
+
+  .position-header-search {
+    order: 2;
+    width: 100%;
+    max-width: none;
+  }
+
+  /* Move search icon to left on mobile */
+  .position-header-search .search-bar-icon {
+    right: auto !important;
+    left: 12px !important;
+  }
+
+  .position-header-search .search-input {
+    padding-left: 2.5rem !important;
+    padding-right: 0.875rem !important;
+  }
+}
+
+/* Search bar on mobile */
+@media (max-width: 768px) {
+  .position-header .search-bar-wrap {
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+  }
+
+  /* Mobile search icon adjustments */
+  .search-bar-icon {
+    right: 157px !important;
+    size: 18px !important;
+  }
+
+  .search-input {
+    padding-right: 2.5rem !important;
+    font-size: 14px !important;
+    padding-top: 0.625rem !important;
+    padding-bottom: 0.625rem !important;
+    padding-left: 0.875rem !important;
+  }
+
+  /* All search bars in tables */
+  .table-container .search-bar-wrap,
+  .user-table-container .search-bar-wrap,
+  .position-table-container .search-bar-wrap,
+  .group-table-container .search-bar-wrap,
+  .membership-table-container .search-bar-wrap {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .table-container .search-input,
+  .user-table-container .search-input,
+  .position-table-container .search-input,
+  .group-table-container .search-input,
+  .membership-table-container .search-input {
+    font-size: 14px !important;
+    padding: 0.625rem 0.875rem 0.625rem 2.5rem !important;
+  }
+
+  .table-container .search-bar-icon,
+  .user-table-container .search-bar-icon,
+  .position-table-container .search-bar-icon,
+  .group-table-container .search-bar-icon,
+  .membership-table-container .search-bar-icon {
+    right: auto !important;
+    left: 10px !important;
+    size: 16px !important;
+  }
+}
+
+/* Tablet responsive styles */
+@media (max-width: 1024px) {
+  .table {
+    font-size: 0.9rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .user-card {
+    margin-bottom: 0.75rem;
+  }
+
+  .user-card-body {
+    padding: 1.25rem;
+  }
+
+  .position-header-search {
+    width: 220px;
+  }
+}
+
+/* ========== Table/cards compatibility ========== */
+.card {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.table-header-sticky th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-color) !important;
+  z-index: 10;
+  border-bottom: 2px solid var(--divider-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Dark Theme Table Specifics */
+:root[data-theme="dark"] .table {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .table td {
+  border-color: var(--divider-color) !important;
+  background: transparent !important;
+  color: var(--text-primary);
+}
+
+.table-header-sticky th {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #ffffff !important;
+}
+
+:root[data-theme="dark"] .table-header-sticky th {
+  background: #1e293b !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .user-card {
+  border: 1px solid var(--border-color);
+}
+
+:root[data-theme="dark"] .user-card-name {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .user-card-value {
+  color: var(--text-secondary) !important;
+}
+
+.user-th {
+  color: var(--text-secondary) !important;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--divider-color) !important;
+}
+
+tbody tr:last-child {
+  border-bottom: none !important;
+}
+
+.membership-members-list {
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.membership-member-row {
+  border-bottom: 1px solid var(--divider-color);
+}
+
+.user-card {
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
+}
+
+.user-card-name {
+  color: var(--text-primary);
+}
+
+.user-card-email {
+  color: var(--text-secondary);
+  font-size: 0.9em;
+  text-decoration: none;
+}
+
+.user-card-value {
+  color: var(--text-primary);
+}
+
+/* Allow long text (URLs, emails) to wrap inside card layout */
+.user-card-title-wrap {
+  min-width: 0;
+}
+
+.user-card-name,
+.user-card-value,
+.user-card-value-wrap,
+.user-card-email {
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.user-card-value-wrap,
+td .break-word,
+.break-word {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+/* Card rows: column name (label) | value — grid so text never overlaps */
+.user-card-meta {
+  display: grid;
+  grid-template-columns: minmax(6rem, 26%) minmax(0, 1fr);
+  column-gap: 0.875rem;
+  row-gap: 0.25rem;
+  align-items: start;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.35rem 0;
+}
+
+.user-card-label {
+  color: var(--text-secondary, #6c757d);
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.35;
+  word-break: normal;
+  min-width: 0;
+}
+
+.user-card-value,
+.user-card-email {
+  min-width: 0;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.user-card-meta > .user-card-label {
+  grid-column: 1;
+}
+
+.user-card-meta > .user-card-value,
+.user-card-meta > .user-card-email,
+.user-card-meta > a.user-card-email,
+.user-card-meta > a.user-card-value {
+  grid-column: 2;
+}
+
+.user-card-meta > .btn {
+  grid-column: 2;
+  min-width: 0;
+  max-width: 100%;
+  justify-self: start;
+}
+
+.user-card-actions {
+  border-top: 1px solid var(--divider-color);
+}
+
+.user-card-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.user-card-avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.user-table-container {
+  max-height: 453px;
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.user-table-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Group Membership: group & member names follow theme (light: dark text, dark: light text) */
+.group-name-text {
+  color: var(--text-primary) !important;
+  font-size: 18px;
+}
+
+.group-member-name {
+  color: var(--text-primary) !important;
+  font-weight: 600;
+}
+
+/* ========== Desktop tables on narrow / tablet: scroll + wrap text in cells ========== */
+@media (max-width: 1200px) {
+  .user-table-container .table {
+    table-layout: auto;
+  }
+
+  .user-table-container .table th,
+  .user-table-container .table td {
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    vertical-align: top;
+  }
+
+  .user-table-container .table a {
+    word-break: break-all;
+  }
+
+  /* Action column: keep icon buttons on one line */
+  .user-table-container .table td:last-child {
+    white-space: nowrap;
+    vertical-align: middle;
+    word-break: normal;
+  }
+
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Mobile list cards: each field = column label (left) + value (right), no overlap */
+@media (max-width: 768px) {
+  .user-card-header .user-card-title-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+  }
+
+  .user-card-header .user-card-name,
+  .user-card-header .user-card-role {
+    display: block;
+    width: 100%;
+  }
+
+  .user-card-meta {
+    display: grid;
+    grid-template-columns: minmax(5.25rem, 38%) minmax(0, 1fr);
+    column-gap: 0.75rem;
+    row-gap: 0.35rem;
+    align-items: start;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--divider-color, rgba(0, 0, 0, 0.1));
+  }
+
+  :root[data-theme="dark"] .user-card-meta {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .user-card-label {
+    font-size: 0.75rem;
+  }
+
+  .user-card-value,
+  .user-card-email {
+    font-size: 0.88rem;
+  }
+
+  a.user-card-email,
+  .user-card-value a,
+  a.user-card-value {
+    display: block;
+    width: 100%;
+  }
+
+  .user-card-meta > .user-card-label {
+    grid-column: 1;
+  }
+
+  .user-card-meta > .user-card-value,
+  .user-card-meta > .user-card-email,
+  .user-card-meta > a {
+    grid-column: 2;
+  }
+
+  .user-card-meta > .btn {
+    grid-column: 2;
+    min-width: 0;
+    max-width: 100%;
+    justify-self: start;
+  }
+
+  .membership-members-list-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 0.75rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 0.25rem 0 0.5rem;
+  }
+
+  .membership-member-info {
+    min-width: 0;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+/* Card: avatar-only header; all table columns use user-card-meta below */
+.user-card-header--icon-only {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--divider-color, rgba(0, 0, 0, 0.08));
+  margin-bottom: 0.25rem;
+}
+
+.user-card-header--icon-only .user-card-title-wrap:empty {
+  display: none;
+}
+
+:root[data-theme="dark"] .user-card-header--icon-only {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Nested label/value inside membership member card (Name / Email) */
+.user-card-meta--nested {
+  display: grid;
+  grid-template-columns: minmax(4.25rem, 34%) minmax(0, 1fr);
+  column-gap: 0.5rem;
+  align-items: start;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--divider-color, rgba(0, 0, 0, 0.07));
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.user-card-meta--nested:last-of-type {
+  border-bottom: none;
+}
+
+.user-card-meta--nested .user-card-label {
+  font-size: 0.72rem;
+}
+
+.user-card-meta--nested .user-card-value {
+  font-size: 0.86rem;
+}
+
+/* Group membership: list of members on mobile */
+.group-membership-row-card .membership-members-list--mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.group-membership-row-card .membership-member-card {
+  background: var(--bg-light, #f4f6f8);
+  border: 1px solid var(--border-color, #dee2e6);
+  border-radius: 12px;
+  padding: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .group-membership-row-card .membership-member-card {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: var(--border-color, #334155);
+}
+
+.membership-member-card-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.membership-member-avatar {
+  flex-shrink: 0;
+}
+
+.membership-member-fields {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.membership-member-card-actions {
+  margin-top: 0.65rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+}
+
+.membership-empty-msg {
+  margin-top: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.user-card-meta--membership-info {
+  align-items: center;
+}
+
+.user-card-meta--membership-info .membership-toggle-btn {
+  min-width: 0;
+  flex-wrap: wrap;
+}

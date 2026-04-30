@@ -1,0 +1,48 @@
+.image-section {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Medium laptops (1025px - 1440px) - Rounded corners, no scroll, no right space */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .image-section {
+    border-radius: 12px !important;
+    -webkit-border-radius: 12px !important;
+    -moz-border-radius: 12px !important;
+    display: block;
+    width: calc(100% + 4rem) !important;
+    max-width: calc(100% + 4rem) !important;
+    height: calc(100vh - 1rem) !important;
+    max-height: calc(100vh - 1rem) !important;
+    object-fit: cover !important;
+    object-position: center;
+    margin-right: -4rem !important;
+  }
+  
+  /* Remove right spacing like large screens */
+  .col-lg-6.d-flex.justify-content-center,
+  .col-lg-6.d-none.d-lg-flex.justify-content-center,
+  .col-lg-6.d-none.d-lg-flex.justify-content-center.align-items-center {
+    overflow: visible;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+    margin-right: 0 !important;
+    max-height: 100vh;
+  }
+}
+
+/* Also apply for 1441px - 1499px range */
+@media (min-width: 1441px) and (max-width: 1499px) {
+  .image-section {
+    border-radius: 12px !important;
+  }
+}
+
+@media (min-width: 1500px) {
+  .image-section {
+    width: 868px !important;
+    height: 710px;
+    border-radius: 12px;
+  }
+}

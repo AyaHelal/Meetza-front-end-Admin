@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import axios from "axios";
-import { LogoSection } from "../../components";
+import { LogoSection } from "../../Features";
 import { usePasswordVisibility } from "../../hooks";
 import { Eye, EyeSlash } from "phosphor-react";
 import '../Login/LoginForm.css';
+import apiCommon from "../../utils/api";
 
 export default function ResetPassword() {
     const [formData, setFormData] = useState({
@@ -31,7 +31,22 @@ export default function ResetPassword() {
     }, [navigate]);
 
     const validatePassword = (password) => {
-        return password.length >= 8;
+        const minLength = password.length >= 8;
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const hasNumber = /\d/.test(password);
+        const hasSpecial = /[@$!%*?&]/.test(password);
+        
+        return {
+            isValid: minLength && hasUpper && hasLower && hasNumber && hasSpecial,
+            errors: {
+                minLength,
+                hasUpper,
+                hasLower,
+                hasNumber,
+                hasSpecial
+            }
+        };
     };
 
     const handleChange = (e) => {
@@ -62,8 +77,13 @@ export default function ResetPassword() {
             return;
         }
 
-        if (!validatePassword(formData.newPassword)) {
-            setError("Password must be at least 8 characters long");
+        const validation = validatePassword(formData.newPassword);
+        if (!validation.isValid) {
+            if (!validation.errors.minLength) setError("Password must be at least 8 characters long");
+            else if (!validation.errors.hasUpper) setError("Password must include at least one uppercase letter");
+            else if (!validation.errors.hasLower) setError("Password must include at least one lowercase letter");
+            else if (!validation.errors.hasNumber) setError("Password must include at least one number");
+            else if (!validation.errors.hasSpecial) setError("Password must include at least one special character (@$!%*?&)");
             return;
         }
 
@@ -80,10 +100,10 @@ export default function ResetPassword() {
 
         try {
             setLoading(true);
-            const response = await axios.post("https://meetza-backend.vercel.app/api/auth/reset_password", {
+            const response = await apiCommon.post("/auth/reset_password", {
                 email: email,
                 new_password: formData.newPassword,
-                is_verifyed: "true"
+                is_verified: "true"
             });
 
             setSuccess("Password reset successfully!");

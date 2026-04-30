@@ -1,0 +1,114 @@
+.groups-table-card {
+    border-radius: 16px;
+    border: none;
+}
+
+:root[data-theme="dark"] .groups-table-card {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+}
+
+:root[data-theme="dark"] .groups-table thead th {
+    background: transparent !important;
+    color: var(--text-secondary) !important;
+}
+
+
+.bg-g {
+    background: linear-gradient(225deg, rgba(0, 118, 234, 0.25) 0%, #ffffff 45%, #ffffff 100%) !important;
+}
+
+
+.groups-table-header-wrapper {
+    z-index: 10;
+    position: relative;
+    background: transparent !important;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.groups-table-header-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.groups-table-container {
+    z-index: 1;
+    max-height: 350px;
+    overflow-y: auto;
+    overflow-x: auto;
+    /* Hide scrollbars visually but keep functional */
+    -ms-overflow-style: none;
+    scrollbar-width: thin;
+    margin-top: -1px;
+}
+
+/* Custom Scrollbar for a more premium feel */
+.groups-table-container::-webkit-scrollbar {
+    width: 6px;
+    height: 0px;
+}
+
+.groups-table-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 118, 234, 0.2);
+    border-radius: 10px;
+}
+
+/* Hide scrollbar on large screens only as requested */
+@media (min-width: 992px) {
+    .groups-table-container {
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE/Edge */
+    }
+
+    .groups-table-container::-webkit-scrollbar {
+        display: none;
+        /* Chrome/Safari/Webkit */
+    }
+}
+
+.groups-table-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.groups-table {
+    width: 100%;
+    min-width: 1000px;
+    table-layout: auto;
+    border-collapse: collapse;
+}
+
+/* ✅ Transparent Header */
+.groups-table thead th {
+    background: transparent !important;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.96rem;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+.groups-table td {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    background: transparent !important;
+}
+
+.groups-table tbody tr {
+    border-bottom: 1px solid var(--divider-color) !important;
+    background: transparent !important;
+}
+
+.groups-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+@media (max-width: 768px) {
+    .groups-table th,
+    .groups-table td {
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+}

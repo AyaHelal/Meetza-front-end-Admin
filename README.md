@@ -2,21 +2,15 @@
 
 A comprehensive React-based admin dashboard for managing the Meetza platform. This application provides administrators with powerful tools to manage users, groups, meetings, videos, resources, and more through an intuitive and responsive interface.
 
+## 📁 Repository Structure (Required)
 
-## 🚀 Live Demo
+```text
+/src   → Source code
+/exe   → Executable files (if applicable)
+README.md
+```
 
-Access the live application: [https://meetza-front-end-admin.vercel.app/](https://meetza-front-end-admin.vercel.app/)
-
-## 🎨 Design
-
-View the Figma design: [https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Farida-Meetza?node-id=0-1&p=f&t=ehzpvGrgs7fbkPe3-0](https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Farida-Meetza?node-id=0-1&p=f&t=ehzpvGrgs7fbkPe3-0)
-
-
-## 📊 Presentation
-
-- Project Presentation on Canva: https://www.canva.com/design/DAG6wME9m9I/6szllu6C4vuPiD5iRwwTcQ/edit
-
-
+> This repository provides **source code** and full setup/build/run instructions. Add any optional executables to `exe/`.
 
 ## ✨ Features
 
@@ -36,7 +30,6 @@ View the Figma design: [https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Fari
 
 ## 🛠 Tech Stack
 
-### Frontend
 - **React 19.2.0**: Modern JavaScript library for building user interfaces
 - **React Router DOM 7.9.4**: Declarative routing for React applications
 - **Bootstrap 5.3.8**: Responsive CSS framework
@@ -46,52 +39,97 @@ View the Figma design: [https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Fari
 - **React Toastify 11.0.5**: Toast notifications
 - **Phosphor React 1.4.1**: Icon library
 - **Lottie React 2.4.1**: Lottie animations for React
-
-### Development Tools
 - **Create React App**: Build setup and development server
 - **ESLint**: Code linting
 - **Cross-env**: Cross-platform environment variable setting
 
-## 🚀 Getting Started
+## 📌 Status
+This project is completed as a submission.
 
-### Prerequisites
+## ⚙️ Setup & Env
 
-- Node.js (v14 or higher)
-- npm or yarn package manager
+### Prerequisites and Dependencies
+
+#### System Requirements
+
+- OS: Windows / macOS / Linux
+- RAM: 4GB minimum (8GB recommended)
+- Disk: 1GB+ free space
+
+#### Required Software / Tools
+
+- Node.js: **v18+ recommended**
+- npm (or yarn)
 - Git
 
-### Installation
+#### External Services
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd meetza-admin
-   ```
+This dashboard expects a Meetza backend API:
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+- `REACT_APP_API_BASE` (example: `http://localhost:4000/api`)
 
-3. **Environment Setup**
-   Create a `.env` file in the root directory and add your environment variables:
-   ```env
-   REACT_APP_API_BASE=https://meetza-backend.vercel.app/api
-   ```
+### Environment variables
 
-4. **Start the development server**
-   ```bash
-   npm start
-   ```
+Create a `.env` file in the project root (you can copy from `.env.example`):
 
-   The application will open at [http://localhost:3000](http://localhost:3000)
+    # Windows
+    copy .env.example .env
 
-### Available Scripts
+    # Mac/Linux
+    cp .env.example .env
 
-- `npm start` - Runs the app in development mode
-- `npm run build` - Builds the app for production
-- `npm test` - Launches the test runner
-- `npm run eject` - Ejects from Create React App (irreversible)
+Required variables:
+
+- `REACT_APP_API_BASE`
+
+Optional:
+
+- `REACT_APP_RECAPTCHA_SITE_KEY`
+
+## 🔧 Installation
+
+1. Clone the repository
+
+    git clone <repository-url>
+    cd meetza-admin
+
+2. Install dependencies
+
+    npm install
+
+3. Configure the environment
+
+    copy .env.example .env
+
+4. Make sure backend is running
+
+This admin dashboard requires a backend server to function properly.
+
+## ▶️ Run
+
+### Development
+
+    npm start
+
+Open: http://localhost:3000
+
+## 🏗 Build
+
+    npm run build
+
+Build output will be generated in the `build/` folder.
+
+## 🚀 Deployment
+
+### Vercel / Netlify
+
+- Build command: `npm run build`
+- Output directory: `build/`
+- Set environment variables in the platform dashboard (at least `REACT_APP_API_BASE`)
+
+### CI/CD (GitHub Actions / GitLab CI)
+
+- `npm ci` → `npm test` → `npm run build` → deploy artifacts
 
 ## 🔧 Configuration
 
@@ -100,7 +138,8 @@ View the Figma design: [https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Fari
 The application uses Axios for API communication. The base URL is configured in `src/utils/api.js`:
 
 ```javascript
-const API_BASE = process.env.REACT_APP_API_BASE || "https://meetza-backend.vercel.app/api";
+const API_BASE =
+  process.env.REACT_APP_API_BASE || "https://meetza-backend.vercel.app/api";
 ```
 
 ### Authentication
@@ -130,16 +169,19 @@ Protected routes are implemented using React Router with a `ProtectedRoute` comp
 ## 🎯 Key Components
 
 ### Dashboard Layout
+
 - Responsive sidebar navigation
 - Main content area with dynamic components
 - Toast notifications for user feedback
 
 ### Data Management
+
 - Custom hooks for API data fetching (`useUserData`, `useGroupData`, etc.)
 - Modal components for create/edit operations
 - Table components with pagination and search
 
 ### Forms and Validation
+
 - Reusable form input components
 - Custom validation hooks
 - Password visibility toggles
@@ -159,6 +201,15 @@ This project is private and proprietary to Meetza.
 ## 📞 Support
 
 For support or questions, please contact the development team.
+
+## 🔗 Links
+
+- Live application: [https://meetza-front-end-admin.vercel.app/](https://meetza-front-end-admin.vercel.app/)
+- Figma design: [https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Farida-Meetza?node-id=0-1&p=f&t=ehzpvGrgs7fbkPe3-0](https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Farida-Meetza?node-id=0-1&p=f&t=ehzpvGrgs7fbkPe3-0)
+
+## 📊 Presentation
+
+- Project Presentation on Canva: https://www.canva.com/design/DAG6wME9m9I/6szllu6C4vuPiD5iRwwTcQ/edit
 
 ---
 
