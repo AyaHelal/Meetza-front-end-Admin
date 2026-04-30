@@ -23,9 +23,9 @@ const BrandingSettings = () => {
 
             {isSuperAdmin && (
                 <>
-                    <div className="branding-header mb-4 mt-3">
-                        <h2 className="fw-semibold">Branding </h2>
-                        <p className="text-muted">Customize the platform name and logo for your organization.</p>
+                    <div className="branding-header mb-4" style={{ marginTop: "var(--dashboard-top-margin)" }}>
+                        <h2 className="fw-semibold mb-1">Branding</h2>
+                        <p className="text-muted mb-0">Customize the platform name and logo for your organization.</p>
                     </div>
                     
                     <div className="branding-card shadow-sm rounded-4 p-4 bg-white">
