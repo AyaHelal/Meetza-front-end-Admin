@@ -6,8 +6,11 @@ import { CalendarBlank } from "phosphor-react";
 const AnalysisHeader = ({ currentUser, dateRange, setDateRange }) => {
     return (
         <div
-            className="branded-card-bg border-bottom px-4 py-3 mt-4 mx-4 rounded-3 d-flex justify-content-between align-items-center"
-            style={{ boxShadow: "var(--shadow-sm)" }}
+            className="branded-card-bg border-bottom px-4 py-3 mx-4 rounded-3 d-flex justify-content-between align-items-center"
+            style={{ 
+                boxShadow: "var(--shadow-sm)",
+                marginTop: "var(--dashboard-top-margin)"
+            }}
         >
             <div>
                 <h1 className="h4 fw-semibold mb-1" style={{ color: "var(--text-primary)" }}>

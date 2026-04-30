@@ -107,7 +107,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                 <div className="ps-0 ms-0 video-main-col responsive-aside responsive-a align-items-start">
                     {showUploadModal ? (
                         <>
-                            <div className="card border-0 mt-4 width-850 video-upload-card">
+                            <div className="card border-0 width-850 video-upload-card" style={{ marginTop: "var(--dashboard-top-margin)" }}>
                                 <div className="card-body ps-4 pb-4 pt-4 d-flex flex-column h-820 responsive-aside video-upload-card-body">
                                     <div className="d-flex align-items-center gap-3 mb-3" >
                                         <button
@@ -286,7 +286,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                         </>
                     ) : currentVideo ? (
                         <>
-                            <div className="card border-0 mt-4 width-850 video-current-card">
+                            <div className="card border-0 width-850 video-current-card" style={{ marginTop: "var(--dashboard-top-margin)" }}>
 
                                 {/* Video Header */}
                                 <div className="card-header border-0 d-flex justify-content-between align-items-center p-3 flex-wrap gap-2">
@@ -410,7 +410,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                             </div>
                         </>
                     ) : (
-                        <div className="card border-0 mt-4 width-850 d-flex justify-content-center align-items-center video-empty-state">
+                        <div className="card border-0 width-850 d-flex justify-content-center align-items-center video-empty-state" style={{ marginTop: "var(--dashboard-top-margin)" }}>
                             <div className="text-center text-muted">
                                 <p className="mb-0 video-empty-state-text">No video selected</p>
                             </div>
@@ -421,7 +421,7 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                 </div>
 
                 {/* Videos Sidebar */}
-                <div className="mt-4 video-sidebar-wrap">
+                <div className="video-sidebar-wrap" style={{ marginTop: "var(--dashboard-top-margin)" }}>
                     <div className={`card border-0 branded-card-bg video-sidebar-card ${showUploadModal ? 'video-sidebar-card--upload-open' : ''}`}>
                         <div className="card-header border-0 d-flex justify-content-between align-items-center p-3 branded-card-bg video-sidebar-header">
                             <h5 className="mb-0 fw-semibold me-1">Videos</h5>

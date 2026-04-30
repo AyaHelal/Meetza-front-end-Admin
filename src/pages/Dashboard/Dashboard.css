@@ -8,20 +8,22 @@
   overflow: hidden;
   background-color: var(--bg-color);
   box-sizing: border-box;
+  --dashboard-top-margin: 2rem;
+  --dashboard-side-margin: 1.5rem;
 }
 
 /* ========== Sidebar ========== */
 .dashboard-sidebar {
   width: 230px;
   min-width: 230px;
-  /* Fit viewport: margin-top 2.25rem + margin-bottom 1rem — avoids page-level scroll */
-  height: calc(100vh - 3.25rem);
-  max-height: calc(100vh - 3.25rem);
+  /* Fit viewport: top margin + bottom margin — avoids page-level scroll */
+  height: calc(100vh - (var(--dashboard-top-margin) + var(--dashboard-side-margin)));
+  max-height: calc(100vh - (var(--dashboard-top-margin) + var(--dashboard-side-margin)));
   background: var(--surface-color);
   border-radius: 12px;
   padding: 0.5rem;
-  margin: 1rem 1rem 1rem 1rem;
-  margin-top: 2.25rem;
+  margin: var(--dashboard-side-margin);
+  margin-top: var(--dashboard-top-margin);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
