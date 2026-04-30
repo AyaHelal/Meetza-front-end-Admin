@@ -6,15 +6,15 @@ import useGroupContentData from "../GroupContent/hooks/useGroupContentData";
 import { GroupHeader } from "./components/GroupHeader";
 import { GroupTable } from "./components/GroupTable";
 import { SearchBar } from "../shared/SearchBar";
-import GroupModalComponent from "./GroupModalComponent";
-import GroupDetails from "./GroupDetails";
+import GroupModalComponent from "./components/GroupModalComponent";
+import GroupDetails from "./components/GroupDetails";
 import { ConfirmDeleteModal } from "../shared/ConfirmDeleteModal";
 import { PlusCircle, ArrowLeft } from "phosphor-react";
 import Select from 'react-select';
-import "./GroupMainComponent.css";
+import "./CSS/GroupMainComponent.css";
 import api from "../../../utils/api";
-import AssignGroupAdminModal from "./AssignGroupAdminModal";
-import RemoveGroupAdminModal from "./RemoveGroupAdminModal";
+import AssignGroupAdminModal from "./components/AssignGroupAdminModal";
+import RemoveGroupAdminModal from "./components/RemoveGroupAdminModal";
 import { parseEmailsInput } from "./parseEmailsInput";
 
 const GroupMainContent = ({ currentUser }) => {
@@ -148,12 +148,12 @@ const GroupMainContent = ({ currentUser }) => {
     };
 
     const handleUpdateGroup = async () => {
-    if (!selectedGroup) {
-        console.error("No group selected for update");
-        return;
-    }
+        if (!selectedGroup) {
+            console.error("No group selected for update");
+            return;
+        }
 
-    const groupId = selectedGroup.id;
+        const groupId = selectedGroup.id;
 
         try {
             await updateGroup(groupId, {
@@ -163,16 +163,16 @@ const GroupMainContent = ({ currentUser }) => {
                 semester: formData.semester,
                 group_photo: formData.group_photo ?? undefined,
             });
-        setShowEditModal(false);
-        toast.success("Group updated successfully");
-        fetchData();
+            setShowEditModal(false);
+            toast.success("Group updated successfully");
+            fetchData();
 
-    } catch (error) {
-        console.error("Update error:", error);
-        const msg = error?.response?.data?.message || error.message || "Failed to update group";
-        toast.error(msg);
-    }
-};
+        } catch (error) {
+            console.error("Update error:", error);
+            const msg = error?.response?.data?.message || error.message || "Failed to update group";
+            toast.error(msg);
+        }
+    };
 
 
 
@@ -415,7 +415,7 @@ const GroupMainContent = ({ currentUser }) => {
                                     </h2>
                                 </div>
 
-                                 <div className="row justify-content-center">
+                                <div className="row justify-content-center">
                                     <div className="col-lg-7">
                                         <div className="create-group-form border-0 p-4" style={{ backgroundColor: 'var(--surface-color)', color: 'var(--text-primary)', border: "1px solid var(--border-color)" }}>
                                             <div className="mb-4">
@@ -427,7 +427,7 @@ const GroupMainContent = ({ currentUser }) => {
                                                     className="form-control rounded-3 create-group-form__input"
                                                     name="group_name"
                                                     value={formData.group_name || ''}
-                                                     onChange={handleContentChange}
+                                                    onChange={handleContentChange}
                                                     placeholder="Enter group name"
                                                     style={{ border: "1px solid var(--border-color)", fontSize: "16px", backgroundColor: 'var(--bg-light)', color: 'var(--text-primary)' }}
                                                 />
@@ -436,7 +436,7 @@ const GroupMainContent = ({ currentUser }) => {
                                             {isSuperAdmin && (
                                                 <div className="mb-4">
                                                     <label className="form-label fw-semibold create-group-form__label">
-                                                        Group leaders <span style={{ color: "#FF0000" }}>*</span>
+                                                        Group leaders <span style={{ color: "#FF383C" }}>*</span>
                                                     </label>
                                                     <div className="create-group-form__field rounded-3 dashboard-form-modal__select-wrap">
                                                         <Select
@@ -454,7 +454,7 @@ const GroupMainContent = ({ currentUser }) => {
                                                             }
                                                             placeholder="Select Leaders…"
                                                             menuPortalTarget={document.body}
-                                                            styles={{ 
+                                                            styles={{
                                                                 menuPortal: base => ({ ...base, zIndex: 9999 }),
                                                                 control: (base) => ({ ...base, backgroundColor: 'transparent', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }),
                                                                 menu: (base) => ({ ...base, backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)', zIndex: 9999 }),
@@ -480,7 +480,7 @@ const GroupMainContent = ({ currentUser }) => {
                                                         name="year"
                                                         min={1}
                                                         value={formData.year || ''}
-                                                         onChange={handleContentChange}
+                                                        onChange={handleContentChange}
                                                         placeholder="Enter year"
                                                         style={{ border: "1px solid var(--border-color)", fontSize: "16px", backgroundColor: 'var(--bg-light)', color: 'var(--text-primary)' }}
                                                     />
@@ -497,7 +497,7 @@ const GroupMainContent = ({ currentUser }) => {
                                                             onChange={(opt) => setFormData({ ...formData, semester: opt?.value ?? '' })}
                                                             placeholder="Select semester"
                                                             menuPortalTarget={document.body}
-                                                            styles={{ 
+                                                            styles={{
                                                                 menuPortal: base => ({ ...base, zIndex: 9999 }),
                                                                 control: (base) => ({ ...base, backgroundColor: 'transparent', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }),
                                                                 menu: (base) => ({ ...base, backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)', zIndex: 9999 }),
@@ -519,7 +519,7 @@ const GroupMainContent = ({ currentUser }) => {
                                                     className="form-control rounded-3 create-group-form__input"
                                                     name="group_content_name"
                                                     value={formData.group_content_name || ''}
-                                                     onChange={handleContentChange}
+                                                    onChange={handleContentChange}
                                                     placeholder="Enter content name"
                                                     style={{ border: "1px solid var(--border-color)", fontSize: "16px", backgroundColor: 'var(--bg-light)', color: 'var(--text-primary)' }}
                                                 />
@@ -533,7 +533,7 @@ const GroupMainContent = ({ currentUser }) => {
                                                     className="form-control rounded-3 create-group-form__input create-group-form__textarea"
                                                     name="content_description"
                                                     value={formData.content_description || ''}
-                                                     onChange={handleContentChange}
+                                                    onChange={handleContentChange}
                                                     placeholder="Enter content description (optional)"
                                                     style={{ border: "1px solid var(--border-color)", fontSize: "16px", minHeight: 90, backgroundColor: 'var(--bg-light)', color: 'var(--text-primary)' }}
                                                 />
@@ -547,7 +547,7 @@ const GroupMainContent = ({ currentUser }) => {
                                                     className="form-control rounded-3 create-group-form__input create-group-form__textarea"
                                                     name="description"
                                                     value={formData.description || ''}
-                                                     onChange={handleContentChange}
+                                                    onChange={handleContentChange}
                                                     placeholder="Enter group description (optional)"
                                                     style={{ border: "1px solid var(--border-color)", fontSize: "16px", minHeight: 90, backgroundColor: 'var(--bg-light)', color: 'var(--text-primary)' }}
                                                 />

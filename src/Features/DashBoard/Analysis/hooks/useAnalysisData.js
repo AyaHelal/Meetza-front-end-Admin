@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import api from '../../../../utils/api';
+import { getAnalysisData } from '../service/analysisService';
 
 const useAnalysisData = (startDate, endDate) => {
     const cacheKey = `analysis_dashboard_${startDate || 'all'}_${endDate || 'all'}`;
@@ -42,14 +42,7 @@ const useAnalysisData = (startDate, endDate) => {
             try {
                 if (!hasCache) setLoading(true);
 
-                const params = {};
-                if (startDate && endDate) {
-                    params.startDate = startDate;
-                    params.endDate = endDate;
-                }
-
-                const response = await api.get('/reports/analytics', { params });
-                const responseData = response.data?.data || response.data;
+                const responseData = await getAnalysisData(startDate, endDate);
 
 
                 const newSummary = responseData?.summary || responseData;

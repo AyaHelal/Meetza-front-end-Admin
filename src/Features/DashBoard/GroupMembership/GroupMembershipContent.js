@@ -1,5 +1,4 @@
 
-// GroupMembershipContent.jsx
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useGroupMembershipData } from "./hooks/useGroupMembershipData";
@@ -11,7 +10,7 @@ import { PlusCircle } from "phosphor-react";
 import Select from 'react-select';
 import "../User/UserMainComponent.css";
 import { ArrowLeft } from "phosphor-react";
-import api from "../../../utils/api";
+import * as groupMembershipService from "./service/groupMembershipService";
 
 const GroupMembershipContent = ({ currentUser }) => {
     const isAdmin = (currentUser?.role || "").toLowerCase() === "administrator" || (currentUser?.role || "").toLowerCase() === "super_admin";
@@ -54,8 +53,7 @@ const GroupMembershipContent = ({ currentUser }) => {
 
         try {
             const email = formData.member_email.trim();
-            const response = await api.get(`/user/email/${encodeURIComponent(email)}`);
-            const raw = response?.data;
+            const raw = await groupMembershipService.getUserByEmail(email);
             const userData = raw?.data ?? raw;
 
             if (!userData?.id) {

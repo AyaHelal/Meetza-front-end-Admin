@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "../../Group/GroupMainComponent.css";
+import "../../Group/CSS/GroupMainComponent.css";
 import Select from "react-select";
 import { useAuth } from "../../../../context/AuthContext";
 

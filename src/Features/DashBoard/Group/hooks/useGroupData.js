@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import api from "../../../../utils/api";
 import { useAuth } from "../../../../context/AuthContext";
 import { dedupeById } from "../../../../utils/dedupeById";
 import { groupIsManagedByUser } from "../../../../utils/groupIsManagedByUser";
+import * as groupService from "../service/groupService";
 
 function pickPrimaryAdminFromAdmins(admins) {
   if (!Array.isArray(admins) || admins.length === 0) return null;
@@ -17,13 +17,7 @@ function pickPrimaryAdminFromAdmins(admins) {
 function mapApiGroupToRow(g) {
   const primary = pickPrimaryAdminFromAdmins(g.admins);
   const adminUserId =
-    g.admin_id ||
-    g.adminId ||
     g.administrator_id ||
-    g.user_id ||
-    g.admin?.id ||
-    primary?.user_id ||
-    primary?.userId ||
     null;
   const adminName =
     g.admin?.name ||
@@ -67,8 +61,7 @@ export const useGroupData = () => {
     try {
       if (!hasCache) setLoading(true);
       setError(null);
-      const res = await api.get("/group");
-      const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      const payload = await groupService.getGroups();
 
       const isSuperAdmin = user?.role === "Super_Admin";
       const isAdministrator = user?.role === "Administrator";
@@ -92,8 +85,7 @@ export const useGroupData = () => {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await api.get("/user");
-      const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      const payload = await groupService.getUsers();
       setUsers(dedupeById(payload));
     } catch (err) {
       console.error("Failed to fetch users:", err);
@@ -102,27 +94,15 @@ export const useGroupData = () => {
 
   const fetchGroupContents = useCallback(async () => {
     try {
-      const res = await api.get("/group-contents");
-      const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      const payload = await groupService.getGroupContents();
       setContents(dedupeById(payload));
     } catch (err) {
       console.error("Failed to fetch group contents:", err);
     }
   }, []);
 
-  // Accept optional description (string) and posterFile (File object). When posterFile is provided
-  // the request will be sent as multipart/form-data with the poster attached under the 'poster' key.
   /**
    * @param {object} params
-   * @param {string} params.group_name
-   * @param {string|number|undefined} [params.position_id] — omit for non–super-admin create
-   * @param {string|number} params.year
-   * @param {string} params.semester
-   * @param {string} params.group_content_name
-   * @param {string} [params.group_content_description]
-   * @param {string} [params.description]
-   * @param {File} [params.group_photo]
-   * @param {number[]} [params.admin_ids] — super admin: sent as `administrator_ids[0]`, `[1]`, … plus `administrator_id` (first)
    */
   const createGroup = async ({
     group_name,
@@ -173,20 +153,7 @@ export const useGroupData = () => {
         });
       }
 
-      let res;
-      if (group_photo) {
-        const form = new FormData();
-        Object.entries(payload).forEach(([k, v]) => {
-          if (v === undefined || v === null) return;
-          form.append(k, v);
-        });
-        form.append("group_photo", group_photo);
-        res = await api.post("/group", form, { headers: { "Content-Type": "multipart/form-data" } });
-      } else {
-        res = await api.post("/group", payload);
-      }
-
-      const newGroup = res.data?.data || res.data;
+      const newGroup = await groupService.createGroup(payload, group_photo);
 
       await fetchData();
       return newGroup;
@@ -209,17 +176,7 @@ export const useGroupData = () => {
       if (year !== undefined && year !== null && year !== "") payload.year = year;
       if (semester !== undefined && semester !== null && semester !== "") payload.semester = semester;
 
-      let response;
-      if (group_photo) {
-        const form = new FormData();
-        Object.entries(payload).forEach(([k, v]) => {
-          if (v !== undefined && v !== null) form.append(k, v);
-        });
-        form.append("group_photo", group_photo);
-        response = await api.put(`/group/${id}`, form, { headers: { "Content-Type": "multipart/form-data" } });
-      } else {
-        response = await api.put(`/group/${id}`, payload);
-      }
+      const response = await groupService.updateGroup(id, payload, group_photo);
 
       setGroups((prev) =>
         prev.map((g) => {
@@ -234,23 +191,18 @@ export const useGroupData = () => {
         })
       );
 
-      return response.data;
+      return response;
     } catch (err) {
       console.error("Update group error:", err);
       throw err;
     }
   };
 
-
-
-
-
   const deleteGroup = async (id) => {
     try {
-      // Delete the group
-      await api.delete(`/group/${id}`);
+      const result = await groupService.deleteGroup(id);
       setGroups(prev => prev.filter(g => g.id !== id));
-      return { success: true };
+      return result;
     } catch (e) {
       console.error("Delete error:", e);
       return { success: false, message: e.message };
@@ -259,8 +211,7 @@ export const useGroupData = () => {
 
   const searchGroups = async (query) => {
     try {
-      const res = await api.get(`/group?name=${query}`);
-      const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      const payload = await groupService.getGroups(query);
 
       const isSuperAdmin = user?.role === "Super_Admin";
       const isAdministrator = user?.role === "Administrator";

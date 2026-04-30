@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import api from "../../../../utils/api";
 import { dedupeById } from "../../../../utils/dedupeById";
 import { groupIsManagedByUser } from "../../../../utils/groupIsManagedByUser";
+import * as groupMembershipService from "../service/groupMembershipService";
 
 export const useGroupMembershipData = (currentUser = null) => {
   const cacheKey = `admin_membership_cache_${currentUser?.id || 'guest'}`;
@@ -30,20 +30,18 @@ export const useGroupMembershipData = (currentUser = null) => {
       if (!hasCache) setLoading(true);
       setError(null);
 
-      const res = await api.get("/group-membership");
-      const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      const resData = await groupMembershipService.getMemberships();
+      const payload = Array.isArray(resData) ? resData : resData?.data || [];
       const membershipIdMap = new Map();
 
       try {
-        const flatRes = await api.get("/group-membership");
-        if (flatRes.data && Array.isArray(flatRes.data)) {
-          const flatData = Array.isArray(flatRes.data) ? flatRes.data : flatRes.data?.data || [];
-          flatData.forEach((membership) => {
-            const key = `${membership.group_id}_${membership.member_id || membership.memberId}`;
-            membershipIdMap.set(key, membership.id || membership.membership_id);
-          });
-        }
-      } catch (e1) {}
+        const flatResData = await groupMembershipService.getMemberships();
+        const flatData = Array.isArray(flatResData) ? flatResData : flatResData?.data || [];
+        flatData.forEach((membership) => {
+          const key = `${membership.group_id}_${membership.member_id || membership.memberId}`;
+          membershipIdMap.set(key, membership.id || membership.membership_id);
+        });
+      } catch (e1) { }
 
       membershipIdMapRef.current = membershipIdMap;
       let groupedMemberships = [];
@@ -108,8 +106,8 @@ export const useGroupMembershipData = (currentUser = null) => {
   // 🟩 Fetch groups
   const fetchGroups = useCallback(async () => {
     try {
-      const res = await api.get("/group");
-      let payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      const resData = await groupMembershipService.getGroups();
+      let payload = Array.isArray(resData) ? resData : resData?.data || [];
       const user = currentUser;
       const roleNorm = String(user?.role || "").trim().toLowerCase();
       const isSuperAdmin = roleNorm === "super_admin";
@@ -122,29 +120,26 @@ export const useGroupMembershipData = (currentUser = null) => {
 
       setGroups(filteredGroups);
       localStorage.setItem(`${cacheKey}_groups`, JSON.stringify(filteredGroups));
-    } catch (err) {}
+    } catch (err) { }
   }, [currentUser, cacheKey]);
 
   // 🟩 Fetch members
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await api.get("/user");
-      const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      const resData = await groupMembershipService.getUsers();
+      const payload = Array.isArray(resData) ? resData : resData?.data || [];
       setUsers(payload);
       localStorage.setItem(`${cacheKey}_users`, JSON.stringify(payload));
-    } catch (err) {}
+    } catch (err) { }
   }, [cacheKey]);
 
 
   // ➕ Create new membership
   const createMembership = async (group_id, member_id) => {
     try {
-      const res = await api.post("/group-membership", {
-        group_id,
-        member_id,
-      });
+      const resData = await groupMembershipService.createMembership(group_id, member_id);
 
-      const newMembership = res.data;
+      const newMembership = resData;
 
       // Refresh data after creation (this will get the latest data including any IDs)
       await fetchData();
@@ -185,7 +180,7 @@ export const useGroupMembershipData = (currentUser = null) => {
 
       // Since the API doesn't return membership IDs, we need to delete using group_id and member_id
       // Try different delete approaches
-      let deleteResponse = null;
+      let deleteResponseData = null;
       let deleteSuccess = false;
 
       // First, check if we have membership ID (from map or if API starts including it)
@@ -195,11 +190,8 @@ export const useGroupMembershipData = (currentUser = null) => {
       if (membershipId) {
         // Try delete with membership ID first
         try {
-          deleteResponse = await api.delete(`/group-membership/${membershipId}`);
-
-          if (deleteResponse.status >= 200 && deleteResponse.status < 300) {
-            deleteSuccess = true;
-          }
+          deleteResponseData = await groupMembershipService.deleteMembershipById(membershipId);
+          deleteSuccess = true;
         } catch (error1) {
         }
       }
@@ -208,24 +200,13 @@ export const useGroupMembershipData = (currentUser = null) => {
       if (!deleteSuccess) {
         // Try DELETE with request body containing group_id and member_id
         try {
-          deleteResponse = await api.delete(`/group-membership`, {
-            data: {
-              group_id: groupId,
-              member_id: memberId,
-            },
-          });
-
-          if (deleteResponse.status >= 200 && deleteResponse.status < 300) {
-            deleteSuccess = true;
-          }
+          deleteResponseData = await groupMembershipService.deleteMembershipByBody(groupId, memberId);
+          deleteSuccess = true;
         } catch (error2) {
           // Try DELETE with query parameters
           try {
-            deleteResponse = await api.delete(`/group-membership?group_id=${groupId}&member_id=${memberId}`);
-
-            if (deleteResponse.status >= 200 && deleteResponse.status < 300) {
-              deleteSuccess = true;
-            }
+            deleteResponseData = await groupMembershipService.deleteMembershipByQuery(groupId, memberId);
+            deleteSuccess = true;
           } catch (error3) {
             console.error("All delete methods failed. Backend requires membership ID but API doesn't provide it.");
             throw new Error(
@@ -245,8 +226,8 @@ export const useGroupMembershipData = (currentUser = null) => {
         // Fetch fresh data from API
         try {
           setLoading(true);
-          const res = await api.get("/group-membership");
-          const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+          const resData = await groupMembershipService.getMemberships();
+          const payload = Array.isArray(resData) ? resData : resData?.data || [];
 
           // Transform to grouped structure (same as fetchData)
           let groupedMemberships = [];
@@ -342,28 +323,23 @@ export const useGroupMembershipData = (currentUser = null) => {
 
       // Try update by ID first
       try {
-        const res = await api.patch(`/group-membership/${id}`, {
+        const resData = await groupMembershipService.updateMembership(id, {
           group_id,
           member_id,
         });
         await fetchData();
-        return res.data;
+        return resData;
       } catch (patchError) {
         // If PATCH with ID doesn't work, try deleting old and creating new
         if (patchError.response?.status === 404 || patchError.response?.status === 400) {
           // Delete the old membership
           if (oldGroupId && oldMemberId) {
             try {
-              await api.delete(`/group-membership`, {
-                params: {
-                  group_id: oldGroupId,
-                  member_id: oldMemberId,
-                },
-              });
+              await groupMembershipService.deleteMembershipByQuery(oldGroupId, oldMemberId);
             } catch (deleteError) {
               // Try with composite ID as path parameter
               try {
-                await api.delete(`/group-membership/${id}`);
+                await groupMembershipService.deleteMembershipById(id);
               } catch (e) {
                 console.error("Failed to delete old membership:", e);
               }
@@ -371,19 +347,16 @@ export const useGroupMembershipData = (currentUser = null) => {
           } else {
             // Try to find and delete by composite ID
             try {
-              await api.delete(`/group-membership/${id}`);
+              await groupMembershipService.deleteMembershipById(id);
             } catch (e) {
               console.error("Failed to delete old membership:", e);
             }
           }
 
           // Create new membership
-          const res = await api.post("/group-membership", {
-            group_id,
-            member_id,
-          });
+          const resData = await groupMembershipService.createMembership(group_id, member_id);
           await fetchData();
-          return res.data;
+          return resData;
         } else {
           throw patchError;
         }
@@ -398,10 +371,8 @@ export const useGroupMembershipData = (currentUser = null) => {
   const searchMemberships = async (query) => {
     try {
       // Search by group name or ID - get full data to include photos
-      const res = await api.get(`/group-membership`, {
-        params: { search: query },
-      });
-      const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      const resData = await groupMembershipService.getMemberships(query);
+      const payload = Array.isArray(resData) ? resData : resData?.data || [];
 
       // Handle nested structure like in fetchData but include all photo data
       let groupedMemberships = [];

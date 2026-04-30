@@ -48,10 +48,10 @@ export default function Meeting() {
 
     const handleSave = async (id, data) => {
         try {
-        if (id) await updateMeeting(id, data);
-        else await addMeeting(data);
-        setEditing({}); setAddingNew(false);
-        await fetchMeetings();
+            if (id) await updateMeeting(id, data);
+            else await addMeeting(data);
+            setEditing({}); setAddingNew(false);
+            await fetchMeetings();
         } catch (err) { smartToast.error(err.response?.data?.message || "Failed to save meeting"); }
     };
 
@@ -179,25 +179,25 @@ export default function Meeting() {
 
     return (
         <main className="flex-fill">
-        <UserWelcomeHeader userName={currentUser?.name || "User"} description="Welcome back! Manage your meetings efficiently." />
-        <MeetingTable meetings={meetings} groups={groups} loading={loading} error={error?.message} onSave={handleSave} onDelete={handleDelete} onEdit={handleEdit} onAdd={handleAdd} searchTerm={searchTerm} onSearchChange={handleSearch} addingNew={addingNew} editing={editing} currentUser={currentUser} />
-        {modalOpen && (
-            <MeetingModal mode={modalMode} data={modalData} groups={groups} onChange={setModalData} onClose={closeModal} onSubmit={handleModalSubmit} />
-        )}
-        <ConfirmDeleteModal
-            show={showDeleteModal}
-            onClose={() => { setShowDeleteModal(false); setMeetingToDelete(null); }}
-            onConfirm={confirmDeleteMeeting}
-            title="Delete Meeting"
-            message="Are you sure you want to delete this meeting? This action cannot be undone."
-        />
-        <WeeklyDeleteModal
-            show={showWeeklyDeleteModal}
-            onClose={() => { setShowWeeklyDeleteModal(false); setMeetingToDelete(null); }}
-            onConfirmThisWeek={() => confirmWeeklyDeleteMeeting(false)}
-            onConfirmAllWeeks={() => confirmWeeklyDeleteMeeting(true)}
-            confirming={deletingMeeting}
-        />
+            <UserWelcomeHeader userName={currentUser?.name || "User"} description="Welcome back! Manage your meetings efficiently." />
+            <MeetingTable meetings={meetings} groups={groups} loading={loading} error={error?.message} onSave={handleSave} onDelete={handleDelete} onEdit={handleEdit} onAdd={handleAdd} searchTerm={searchTerm} onSearchChange={handleSearch} addingNew={addingNew} editing={editing} currentUser={currentUser} />
+            {modalOpen && (
+                <MeetingModal mode={modalMode} data={modalData} groups={groups} onChange={setModalData} onClose={closeModal} onSubmit={handleModalSubmit} />
+            )}
+            <ConfirmDeleteModal
+                show={showDeleteModal}
+                onClose={() => { setShowDeleteModal(false); setMeetingToDelete(null); }}
+                onConfirm={confirmDeleteMeeting}
+                title="Delete Meeting"
+                message="Are you sure you want to delete this meeting? This action cannot be undone."
+            />
+            <WeeklyDeleteModal
+                show={showWeeklyDeleteModal}
+                onClose={() => { setShowWeeklyDeleteModal(false); setMeetingToDelete(null); }}
+                onConfirmThisWeek={() => confirmWeeklyDeleteMeeting(false)}
+                onConfirmAllWeeks={() => confirmWeeklyDeleteMeeting(true)}
+                confirming={deletingMeeting}
+            />
         </main>
     );
 }
