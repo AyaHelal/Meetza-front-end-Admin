@@ -11,12 +11,16 @@ export const brandingService = {
     return res.data?.data || res.data;
   },
 
-  createCompany: async (formData) => {
-    const res = await api.post('/companies', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
+  createCompany: async (payload) => {
+    const isFormData = payload instanceof FormData;
+    const config = isFormData
+      ? {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      : undefined;
+    const res = await api.post('/companies', payload, config);
     return res.data?.data || res.data;
   },
 

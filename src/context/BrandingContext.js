@@ -16,6 +16,24 @@ export const BrandingProvider = ({ children }) => {
         loading: true
     });
 
+    const normalizeLogoUrl = useCallback((rawUrl) => {
+        if (!rawUrl || typeof rawUrl !== 'string') return '';
+        const trimmed = rawUrl.trim();
+        if (!trimmed || trimmed.startsWith('blob:')) return '';
+
+        // Keep already absolute URLs as is.
+        if (/^https?:\/\//i.test(trimmed)) return trimmed;
+
+        // Convert relative backend paths to absolute URLs using API base origin.
+        try {
+            const apiOrigin = new URL(API_BASE_URL).origin;
+            const normalizedPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+            return `${apiOrigin}${normalizedPath}`;
+        } catch {
+            return '';
+        }
+    }, []);
+
     const fetchBranding = useCallback(async () => {
         try {
             // Check if company was deleted (localStorage cleared)
@@ -28,16 +46,20 @@ export const BrandingProvider = ({ children }) => {
                 // Don't return here, continue to API fetch
             }
 
-            // First, try to load branding from localStorage
+            // First, load branding from localStorage as immediate fallback,
+            // then continue and refresh from API to avoid stale logo/name.
             const storedBranding = localStorage.getItem('brandingData');
             if (storedBranding) {
                 try {
                     const parsedBranding = JSON.parse(storedBranding);
-                    setBranding({
+                    const normalizedStoredBranding = {
                         ...parsedBranding,
+                        logoUrl: normalizeLogoUrl(parsedBranding?.logoUrl || '')
+                    };
+                    setBranding({
+                        ...normalizedStoredBranding,
                         loading: false
                     });
-                    return; // Use stored data, don't fetch from API
                 } catch (e) {
                     console.warn('Failed to parse stored branding data');
                     // Continue to API fetch if stored data is invalid
@@ -50,17 +72,11 @@ export const BrandingProvider = ({ children }) => {
                 token = sessionStorage.getItem("authToken");
             }
             
-            if (!token) {
-                console.warn('No token found, using default branding');
-                setBranding(prev => ({ ...prev, loading: false }));
-                return;
-            }
-            
             // Using /id endpoint, no need for companyId logic
-            
-            const res = await axios.get(`${API_BASE_URL}/companies/id`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const requestConfig = token
+                ? { headers: { Authorization: `Bearer ${token}` } }
+                : undefined;
+            const res = await axios.get(`${API_BASE_URL}/companies/id`, requestConfig);
             const data = res.data?.data || res.data;
             const settings = data?.settings || {};
             
@@ -69,22 +85,9 @@ export const BrandingProvider = ({ children }) => {
                 // Check if logo URL is valid (not blob)
                 const logoUrl = settings.logo_url || '';
                 
-                const isValidLogoUrl = (url) => {
-                    if (!url) return false;
-                    // Check if it's a blob URL (invalid for display)
-                    if (url.startsWith('blob:')) return false;
-                    // Check if it's a valid HTTP/HTTPS URL
-                    try {
-                        new URL(url);
-                        return true;
-                    } catch {
-                        return false;
-                    }
-                };
-                
                 const brandingData = {
                     systemName: settings.system_name || data.name || 'Meetza',
-                    logoUrl: isValidLogoUrl(logoUrl) ? logoUrl : '',
+                    logoUrl: normalizeLogoUrl(logoUrl),
                     systemNameColor: settings.system_name_color || '#2c3e50',
                     showPoweredBy: true, // This might not be in backend yet
                     loading: false
@@ -102,8 +105,8 @@ export const BrandingProvider = ({ children }) => {
             console.error('Branding fetch error:', error);
             console.error('Error details:', error.response?.data);
             
-            // If company not found (404), clear localStorage and use defaults
-            if (error.response?.status === 404) {
+            // If company not found/unauthorized, clear localStorage and use defaults
+            if (error.response?.status === 404 || error.response?.status === 401) {
                 localStorage.removeItem('selectedCompany');
                 localStorage.removeItem('companySettings');
                 localStorage.removeItem('brandingData');
@@ -120,7 +123,7 @@ export const BrandingProvider = ({ children }) => {
                 setBranding(prev => ({ ...prev, loading: false }));
             }
         }
-    }, []);
+    }, [normalizeLogoUrl]);
 
     useEffect(() => {
         fetchBranding();
@@ -129,7 +132,8 @@ export const BrandingProvider = ({ children }) => {
     const updateBranding = (newData) => {
         const updatedBranding = {
             ...branding,
-            ...newData
+            ...newData,
+            logoUrl: normalizeLogoUrl(newData?.logoUrl ?? branding.logoUrl)
         };
         
         setBranding(updatedBranding);
@@ -143,22 +147,10 @@ export const BrandingProvider = ({ children }) => {
         
         // Check if logo URL is valid (not blob)
         const logoUrl = settings.logo_url || '';
-        const isValidLogoUrl = (url) => {
-            if (!url) return false;
-            // Check if it's a blob URL (invalid for display)
-            if (url.startsWith('blob:')) return false;
-            // Check if it's a valid HTTP/HTTPS URL
-            try {
-                new URL(url);
-                return true;
-            } catch {
-                return false;
-            }
-        };
         
         const brandingData = {
             systemName: settings.system_name || provisionData.name || 'Meetza',
-            logoUrl: isValidLogoUrl(logoUrl) ? logoUrl : '',
+            logoUrl: normalizeLogoUrl(logoUrl),
             systemNameColor: settings.system_name_color || '#2c3e50',
             showPoweredBy: true,
             loading: false

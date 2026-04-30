@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { CheckCircle, UploadSimple, Trash } from 'phosphor-react';
 
 const BrandingFormSection = ({ state, setters, handlers }) => {
@@ -11,7 +11,15 @@ const BrandingFormSection = ({ state, setters, handlers }) => {
         setUserEditedName, setUserEditedColor, setUserEditedTerms, setUserEditedPrivacy, setUserEditedGuidelines, setUserEditedAuth,
         setLogoDraft, setLogoFile
     } = setters;
-    const { handleUpdateMode, handleUpdateCompany, handleLogoUpload } = handlers;
+    const { handleUpdateMode, handleUpdateCompany, handleLogoUpload, handleFileSelect } = handlers;
+    
+    const fileInputRef = useRef(null);
+
+    const triggerFileSelect = () => {
+        if (isEditMode && fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
 
     return (
         <div className="row g-4">
@@ -32,7 +40,7 @@ const BrandingFormSection = ({ state, setters, handlers }) => {
                         tabIndex={isEditMode ? "0" : "-1"}
                         style={{ backgroundColor: isEditMode ? 'white' : '#f8f9fa' }}
                     />
-                    {hasCompany && !isEditMode && (
+                    {hasCompany && !isEditMode && nameDraft.trim() && (
                         <button 
                             className="btn btn-primary rounded-pill px-3 d-flex align-items-center" 
                             onClick={handleUpdateMode} 
@@ -41,7 +49,7 @@ const BrandingFormSection = ({ state, setters, handlers }) => {
                             <CheckCircle size={18} />
                         </button>
                     )}
-                    {hasCompany && isEditMode && (
+                    {hasCompany && isEditMode && nameDraft.trim() && (
                         <button 
                             className="btn btn-success rounded-pill px-3 d-flex align-items-center" 
                             onClick={handleUpdateCompany} 
@@ -92,7 +100,11 @@ const BrandingFormSection = ({ state, setters, handlers }) => {
             <div className="col-12 mt-4">
                 <label className="form-label fw-semibold">Platform Logo</label>
                 <div className="logo-upload-container d-flex align-items-center gap-4 p-4 rounded-4 border-dashed">
-                    <div className="logo-preview bg-light rounded-4 d-flex align-items-center justify-content-center">
+                    <div 
+                        className={`logo-preview bg-light rounded-4 d-flex align-items-center justify-content-center ${isEditMode ? 'cursor-pointer hover-opacity' : ''}`}
+                        onClick={triggerFileSelect}
+                        style={{ cursor: isEditMode ? 'pointer' : 'default', transition: 'all 0.2s', minWidth: '120px', minHeight: '120px' }}
+                    >
                         {logoDraft ? (
                             <img src={logoDraft} alt="Preview" className="img-fluid rounded-4" style={{ maxHeight: '100px' }} />
                         ) : (
@@ -103,26 +115,39 @@ const BrandingFormSection = ({ state, setters, handlers }) => {
                         )}
                     </div>
                     <div className="logo-actions d-flex flex-column gap-2">
+                        <input 
+                            type="file" 
+                            ref={fileInputRef}
+                            hidden 
+                            accept="image/*" 
+                            onChange={(e) => {
+                                handleFileSelect(e);
+                                e.target.value = '';
+                            }} 
+                            disabled={uploading} 
+                        />
+                        
                         {isEditMode && (
                             <>
-                                {hasCompany && logoDraft ? (
-                                    <label className={`btn btn-success rounded-pill px-4 ${uploading ? 'disabled' : ''}`}>
+                                {logoFile && (
+                                    <button 
+                                        className={`btn btn-success rounded-pill px-4 ${uploading ? 'disabled' : ''}`}
+                                        onClick={handleLogoUpload}
+                                        disabled={uploading}
+                                    >
                                         {uploading ? 'Updating...' : 'Update Logo'}
-                                        <input type="file" hidden accept="image/*" onChange={handleLogoUpload} disabled={uploading} />
-                                    </label>
-                                ) : (
-                                    <label className={`btn btn-primary rounded-pill px-4 ${uploading ? 'disabled' : ''}`}>
-                                        {logoFile ? 'Logo Selected' : 'Upload Logo'}
-                                        <input type="file" hidden accept="image/*" onChange={handleLogoUpload} disabled={uploading} />
-                                    </label>
+                                    </button>
                                 )}
                                 
                                 {logoDraft && isEditMode && (
                                     <button className="btn btn-outline-danger rounded-pill px-4" onClick={() => {
                                         setLogoDraft('');
                                         setLogoFile(null);
+                                        if (fileInputRef.current) {
+                                            fileInputRef.current.value = '';
+                                        }
                                     }}>
-                                        <Trash className="me-2" /> Remove
+                                        <Trash size={18} className="me-2" /> Remove
                                     </button>
                                 )}
                             </>

@@ -45,6 +45,7 @@ export const useBrandingSettings = () => {
     const isValidLogoUrl = (url) => {
         if (!url) return false;
         if (url.startsWith('blob:')) return false;
+        if (url.startsWith('/')) return true;
         try {
             new URL(url);
             return true;
@@ -103,15 +104,34 @@ export const useBrandingSettings = () => {
         return token;
     };
 
-    const handleLogoUpload = async (e) => {
+    const handleFileSelect = (e) => {
         if (!e.target.files || e.target.files.length === 0) return;
         
         const file = e.target.files[0];
         if (!file) return;
 
+        setLogoFile(file);
+        // Create a local preview URL
+        const previewUrl = URL.createObjectURL(file);
+        setLogoDraft(previewUrl);
+        setUserEditedLogo(true);
+    };
+
+    const handleLogoUpload = async () => {
+        if (!logoFile) {
+            toast.error('Please select a logo first');
+            return;
+        }
+
+        // If company doesn't exist yet, it's already in preview/state
+        if (!hasCompany) {
+            toast.success('Logo selected for creation. It will be saved when you create the company.');
+            return;
+        }
+
         setUploading(true);
         const formData = new FormData();
-        formData.append('company_logo', file);
+        formData.append('company_logo', logoFile);
 
         try {
             if (!getToken()) {
@@ -126,7 +146,15 @@ export const useBrandingSettings = () => {
                 setLogoDraft(url);
                 setLogoFile(null);
                 setUserEditedLogo(false);
+                updateBranding({
+                    systemName: systemName,
+                    logoUrl: url,
+                    systemNameColor: colorDraft || systemNameColor
+                });
                 toast.success('Logo updated successfully');
+                // Clear branding cache so fetchCompanyData and BrandingContext get fresh data
+                localStorage.removeItem('brandingData');
+                fetchCompanyData();
             }
         } catch (error) {
             console.error('Logo update error:', error);
@@ -143,6 +171,7 @@ export const useBrandingSettings = () => {
         }
 
         setSaving(true);
+        let shouldRefetchAfterSave = true;
         try {
             if (!getToken()) {
                 toast.error('Authentication token not found. Please login again.');
@@ -151,51 +180,135 @@ export const useBrandingSettings = () => {
             }
             
             if (!hasCompany) {
-                const formData = new FormData();
-                formData.append('name', nameDraft);
-                formData.append('is_active', true);
-                formData.append('system_name', nameDraft);
-                formData.append('system_name_color', colorDraft || '#000000');
-                formData.append('theme', theme || 'light');
-                formData.append('terms_html', termsHtml || '<h1>Terms</h1>');
-                formData.append('privacy_html', privacyHtml || '<h1>Privacy</h1>');
-                formData.append('guidelines_html', guidelinesHtml || '<h1>Guidelines</h1>');
-                formData.append('auth_email_enabled', true);
-                formData.append('auth_google_enabled', true);
-                
-                if (logoFile) {
-                    formData.append('company_logo', logoFile);
+                const domainsPayload = domains
+                    .filter((domain) => domain?.domain_name?.trim())
+                    .map((domain) => ({
+                        domain_name: domain.domain_name.trim(),
+                        auth_email_enabled: true,
+                        auth_google_enabled: Boolean(domain.auth_google_enabled)
+                    }));
+
+                const typedDomain = newDomain.trim();
+                if (typedDomain) {
+                    const exists = domainsPayload.some(
+                        (domain) => domain.domain_name.toLowerCase() === typedDomain.toLowerCase()
+                    );
+                    if (!exists) {
+                        domainsPayload.push({
+                            domain_name: typedDomain,
+                            auth_email_enabled: true,
+                            auth_google_enabled: Boolean(newDomainGoogleEnabled)
+                        });
+                    }
                 }
-                
-                const data = await brandingService.createCompany(formData);
+
+                const basePayload = {
+                    name: nameDraft,
+                    is_active: true,
+                    system_name: nameDraft,
+                    system_name_color: colorDraft || '#000000',
+                    theme: theme || 'light',
+                    terms_html: termsHtml || '<h1>Terms</h1>',
+                    privacy_html: privacyHtml || '<h1>Privacy</h1>',
+                    guidelines_html: guidelinesHtml || '<h1>Guidelines</h1>',
+                    auth_email_enabled: true,
+                    auth_google_enabled: true
+                };
+
+                const createPayload = logoFile ? (() => {
+                    const formData = new FormData();
+                    Object.entries(basePayload).forEach(([key, value]) => {
+                        formData.append(key, value);
+                    });
+                    domainsPayload.forEach((domain, index) => {
+                        formData.append(`domains[${index}][domain_name]`, domain.domain_name);
+                        formData.append(`domains[${index}][auth_email_enabled]`, String(domain.auth_email_enabled));
+                        formData.append(`domains[${index}][auth_google_enabled]`, String(domain.auth_google_enabled));
+                    });
+                    formData.append('company_logo', logoFile);
+                    return formData;
+                })() : {
+                    ...basePayload,
+                    domains: domainsPayload
+                };
+
+                let data;
+                try {
+                    data = await brandingService.createCompany(createPayload);
+                } catch (createError) {
+                    const status = createError?.response?.status;
+                    if (status === 409) {
+                        // If company already exists, continue with update flow instead of failing save.
+                        setHasCompany(true);
+                        await brandingService.updateCompanySettings({
+                            system_name: nameDraft,
+                            logo_url: logoDraft,
+                            system_name_color: colorDraft,
+                            theme: theme || 'light',
+                            terms_html: termsHtml,
+                            privacy_html: privacyHtml,
+                            guidelines_html: guidelinesHtml,
+                            auth_email_enabled: true,
+                            auth_google_enabled: authGoogleEnabled
+                        });
+                        toast.success('Company already exists, settings updated successfully');
+                        setSaving(false);
+                        setIsEditMode(false);
+                        fetchCompanyData();
+                        return;
+                    }
+                    throw createError;
+                }
+
+                const uploadedLogoUrl = data?.settings?.logo_url || data?.logo_url || '';
                 
                 if (data?.name) {
+                    const persistedLogoUrl = uploadedLogoUrl || data?.settings?.logo_url || data?.logo_url || '';
                     updateBranding({
                         systemName: data.name,
-                        logoUrl: logoDraft,
+                        logoUrl: persistedLogoUrl || logoDraft,
                         systemNameColor: colorDraft
                     });
                     
                     setHasCompany(true);
+                    setLogoFile(null);
+                    setUserEditedLogo(false);
                     toast.success('Company created and settings saved successfully');
-                    fetchCompanyData();
+                    shouldRefetchAfterSave = false;
                 }
             } else {
+                let finalLogoUrl = logoDraft;
+                if (logoFile) {
+                    const logoData = new FormData();
+                    logoData.append('company_logo', logoFile);
+                    const logoResponse = await brandingService.updateCompanyLogo(logoData);
+                    finalLogoUrl = logoResponse?.settings?.logo_url || logoResponse?.logo_url || finalLogoUrl;
+                    setLogoFile(null);
+                    setUserEditedLogo(false);
+                    if (finalLogoUrl) {
+                        setLogoDraft(finalLogoUrl);
+                    }
+                }
+
+                const safeLogoUrl = finalLogoUrl && !String(finalLogoUrl).startsWith('blob:')
+                    ? finalLogoUrl
+                    : undefined;
+
                 await brandingService.updateCompanySettings({
                     system_name: nameDraft,
-                    logo_url: logoDraft,
                     system_name_color: colorDraft,
                     theme: theme || 'light',
                     terms_html: termsHtml,
                     privacy_html: privacyHtml,
                     guidelines_html: guidelinesHtml,
                     auth_email_enabled: true,
-                    auth_google_enabled: authGoogleEnabled
+                    auth_google_enabled: authGoogleEnabled,
+                    ...(safeLogoUrl ? { logo_url: safeLogoUrl } : {})
                 });
 
                 updateBranding({
                     systemName: nameDraft,
-                    logoUrl: logoDraft,
+                    logoUrl: safeLogoUrl || logoUrl,
                     systemNameColor: colorDraft
                 });
                 toast.success('Branding settings updated successfully');
@@ -203,10 +316,16 @@ export const useBrandingSettings = () => {
             
             setSaving(false);
             setIsEditMode(false);
-            fetchCompanyData();
+            if (shouldRefetchAfterSave) {
+                fetchCompanyData();
+            }
         } catch (error) {
             console.error('Save error:', error);
-            toast.error(hasCompany ? 'Failed to update settings' : 'Failed to create company');
+            const apiMessage =
+                error?.response?.data?.message ||
+                error?.response?.data?.error ||
+                error?.message;
+            toast.error(apiMessage || (hasCompany ? 'Failed to update settings' : 'Failed to create company'));
             setSaving(false);
         }
     };
@@ -421,7 +540,7 @@ export const useBrandingSettings = () => {
             setUserEditedAuth, setUserEditedDomain, setDomains, setDeleteType, setDeleteItem
         },
         handlers: {
-            handleLogoUpload, handleSave, handleUpdateCompany, handleCreateCompany,
+            handleLogoUpload, handleFileSelect, handleSave, handleUpdateCompany, handleCreateCompany,
             handleUpdateMode, handleDeleteCompany, confirmDelete,
             handleAddDomain, handleUpdateDomain, handleUpdateDomainFromInput, handleDeleteDomain,
             cancelEdit

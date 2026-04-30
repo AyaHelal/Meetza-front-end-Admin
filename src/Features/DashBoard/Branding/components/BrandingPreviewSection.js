@@ -18,7 +18,7 @@ const BrandingPreviewSection = ({ logoDraft, nameDraft, colorDraft }) => {
                 <span className="fw-bold h5 mb-0" style={{ color: nameDraft !== 'Meetza' ? colorDraft : '#2c3e50' }}>{nameDraft}</span>
             </div>
             <div className="preview-footer p-3 rounded-4 shadow-sm bg-dark text-white d-flex justify-content-between align-items-center">
-                <span>© 2025 {nameDraft} — All rights reserved</span>
+                <span>© 2025 Meetza — All rights reserved</span>
                 <div className="d-flex align-items-center" style={{ opacity: 0.7 }}>
                     <small style={{ fontSize: '10px', marginRight: '4px' }}>Powered by</small>
                     <img src="/assets/MeetzaLogo.png" alt="Meetza" style={{ height: '12px', filter: 'brightness(10)' }} />

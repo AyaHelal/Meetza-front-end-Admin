@@ -99,7 +99,7 @@ const BrandingLogo = ({
   }
 
   // Case 1: Default Meetza - show logo + word as images
-  const isDefaultMeetza = systemName === 'Meetza';
+  const isDefaultMeetza = systemName === 'Meetza' && !logoUrl;
   
   
   if (isDefaultMeetza) {

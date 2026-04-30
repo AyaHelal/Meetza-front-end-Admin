@@ -1,9 +1,10 @@
 import React from 'react';
 
 const DomainManagementSection = ({ state, setters, handlers }) => {
-    const { domains, isEditMode, showDomainForm, newDomain, hasCompany, authGoogleEnabled } = state;
+    const { domains, isEditMode, showDomainForm, newDomain, hasCompany, authGoogleEnabled, theme } = state;
     const { setDomains, setShowDomainForm, setNewDomain, setUserEditedDomain, setDeleteType, setDeleteItem, setShowDeleteModal } = setters;
     const { handleUpdateDomain, handleUpdateDomainFromInput, handleAddDomain } = handlers;
+    const isDark = theme === 'dark';
 
     return (
         <div className="col-12 mt-4">
@@ -11,7 +12,10 @@ const DomainManagementSection = ({ state, setters, handlers }) => {
             
             {/* Existing Domain - Show in editable input */}
             {domains.length > 0 && domains.map((domain) => (
-                <div key={domain.id} className="domain-item bg-light p-4 rounded-4 mb-3">
+                <div
+                    key={domain.id}
+                    className={`domain-item p-4 rounded-4 mb-3 ${isDark ? 'bg-dark text-white border border-secondary' : 'bg-light'}`}
+                >
                     <div className="row g-3 align-items-end">
                         <div className="col-md-6">
                             <label className="form-label fw-semibold">Domain Name</label>
@@ -82,7 +86,7 @@ const DomainManagementSection = ({ state, setters, handlers }) => {
                     </div>
                     
                     {showDomainForm && (
-                        <div className="bg-light p-4 rounded-4">
+                        <div className={`p-4 rounded-4 ${isDark ? 'bg-dark text-white border border-secondary' : 'bg-light'}`}>
                             <div className="row g-3">
                                 <div className="col-md-6">
                                     <label className="form-label">Domain Name</label>
@@ -99,7 +103,7 @@ const DomainManagementSection = ({ state, setters, handlers }) => {
                                             tabIndex={isEditMode ? "0" : "-1"}
                                             style={{ backgroundColor: isEditMode ? 'white' : '#f8f9fa' }}
                                         />
-                                        {hasCompany && domains.length > 0 && newDomain.trim() && domains[0]?.domain_name === newDomain ? (
+                                        {hasCompany && (hasCompany && domains.length > 0 && newDomain.trim() && domains[0]?.domain_name === newDomain ? (
                                             <button 
                                                 className="btn btn-success rounded-pill px-3" 
                                                 onClick={handleUpdateDomainFromInput}
@@ -115,7 +119,7 @@ const DomainManagementSection = ({ state, setters, handlers }) => {
                                             >
                                                 Add
                                             </button>
-                                        )}
+                                        ))}
                                         <button 
                                             className="btn btn-secondary rounded-pill px-3" 
                                             onClick={() => {
@@ -126,6 +130,11 @@ const DomainManagementSection = ({ state, setters, handlers }) => {
                                             Cancel
                                         </button>
                                     </div>
+                                    {!hasCompany && (
+                                        <div className={`form-text mt-2 ${isDark ? 'text-light' : ''}`}>
+                                            Domain will be sent with company creation.
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
