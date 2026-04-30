@@ -5,6 +5,7 @@ import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import VerifyResetCode from "./pages/VerifyResetCode/VerifyResetCode";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
+import NotFound from "./pages/NotFound/NotFound";
 import { AnimatePresence } from 'framer-motion';
 import Dashboard from './pages/Dashboard/Dashboard';
 import PageLoader from './Features/PageLoader/PageLoader';
@@ -122,6 +123,8 @@ function AnimatedRoutes() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-reset-code" element={<VerifyResetCode />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/not-found" element={<NotFound />} />
+          <Route path="*" element={<Navigate to="/not-found" replace />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         </Routes>
       </AnimatePresence>
