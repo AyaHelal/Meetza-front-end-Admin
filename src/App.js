@@ -74,16 +74,21 @@ function AnimatedRoutes() {
       try {
         const userData = JSON.parse(decodeURIComponent(userParam));
         loginUser(userData, tokenParam, true);
-        navigate(location.pathname, { replace: true });
+        
         const role = (userData?.role || "").toString().trim().toLowerCase();
         const allowedRoles = ['super_admin', 'administrator', 'super admin'];
-        if (role && allowedRoles.includes(role)) {
-          navigate('/dashboard', { replace: true });
-        } else if (role === 'member') {
-          navigate('/login?error=member_access_denied', { replace: true });
-        } else {
-          navigate('/login?error=access_denied', { replace: true });
-        }
+        
+        // Use a small timeout to ensure AuthContext state is updated before navigation
+        // and avoid race conditions with ProtectedRoute
+        setTimeout(() => {
+          if (role && allowedRoles.includes(role)) {
+            navigate('/dashboard', { replace: true });
+          } else if (role === 'member') {
+            navigate('/login?error=member_access_denied', { replace: true });
+          } else {
+            navigate('/login?error=access_denied', { replace: true });
+          }
+        }, 100);
       } catch (error) {
         console.error('Error parsing social login data:', error);
         navigate('/login?error=parse_error', { replace: true });
