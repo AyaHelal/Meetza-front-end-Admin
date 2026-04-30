@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
-import api from "../../../../utils/api";
 import { smartToast } from "../../../../utils/toastManager";
+import * as resourceService from "../service/resourceService";
 
 export default function useResourcesData(fetchContents) {
   const [loading, setLoading] = useState(false);
@@ -9,28 +9,26 @@ export default function useResourcesData(fetchContents) {
   const [fileUploadPending, setFileUploadPending] = useState(null);
 
   const addResource = useCallback(async (meetingContentId, file) => {
-    const fileName = file instanceof File ? file.name : (file?.file?.name || "File");
+    const rawFile = file instanceof File ? file : file?.file;
+    if (!(rawFile instanceof File)) {
+      smartToast.error("Invalid file");
+      return;
+    }
+
+    const fileName = rawFile.name || "File";
     try {
       setFileUploadPending({ fileName });
       setLoading(true);
-      const form = new FormData();
-      // Append file with 'files' field name (backend expects this)
-      if (file instanceof File) form.append("files", file);
-      else if (file?.file instanceof File) form.append("files", file.file);
-      else throw new Error("Invalid file");
 
-      // POST /group-contents/:id/files
-      const res = await api.post(`/group-contents/${meetingContentId}/files`, form, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const data = await resourceService.addResource(meetingContentId, rawFile);
 
-      if (res.data?.success) {
-        smartToast.success(res.data.message || "Resource uploaded");
+      if (data?.success) {
+        smartToast.success(data.message || "Resource uploaded");
         if (typeof fetchContents === "function") await fetchContents();
-        return res.data;
+        return data;
       }
-      smartToast.error(res.data?.message || "Failed to upload resource");
-      return res.data;
+      smartToast.error(data?.message || "Failed to upload resource");
+      return data;
     } catch (err) {
       setError(err);
       smartToast.error(err.response?.data?.message || err.message || "Error uploading resource");
@@ -44,22 +42,15 @@ export default function useResourcesData(fetchContents) {
   const addLinkResource = useCallback(async (meetingContentId, link) => {
     try {
       setLoading(true);
-      const form = new FormData();
-      // Append link as text with 'files' field name (backend expects this, but we'll send text)
-      form.append("links", link); // Assuming backend can handle text as file
+      const data = await resourceService.addLinkResource(meetingContentId, link);
 
-      // POST /group-contents/:id/files
-      const res = await api.post(`/group-contents/${meetingContentId}/files`, form, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      if (res.data?.success) {
-        smartToast.success(res.data.message || "Link added");
+      if (data?.success) {
+        smartToast.success(data.message || "Link added");
         if (typeof fetchContents === "function") await fetchContents();
-        return res.data;
+        return data;
       }
-      smartToast.error(res.data?.message || "Failed to add link");
-      return res.data;
+      smartToast.error(data?.message || "Failed to add link");
+      return data;
     } catch (err) {
       setError(err);
       smartToast.error(err.response?.data?.message || err.message || "Error adding link");
@@ -72,14 +63,15 @@ export default function useResourcesData(fetchContents) {
   const deleteResource = useCallback(async (meetingContentId, resourceId) => {
     try {
       setLoading(true);
-      const res = await api.delete(`/group-contents/${meetingContentId}/files/${resourceId}`);
-      if (res.data?.success) {
-        smartToast.success(res.data.message || "Resource deleted");
+      const data = await resourceService.deleteResource(meetingContentId, resourceId);
+
+      if (data?.success) {
+        smartToast.success(data.message || "Resource deleted");
         if (typeof fetchContents === "function") await fetchContents();
-        return res.data;
+        return data;
       }
-      smartToast.error(res.data?.message || "Failed to delete resource");
-      return res.data;
+      smartToast.error(data?.message || "Failed to delete resource");
+      return data;
     } catch (err) {
       setError(err);
       smartToast.error(err.response?.data?.message || err.message || "Error deleting resource");

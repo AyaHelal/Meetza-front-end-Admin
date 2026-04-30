@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import api from "../../../../utils/api";
+import { positionService } from "../service/positionService";
 import { smartToast } from "../../../../utils/toastManager";
 
 export const usePositionData = (userId, authUser = null) => {
@@ -20,13 +20,7 @@ export const usePositionData = (userId, authUser = null) => {
       if (!hasCache) setLoading(true);
       setError(null);
 
-      const [userRes, posRes] = await Promise.all([
-        api.get(`/user`),
-        api.get(`/position`),
-      ]);
-
-      const allUsers = Array.isArray(userRes.data) ? userRes.data : (userRes.data?.data || []);
-      const allPositions = Array.isArray(posRes.data) ? posRes.data : (posRes.data?.data || []);
+      const { allUsers, allPositions } = await positionService.fetchPositionsAndUsers();
 
       const currentUser = allUsers.find((u) => u.id === userId);
 
@@ -77,21 +71,11 @@ export const usePositionData = (userId, authUser = null) => {
 
 const createPosition = async (title, selectedUser) => {
   try {
-    let payload = { title };
-    const curr = authUser || {};
-    if (curr.role === 'Super_Admin') {
-      payload.role = 'Super_Admin';
-      payload.administrator_id = selectedUser;
-    } else {
-      payload.role = 'Administrator';
-      payload.administrator_id = curr.id;
-    }
-
-    const res = await api.post('/position', payload);
+    const resData = await positionService.createPosition(title, authUser, selectedUser);
 
     await fetchData();
     smartToast.success("Position created successfully");
-    return res.data;
+    return resData;
 
   } catch (e) {
     smartToast.error(e?.response?.data?.message || "Failed to create position");
@@ -99,14 +83,9 @@ const createPosition = async (title, selectedUser) => {
   }
 };
 
-
-
-
-
   const updatePosition = async (id, title) => {
     try {
-      const res = await api.put(`/position/${id}`, { title });
-      const updatedPosition = res.data;
+      const updatedPosition = await positionService.updatePosition(id, title);
 
       setPositions((prev) =>
         prev.map((pos) => (pos.id === id ? updatedPosition : pos))
@@ -135,7 +114,7 @@ const createPosition = async (title, selectedUser) => {
         return { success: false, message: 'No permission' };
       }
 
-      await api.delete(`/position/${id}`);
+      await positionService.deletePosition(id);
       await fetchData();
       smartToast.success("Position deleted successfully");
 
@@ -152,8 +131,7 @@ const createPosition = async (title, selectedUser) => {
 
   const searchPositions = async (query) => {
     try {
-      const res = await api.get(`/position?title=${query}`);
-      let payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      let payload = await positionService.searchPositions(query);
 
       if (query && query.trim() !== "") {
         payload = payload.filter(p => p.title && p.title.toLowerCase().includes(query.toLowerCase()));
@@ -164,8 +142,7 @@ const createPosition = async (title, selectedUser) => {
       }
 
       if (payload.length > 0) {
-        const usersRes = await api.get('/user');
-        const allUsers = Array.isArray(usersRes.data) ? usersRes.data : usersRes.data?.data || [];
+        const allUsers = await positionService.getUsers();
 
         payload = payload.map(position => {
           const user = allUsers.find(u => u.id === position.administrator_id);
@@ -201,3 +178,4 @@ const createPosition = async (title, selectedUser) => {
     fetchData,
   };
 };
+

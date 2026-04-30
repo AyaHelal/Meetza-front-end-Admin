@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { smartToast } from "../../../../utils/toastManager";
-import apiCommon from "../../../../utils/api";
 import { useGroupData } from "../../Group/hooks/useGroupData";
 import { dedupeById } from "../../../../utils/dedupeById";
 import { groupIsManagedByUser } from "../../../../utils/groupIsManagedByUser";
 import { useAuth } from "../../../../context/AuthContext";
+import * as groupContentService from "../service/groupContentService";
 
 /** Content row visible to a group admin: legacy owner fields, or linked group they manage, or group uses this content id. */
 function contentVisibleToAdministrator(content, userId, groupsData) {
@@ -45,8 +45,8 @@ export default function useGroupContentData() {
         try {
             if (!hasCache) setLoading(true);
 
-            const contentsResponse = await apiCommon.get("/group-contents");
-            if (!contentsResponse.data.success) {
+            const contentsResponseData = await groupContentService.getGroupContents();
+            if (!contentsResponseData.success) {
                 if (!hasCache) {
                     smartToast.error("Failed to load contents");
                     setContents([]);
@@ -61,12 +61,11 @@ export default function useGroupContentData() {
             const isAdministrator =
                 roleNorm === "Administrator" || roleNorm.toLowerCase() === "administrator";
 
-            const groupsResponse = await apiCommon.get("/group");
-            const rawGroups = groupsResponse.data?.data ?? groupsResponse.data;
+            const rawGroups = await groupContentService.getGroupsRaw();
             const groupsData = dedupeById(Array.isArray(rawGroups) ? rawGroups : []);
 
-            const allContents = Array.isArray(contentsResponse.data.data)
-                ? contentsResponse.data.data
+            const allContents = Array.isArray(contentsResponseData.data)
+                ? contentsResponseData.data
                 : [];
 
             let filteredContents = allContents;
@@ -127,16 +126,16 @@ export default function useGroupContentData() {
                 return;
             }
 
-            const response = await apiCommon.post(`/group-contents`, contentData);
+            const responseData = await groupContentService.createGroupContent(contentData);
 
-            if (response.data.success) {
+            if (responseData.success) {
                 smartToast.success("Group content created successfully");
                 await fetchContents();
             } else {
-                smartToast.error(response.data.message || "Failed to create content");
+                smartToast.error(responseData.message || "Failed to create content");
             }
 
-            return response.data;
+            return responseData;
         } catch (err) {
             smartToast.error(err.response?.data?.message || "Error creating content");
             throw err;
@@ -159,7 +158,7 @@ export default function useGroupContentData() {
         return;
         }
 
-    await apiCommon.put(`/group-contents/${id}`, payload);
+    await groupContentService.updateGroupContent(id, payload);
 
     smartToast.success("Content updated successfully");
     await fetchContents();
@@ -169,26 +168,23 @@ export default function useGroupContentData() {
     }
 };
 
-
-
-
     // Delete content
     const deleteContent = async (id) => {
         if (!window.confirm("Are you sure you want to delete this content?")) return;
 
         try {
-            const response = await apiCommon.delete(`/group-contents/${id}`);
+            const responseData = await groupContentService.deleteGroupContent(id);
 
-            if (response.data.success) {
+            if (responseData.success) {
                 setContents(prev => prev.filter(c => c.id !== id));
                 // After deleting content, refetch groups so the Group UI knows the group no longer has this content
                 await refetchGroups();
                 smartToast.success("Group content deleted successfully");
             } else {
-                smartToast.error(response.data.message || "Failed to delete content");
+                smartToast.error(responseData.message || "Failed to delete content");
             }
 
-            return response.data;
+            return responseData;
         } catch (err) {
             smartToast.error(err.response?.data?.message || "Error deleting content");
             throw err;
@@ -203,8 +199,8 @@ export default function useGroupContentData() {
     const searchContents = async (query) => {
         try {
             setLoading(true);
-            const response = await apiCommon.get(`/group-contents?search=${query}`);
-            if (!response.data.success) {
+            const responseData = await groupContentService.getGroupContents(query);
+            if (!responseData.success) {
                 smartToast.error("Failed to search contents");
                 setContents([]);
                 return;
@@ -217,11 +213,10 @@ export default function useGroupContentData() {
             const isAdministrator =
                 roleNorm === "Administrator" || roleNorm.toLowerCase() === "administrator";
 
-            const groupsResponse = await apiCommon.get("/group");
-            const rawGroups = groupsResponse.data?.data ?? groupsResponse.data;
+            const rawGroups = await groupContentService.getGroupsRaw();
             const groupsData = dedupeById(Array.isArray(rawGroups) ? rawGroups : []);
 
-            const allFound = Array.isArray(response.data.data) ? response.data.data : [];
+            const allFound = Array.isArray(responseData.data) ? responseData.data : [];
             let filteredContents = allFound;
             if (isAdministrator && !isSuperAdmin) {
                 filteredContents = allFound.filter((c) =>

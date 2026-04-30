@@ -1,18 +1,10 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { smartToast } from "../../../../utils/toastManager";
-import apiCommon from "../../../../utils/api";
 import { useAuth } from "../../../../context/AuthContext";
+import * as meetingService from "../service/meetingService";
 
-    const formatForAPI = (inputValue) => {
-    const d = new Date(inputValue);
-    const pad = (n) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(
-        d.getHours()
-    )}:${pad(d.getMinutes())}:00`;
-    };
-
-    export default function useMeetingData() {
+export default function useMeetingData() {
     const { user: currentUser } = useAuth();
     const cacheKey = `admin_meetings_cache_${currentUser?.id || 'guest'}`;
 
@@ -28,176 +20,169 @@ import { useAuth } from "../../../../context/AuthContext";
         if (!hasCache) setLoading(true);
         setError(null);
         try {
-        const urlSuffix = query ? `?title=${encodeURIComponent(query)}` : '';
-        const res = await apiCommon.get(`/meeting${urlSuffix}`);
+            const resData = await meetingService.getMeetings(query);
 
-        if (res.data.success) {
-            const isSuperAdmin = currentUser?.role === 'Super_Admin' || currentUser?.role === 'Administrator';
+            if (resData.success) {
+                const isSuperAdmin = currentUser?.role === 'Super_Admin' || currentUser?.role === 'Administrator';
 
-            const filteredMeetings = res.data.data.filter(meeting => {
-            if (isSuperAdmin) return true;
-            return meeting.administrator_id === currentUser?.id;
-            });
+                const filteredMeetings = resData.data.filter(meeting => {
+                    if (isSuperAdmin) return true;
+                    return meeting.administrator_id === currentUser?.id;
+                });
 
-            const mapped = (filteredMeetings || []).map(m => {
-                const existing = meetings.find(p => p.id === m.id);
-                const raw = m.recording ?? m.record_meeting ?? (existing?.record_meeting ?? existing?.recording);
-                const recordMeeting = (raw !== undefined && raw !== null) ? raw : undefined;
-                return { ...m, record_meeting: recordMeeting, recording: m.recording ?? recordMeeting };
-            });
+                const mapped = (filteredMeetings || []).map(m => {
+                    const existing = meetings.find(p => p.id === m.id);
+                    const raw = m.recording ?? m.record_meeting ?? (existing?.record_meeting ?? existing?.recording);
+                    const recordMeeting = (raw !== undefined && raw !== null) ? raw : undefined;
+                    return { ...m, record_meeting: recordMeeting, recording: m.recording ?? recordMeeting };
+                });
 
-            setMeetings(mapped);
-            localStorage.setItem(cacheKey, JSON.stringify(mapped));
-        } else {
-            smartToast.error("Failed to load meetings");
-            setMeetings([]);
-        }
+                setMeetings(mapped);
+                localStorage.setItem(cacheKey, JSON.stringify(mapped));
+            } else {
+                smartToast.error("Failed to load meetings");
+                setMeetings([]);
+            }
         } catch (err) {
-        setError(err);
-        toast.error(err.response?.data?.message || "Error loading meetings");
-        setMeetings([]);
+            setError(err);
+            toast.error(err.response?.data?.message || "Error loading meetings");
+            setMeetings([]);
         } finally {
-        setLoading(false);
+            setLoading(false);
         }
     };
 
     const searchMeetings = async (query) => {
         if (query.trim() === '') {
-        await fetchMeetings();
-        return;
+            await fetchMeetings();
+            return;
         }
         if (query.trim().length > 2) {
-        await fetchMeetings(query).catch((err) => {
-            smartToast.error(err?.response?.data?.message || "Failed to search meetings");
-        });
+            await fetchMeetings(query).catch((err) => {
+                smartToast.error(err?.response?.data?.message || "Failed to search meetings");
+            });
         }
     };
 
     const addMeeting = async (data) => {
         try {
+            let groupId = data.group_id || (meetings.length > 0 ? meetings[0].group_id : null);
 
-        let groupId = data.group_id || (meetings.length > 0 ? meetings[0].group_id : null);
-
-        if (!groupId) {
-            try {
-                const groupsRes = await apiCommon.get('/group');
-                const allGroups = Array.isArray(groupsRes.data) ? groupsRes.data : groupsRes.data?.data || [];
-                groupId = allGroups[0]?.id || null;
-            } catch (e) {
-                // ignore, will handle below
+            if (!groupId) {
+                try {
+                    const allGroups = await meetingService.getGroups();
+                    groupId = allGroups[0]?.id || null;
+                } catch (e) {
+                    // ignore, will handle below
+                }
             }
-        }
 
-        if (!groupId) {
-            smartToast.error("Cannot create meeting: no group_id available");
-            return;
-        }
-
-        // Build multipart form data to support poster_file + resources files
-        const formData = new FormData();
-        formData.append("title", data.title);
-        formData.append("start_time", formatForAPI(data.start_time));
-        formData.append("end_time", formatForAPI(data.end_time));
-        formData.append("group_id", groupId);
-        formData.append("status", data.status);
-        formData.append("recording", (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0");
-        formData.append("weekly", (data.weekly || data.weekly_option) === "Active" ? "1" : (data.weekly || data.weekly_option) === "Inactive" ? "0" : "");
-        // description is optional and not displayed, but sent to backend
-        if (data.description) {
-            formData.append("description", data.description);
-        }
-        // Poster image (optional)
-        if (data.poster_file instanceof File) {
-            formData.append("poster_file", data.poster_file);
-        }
-        // Resources files[] (optional, can be multiple)
-        if (Array.isArray(data.files)) {
-            data.files.forEach((file) => {
-            if (file instanceof File) {
-                formData.append("files", file);
+            if (!groupId) {
+                smartToast.error("Cannot create meeting: no group_id available");
+                return;
             }
-            });
-        }
 
-        const res = await apiCommon.post("/meeting", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-        });
-        if (res.data.success) {
-            smartToast.success("Meeting created successfully");
-            const recordValue = (data.recordMeeting || data.record_meeting) === "Recording" ? 1 : 0;
-            setMeetings((prev) => [...prev, { ...res.data.data, record_meeting: recordValue }]);
-            return res.data.data;
-        } else smartToast.error(res.data.message || "Failed to create meeting");
+            // Build multipart form data to support poster_file + resources files
+            const formData = new FormData();
+            formData.append("title", data.title);
+            formData.append("start_time", meetingService.formatForAPI(data.start_time));
+            formData.append("end_time", meetingService.formatForAPI(data.end_time));
+            formData.append("group_id", groupId);
+            formData.append("status", data.status);
+            formData.append("recording", (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0");
+            formData.append("weekly", (data.weekly || data.weekly_option) === "Active" ? "1" : (data.weekly || data.weekly_option) === "Inactive" ? "0" : "");
+            // description is optional and not displayed, but sent to backend
+            if (data.description) {
+                formData.append("description", data.description);
+            }
+            // Poster image (optional)
+            if (data.poster_file instanceof File) {
+                formData.append("poster_file", data.poster_file);
+            }
+            // Resources files[] (optional, can be multiple)
+            if (Array.isArray(data.files)) {
+                data.files.forEach((file) => {
+                    if (file instanceof File) {
+                        formData.append("files", file);
+                    }
+                });
+            }
+
+            const resData = await meetingService.createMeeting(formData);
+            if (resData.success) {
+                smartToast.success("Meeting created successfully");
+                const recordValue = (data.recordMeeting || data.record_meeting) === "Recording" ? 1 : 0;
+                setMeetings((prev) => [...prev, { ...resData.data, record_meeting: recordValue }]);
+                return resData.data;
+            } else smartToast.error(resData.message || "Failed to create meeting");
         } catch (err) {
-        smartToast.error(err.response?.data?.message || "Error creating meeting");
-        throw err;
+            smartToast.error(err.response?.data?.message || "Error creating meeting");
+            throw err;
         }
     };
 
     const updateMeeting = async (id, data) => {
-    try {
-        const originalMeeting = meetings.find(m => m.id === id);
+        try {
+            const originalMeeting = meetings.find(m => m.id === id);
 
-        const hasPoster = data.poster_file instanceof File;
-        const hasDescription = data.description != null;
+            const hasPoster = data.poster_file instanceof File;
+            const hasDescription = data.description != null;
 
-        let res;
-        if (hasPoster || hasDescription) {
-            const formData = new FormData();
-            if (data.title != null) formData.append("title", data.title);
-            if (data.start_time != null) formData.append("start_time", formatForAPI(data.start_time));
-            if (data.end_time != null) formData.append("end_time", formatForAPI(data.end_time));
-            if (data.status != null) formData.append("status", data.status);
-            formData.append("group_id", data.group_id || originalMeeting?.group_id);
-            if (data.description != null) formData.append("description", data.description);
-            formData.append("recording", (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0");
-            formData.append("weekly", (data.weekly || data.weekly_option) === "Active" ? "1" : (data.weekly || data.weekly_option) === "Inactive" ? "0" : "");
+            let resData;
+            if (hasPoster || hasDescription) {
+                const formData = new FormData();
+                if (data.title != null) formData.append("title", data.title);
+                if (data.start_time != null) formData.append("start_time", meetingService.formatForAPI(data.start_time));
+                if (data.end_time != null) formData.append("end_time", meetingService.formatForAPI(data.end_time));
+                if (data.status != null) formData.append("status", data.status);
+                formData.append("group_id", data.group_id || originalMeeting?.group_id);
+                if (data.description != null) formData.append("description", data.description);
+                formData.append("recording", (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0");
+                formData.append("weekly", (data.weekly || data.weekly_option) === "Active" ? "1" : (data.weekly || data.weekly_option) === "Inactive" ? "0" : "");
 
-            if (hasPoster) {
-                formData.append("poster_file", data.poster_file);
+                if (hasPoster) {
+                    formData.append("poster_file", data.poster_file);
+                }
+
+                resData = await meetingService.updateMeeting(id, formData, true);
+            } else {
+                const payload = {
+                    title: data.title,
+                    start_time: meetingService.formatForAPI(data.start_time),
+                    end_time: meetingService.formatForAPI(data.end_time),
+                    status: data.status,
+                    group_id: data.group_id || originalMeeting?.group_id,
+                    recording: (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0",
+                    weekly: (data.weekly || data.weekly_option) === "Active" ? "1" : (data.weekly || data.weekly_option) === "Inactive" ? "0" : "",
+                };
+                resData = await meetingService.updateMeeting(id, payload, false);
             }
 
-            res = await apiCommon.put(`/meeting/${id}`, formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-        } else {
-            const payload = {
-                title: data.title,
-                start_time: formatForAPI(data.start_time),
-                end_time: formatForAPI(data.end_time),
-                status: data.status,
-                group_id: data.group_id || originalMeeting?.group_id,
-                recording: (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0",
-                weekly: (data.weekly || data.weekly_option) === "Active" ? "1" : (data.weekly || data.weekly_option) === "Inactive" ? "0" : "",
-            };
-            res = await apiCommon.put(`/meeting/${id}`, payload);
+            if (resData.success) {
+                smartToast.success("Meeting updated successfully");
+                const recordValue = (data.recordMeeting || data.record_meeting) === "Recording" ? 1 : 0;
+                setMeetings(prev =>
+                    prev.map(m => (m.id === id ? { ...m, ...data, record_meeting: recordValue } : m))
+                );
+                return resData;
+            } else {
+                smartToast.error(resData.message || "Failed to update meeting");
+            }
+        } catch (err) {
+            smartToast.error(err.response?.data?.message || "Error updating meeting");
+            throw err;
         }
-
-        if (res.data.success) {
-            smartToast.success("Meeting updated successfully");
-            const recordValue = (data.recordMeeting || data.record_meeting) === "Recording" ? 1 : 0;
-            setMeetings(prev =>
-                prev.map(m => (m.id === id ? { ...m, ...data, record_meeting: recordValue } : m))
-            );
-            return res.data;
-        } else {
-            smartToast.error(res.data.message || "Failed to update meeting");
-        }
-    } catch (err) {
-        smartToast.error(err.response?.data?.message || "Error updating meeting");
-        throw err;
-    }
-};
+    };
 
 
     const deleteMeeting = async (id, config = {}) => {
         try {
-            const res = await apiCommon.delete(`/meeting/${id}`, config);
-            if (res.data.success) {
+            const resData = await meetingService.deleteMeeting(id, config);
+            if (resData.success) {
                 setMeetings(prev => prev.filter(m => m.id !== id));
-                return res.data;
+                return resData;
             } else {
-                smartToast.error(res.data.message || "Failed to delete meeting");
+                smartToast.error(resData.message || "Failed to delete meeting");
             }
         } catch (err) {
             smartToast.error(err.response?.data?.message || "Error deleting meeting");

@@ -127,19 +127,6 @@ button[style*="amber"] {
   color: #ffffff !important;
 }
 
-/* Override any date picker element with orange background */
-[style*="orange"],
-[style*="#ff"],
-[style*="amber"],
-[style*="rgb(255"],
-[style*="rgb(254"] {
-  background: #0076ea !important;
-  color: #ffffff !important;
-}
-
-
-
-
 
 /* Flatpickr Dark Mode Customization */
 :root[data-theme='dark'] .flatpickr-calendar,
