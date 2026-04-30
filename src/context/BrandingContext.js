@@ -13,6 +13,7 @@ export const BrandingProvider = ({ children }) => {
         logoUrl: '',
         systemNameColor: '#2c3e50',
         showPoweredBy: true,
+        authGoogleEnabled: true,
         loading: true
     });
 
@@ -89,7 +90,8 @@ export const BrandingProvider = ({ children }) => {
                     systemName: settings.system_name || data.name || 'Meetza',
                     logoUrl: normalizeLogoUrl(logoUrl),
                     systemNameColor: settings.system_name_color || '#2c3e50',
-                    showPoweredBy: true, // This might not be in backend yet
+                    showPoweredBy: true,
+                    authGoogleEnabled: settings.auth_google_enabled !== false && settings.auth_google_enabled !== 0 && settings.auth_google_enabled !== '0',
                     loading: false
                 };
                 
@@ -117,6 +119,7 @@ export const BrandingProvider = ({ children }) => {
                     logoUrl: '',
                     systemNameColor: '#2c3e50',
                     showPoweredBy: true,
+                    authGoogleEnabled: true,
                     loading: false
                 });
             } else {
@@ -133,7 +136,8 @@ export const BrandingProvider = ({ children }) => {
         const updatedBranding = {
             ...branding,
             ...newData,
-            logoUrl: normalizeLogoUrl(newData?.logoUrl ?? branding.logoUrl)
+            logoUrl: normalizeLogoUrl(newData?.logoUrl ?? branding.logoUrl),
+            authGoogleEnabled: newData.authGoogleEnabled !== undefined ? newData.authGoogleEnabled : branding.authGoogleEnabled
         };
         
         setBranding(updatedBranding);
@@ -153,6 +157,7 @@ export const BrandingProvider = ({ children }) => {
             logoUrl: normalizeLogoUrl(logoUrl),
             systemNameColor: settings.system_name_color || '#2c3e50',
             showPoweredBy: true,
+            authGoogleEnabled: settings.auth_google_enabled !== false && settings.auth_google_enabled !== 0 && settings.auth_google_enabled !== '0',
             loading: false
         };
         
@@ -160,8 +165,6 @@ export const BrandingProvider = ({ children }) => {
         
         // Store branding data in localStorage for persistence
         localStorage.setItem('brandingData', JSON.stringify(brandingData));
-        
-        
     };
 
     return (

@@ -18,7 +18,7 @@ export default function LoginForm() {
     const [isLoading, setIsLoading] = useState(false);
     const [apiError, setApiError] = useState("");
     const { loginUser } = useAuth();
-    const { systemName } = useBranding();
+    const { systemName, authGoogleEnabled } = useBranding();
     const [rememberMe, setRememberMe] = useState(false);
     const [showCaptcha, setShowCaptcha] = useState(false);
     const [captchaToken, setCaptchaToken] = useState('');
@@ -89,7 +89,7 @@ export default function LoginForm() {
                 });
             }
         }
-    }, [showCaptcha]);
+    }, [showCaptcha, systemName, authGoogleEnabled]);
 
     const submitLogin = async (recaptchaTokenToSend = null) => {
         if (!validateForm()) return;
@@ -291,9 +291,11 @@ export default function LoginForm() {
 
 
 
-                    <div className="mt-2">
-                        <SocialLoginButtons redirectUrl={`${window.location.origin}/dashboard`} />
-                    </div>
+                    {authGoogleEnabled && (
+                        <div className="mt-2">
+                            <SocialLoginButtons redirectUrl={`${window.location.origin}/dashboard`} />
+                        </div>
+                    )}
                 </form>
             </div>
         </motion.div>

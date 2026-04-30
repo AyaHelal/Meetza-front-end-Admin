@@ -79,7 +79,7 @@ export const useBrandingSettings = () => {
             setGuidelinesHtml(settings.guidelines_html || '');
             setTheme(settings.theme || 'light');
             setDomains(data.domains || []);
-            setAuthGoogleEnabled(settings.auth_google_enabled !== false);
+            setAuthGoogleEnabled(settings.auth_google_enabled === true || settings.auth_google_enabled === 1 || settings.auth_google_enabled === 'true' || settings.auth_google_enabled === '1');
             
             setForceUpdate(prev => prev + 1);
         } catch (error) {
@@ -212,7 +212,7 @@ export const useBrandingSettings = () => {
                     privacy_html: privacyHtml || '<h1>Privacy</h1>',
                     guidelines_html: guidelinesHtml || '<h1>Guidelines</h1>',
                     auth_email_enabled: true,
-                    auth_google_enabled: true
+                    auth_google_enabled: authGoogleEnabled
                 };
 
                 const createPayload = logoFile ? (() => {
@@ -265,9 +265,10 @@ export const useBrandingSettings = () => {
                 if (data?.name) {
                     const persistedLogoUrl = uploadedLogoUrl || data?.settings?.logo_url || data?.logo_url || '';
                     updateBranding({
-                        systemName: data.name,
+                        systemName: data.name || nameDraft,
                         logoUrl: persistedLogoUrl || logoDraft,
-                        systemNameColor: colorDraft
+                        systemNameColor: colorDraft,
+                        authGoogleEnabled: authGoogleEnabled
                     });
                     
                     setHasCompany(true);
@@ -309,7 +310,8 @@ export const useBrandingSettings = () => {
                 updateBranding({
                     systemName: nameDraft,
                     logoUrl: safeLogoUrl || logoUrl,
-                    systemNameColor: colorDraft
+                    systemNameColor: colorDraft,
+                    authGoogleEnabled: authGoogleEnabled
                 });
                 toast.success('Branding settings updated successfully');
             }
