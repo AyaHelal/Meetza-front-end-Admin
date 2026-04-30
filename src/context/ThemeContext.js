@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import api from '../utils/api';
 
@@ -7,40 +7,72 @@ const ThemeContext = createContext();
 export const ThemeProvider = ({ children }) => {
   const { user, setUser } = useAuth();
   const [theme, setThemeState] = useState(() => {
-    return localStorage.getItem('app-theme') || 'light';
+    const saved = localStorage.getItem('app-theme');
+    return saved === 'light' || saved === 'dark' ? saved : 'light';
   });
 
-  // 1. Sync theme with user.theme from JWT when user logs in or changes
-  useEffect(() => {
-    if (user?.theme && user.theme !== theme) {
-      setThemeState(user.theme);
-    }
-  }, [user?.theme]);
+  const lastUserId = useRef(null);
 
-  // 2. Apply theme to document and localStorage
+  // 1. Sync theme FROM user object on login/user change
+  //    localStorage is the source of truth — user.theme only used as fallback
+  useEffect(() => {
+    if (user && user.id) {
+      if (lastUserId.current !== user.id) {
+        lastUserId.current = user.id;
+
+        const localTheme = localStorage.getItem('app-theme');
+
+        if (!localTheme && user.theme && (user.theme === 'light' || user.theme === 'dark')) {
+          // No local preference saved yet → use backend theme
+          setThemeState(user.theme);
+        }
+        // If localTheme exists, it wins — don't override with token/user data
+      }
+    } else {
+      lastUserId.current = null;
+    }
+  }, [user]);
+
+  // 2. Apply theme to DOM and localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('app-theme', theme);
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
+  // 3. Update theme locally and persist to backend + storage
   const setTheme = async (newTheme) => {
+    if (newTheme !== 'light' && newTheme !== 'dark') return;
+
+    // Update state and localStorage immediately (optimistic)
     setThemeState(newTheme);
-    
-    // 3. Update theme on server if user is logged in
-    if (user?.id) {
+    localStorage.setItem('app-theme', newTheme);
+
+    if (user && user.id) {
       try {
         await api.patch(`/user/${user.id}`, { theme: newTheme });
-        // Update local user state to reflect the new theme (prevents sync useEffect from reverting it)
+
+        // Keep user object in sync so the useEffect above doesn't fight us
         if (setUser) {
-          setUser(prev => prev ? { ...prev, theme: newTheme } : prev);
+          setUser((prev) => (prev ? { ...prev, theme: newTheme } : prev));
+        }
+
+        // Update whichever storage holds the user object
+        const storage = localStorage.getItem('authToken') ? localStorage : sessionStorage;
+        const raw = storage.getItem('user');
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            storage.setItem('user', JSON.stringify({ ...parsed, theme: newTheme }));
+          } catch (_) { }
         }
       } catch (error) {
-        console.error('Failed to update theme on server:', error);
+        console.error('❌ Failed to persist theme to backend:', error);
       }
     }
   };
 
-  const toggleTheme = (newTheme) => {
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
   };
 
