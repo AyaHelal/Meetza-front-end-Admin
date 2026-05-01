@@ -1,0 +1,75 @@
+import React from 'react';
+
+const PasswordStrengthIndicator = ({ password }) => {
+    const getPasswordStrength = (password) => {
+        if (!password) return { strength: 0, label: '', color: '' };
+
+        let score = 0;
+        const checks = {
+            length: password.length >= 8,
+            lowercase: /[a-z]/.test(password),
+            uppercase: /[A-Z]/.test(password),
+            numbers: /\d/.test(password),
+            symbols: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)
+        };
+
+        Object.values(checks).forEach(check => {
+            if (check) score++;
+        });
+
+        if (score <= 2) {
+            return { strength: 1, label: 'Weak', color: '#dc3545' };
+        } else if (score === 3) {
+            return { strength: 2, label: 'Medium', color: '#fd7e14' };
+        } else {
+            return { strength: 3, label: 'Strong', color: '#198754' };
+        }
+    };
+
+    const { strength, label, color } = getPasswordStrength(password);
+
+    if (!password) return null;
+
+    return (
+        <div className="mt-2 mb-3">
+            <div className="d-flex align-items-center gap-2">
+                <div className="flex-grow-1">
+                    <div
+                        className="progress"
+                        style={{ height: '6px', borderRadius: '3px', backgroundColor: '#e9ecef' }}
+                    >
+                        <div
+                            className="progress-bar"
+                            style={{
+                                width: `${(strength / 3) * 100}%`,
+                                backgroundColor: color,
+                                borderRadius: '3px',
+                                transition: 'all 0.3s ease'
+                            }}
+                        />
+                    </div>
+                </div>
+                <span
+                    className="small fw-medium"
+                    style={{
+                        color: color,
+                        fontSize: '0.75rem',
+                        minWidth: '50px',
+                        textAlign: 'right'
+                    }}
+                >
+                    {label}
+                </span>
+            </div>
+            <div className="mt-1 text-start">
+                <small className="text-muted" style={{ fontSize: '0.7rem' }}>
+                    {strength === 1 && "💡 Try adding uppercase, numbers, or symbols"}
+                    {strength === 2 && "👍 Good! Add more variety for stronger password"}
+                    {strength === 3 && "🔥 Excellent! Your password is very strong"}
+                </small>
+            </div>
+        </div>
+    );
+};
+
+export default PasswordStrengthIndicator;

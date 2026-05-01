@@ -6,6 +6,7 @@ import { usePasswordVisibility } from "../../hooks";
 import { Eye, EyeSlash } from "phosphor-react";
 import '../Login/LoginForm.css';
 import apiCommon from "../../utils/api";
+import PasswordStrengthIndicator from "./components/PasswordStrengthIndicator";
 
 export default function ResetPassword() {
     const [formData, setFormData] = useState({
@@ -35,7 +36,7 @@ export default function ResetPassword() {
         const hasUpper = /[A-Z]/.test(password);
         const hasLower = /[a-z]/.test(password);
         const hasNumber = /\d/.test(password);
-        const hasSpecial = /[@$!%*?&]/.test(password);
+        const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
         
         return {
             isValid: minLength && hasUpper && hasLower && hasNumber && hasSpecial,
@@ -83,7 +84,7 @@ export default function ResetPassword() {
             else if (!validation.errors.hasUpper) setError("Password must include at least one uppercase letter");
             else if (!validation.errors.hasLower) setError("Password must include at least one lowercase letter");
             else if (!validation.errors.hasNumber) setError("Password must include at least one number");
-            else if (!validation.errors.hasSpecial) setError("Password must include at least one special character (@$!%*?&)");
+            else if (!validation.errors.hasSpecial) setError("Password must include at least one special character");
             return;
         }
 
@@ -221,6 +222,7 @@ export default function ResetPassword() {
                                             {showPassword ? <EyeSlash size={20} /> : <Eye size={20} />}
                                         </button>
                                     </div>
+                                    <PasswordStrengthIndicator password={formData.newPassword} />
                                 </div>
 
                                 <div className="form-group mt-3">
