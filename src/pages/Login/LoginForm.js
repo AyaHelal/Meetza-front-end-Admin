@@ -77,19 +77,48 @@ export default function LoginForm() {
 
     // Render reCAPTCHA when showCaptcha changes
     useEffect(() => {
-        if (showCaptcha && window.grecaptcha) {
+        let isMounted = true;
+        
+        const renderCaptcha = () => {
+            if (!showCaptcha || !window.grecaptcha || !isMounted) return;
+            
             const container = document.getElementById('recaptcha-container');
             if (container) {
-                container.innerHTML = '';
-                window.grecaptcha.render('recaptcha-container', {
-                    sitekey: process.env.REACT_APP_RECAPTCHA_SITE_KEY,
-                    callback: (token) => window.onCaptchaVerified(token),
-                    'expired-callback': () => window.onCaptchaExpired(),
-                    size: 'normal'
-                });
+                try {
+                    container.innerHTML = '';
+                    window.grecaptcha.render('recaptcha-container', {
+                        sitekey: process.env.REACT_APP_RECAPTCHA_SITE_KEY || '6LeVQz4sAAAAALscjtOKAqr-Zigom5VdgJ_6qVHd',
+                        callback: (token) => window.onCaptchaVerified(token),
+                        'expired-callback': () => window.onCaptchaExpired(),
+                        size: 'normal'
+                    });
+                } catch (e) {
+                    console.warn("reCAPTCHA render error:", e);
+                }
+            } else {
+                // Try again in a bit if container not ready
+                setTimeout(renderCaptcha, 100);
+            }
+        };
+
+        if (showCaptcha) {
+            // Check if script is loaded, if not, wait for it
+            if (!window.grecaptcha) {
+                const interval = setInterval(() => {
+                    if (window.grecaptcha) {
+                        clearInterval(interval);
+                        renderCaptcha();
+                    }
+                }, 500);
+                // Cleanup interval after 10 seconds to avoid infinite loop
+                setTimeout(() => clearInterval(interval), 10000);
+            } else {
+                renderCaptcha();
             }
         }
-    }, [showCaptcha, systemName, authGoogleEnabled]);
+
+        return () => { isMounted = false; };
+    }, [showCaptcha]);
 
     const submitLogin = async (recaptchaTokenToSend = null) => {
         if (!validateForm()) return;
@@ -126,33 +155,37 @@ export default function LoginForm() {
             } else {
                 const msg = response?.data?.message ?? response?.data?.data?.message ?? "Login failed.";
                 setApiError(msg);
-                const remaining = response?.data?.remaining ?? response?.data?.data?.remaining;
-                if (remaining !== undefined) setRemainingAttempts(remaining);
+                
+                // Check if this "success" response actually contains a security requirement
+                const securityData = response?.data?.data || response?.data || {};
+                if (securityData.requiresCaptcha) {
+                    setCaptchaRequiredByBackend(true);
+                    setShowCaptcha(true);
+                }
+                if (securityData.remaining !== undefined) {
+                    setRemainingAttempts(securityData.remaining);
+                }
             }
         } catch (error) {
             const res = error.response;
             const data = res?.data || {};
             const msg = data?.message ?? data?.data?.message ?? error.message ?? "Login failed. Please try again.";
 
-            if (res?.status === 429 && data?.requiresCaptcha) {
+            // Extract security data from backend response
+            const remaining = data?.remaining;
+            const needsCaptcha = data?.requiresCaptcha || (res?.status === 429);
+            
+            if (remaining !== undefined) {
+                setRemainingAttempts(remaining);
+            }
+
+            if (needsCaptcha) {
                 setCaptchaRequiredByBackend(true);
                 setShowCaptcha(true);
                 setApiError(msg);
             } else {
                 setApiError(msg);
-                // لو الباك رجع إن الـ CAPTCHA فشلت → نمسح التوكن ونعرض الـ reCAPTCHA تاني عشان يحل من جديد
-                const isCaptchaError = res?.status === 400 || res?.status === 500;
-                const msgLower = (msg || "").toLowerCase();
-                if (isCaptchaError && (msgLower.includes("captcha") || msgLower.includes("recaptcha"))) {
-                    setCaptchaToken("");
-                    setShowCaptcha(true);
-                    setCaptchaRequiredByBackend(true);
-                    if (typeof window.grecaptcha?.reset === "function") {
-                        try { window.grecaptcha.reset(); } catch (e) { /* ignore */ }
-                    }
-                }
             }
-            if (data?.remaining !== undefined) setRemainingAttempts(data.remaining);
         } finally {
             setIsLoading(false);
         }
@@ -276,9 +309,11 @@ export default function LoginForm() {
                         <a href="/forgot-password" className="text-decoration-none text-888888" style={{ fontSize: "12px" }}>Forgot Password?</a>
                     </div>
 
-                    {showCaptcha && (
-                        <motion.div id="recaptcha-container" className="g-recaptcha mt-3 mb-3 d-flex justify-content-center" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} />
-                    )}
+                    <div 
+                        id="recaptcha-container" 
+                        className="g-recaptcha mt-3 mb-3 d-flex justify-content-center" 
+                        style={{ display: showCaptcha ? 'flex' : 'none' }}
+                    />
 
                     <motion.button type="submit" className="btn btn-primary w-100 py-3 mt-3 mb-3 rounded-4 d-inline-flex align-items-center justify-content-center" whileHover={!isLoading && !(captchaRequiredByBackend && !captchaToken) ? { scale: 1.02 } : {}} whileTap={!isLoading && !(captchaRequiredByBackend && !captchaToken) ? { scale: 0.98 } : {}} disabled={isLoading || (captchaRequiredByBackend && !captchaToken)}>
                         {isLoading ? (

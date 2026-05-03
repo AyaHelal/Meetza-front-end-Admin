@@ -64,19 +64,36 @@ function AnimatedRoutes() {
     return () => clearTimeout(t);
   }, [location.pathname]);
 
+  const socialLoginProcessed = useRef(false);
+
   // Handle social login redirect (token + user in URL)
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const tokenParam = urlParams.get('token');
     const userParam = urlParams.get('user');
 
-    if (tokenParam && userParam) {
-      try {
-        const userData = JSON.parse(decodeURIComponent(userParam));
-        loginUser(userData, tokenParam, true);
-        navigate(location.pathname, { replace: true });
-        const role = (userData?.role || "").toString().trim().toLowerCase();
-        const allowedRoles = ['super_admin', 'administrator', 'super admin'];
+    if (!tokenParam || socialLoginProcessed.current) return;
+
+    socialLoginProcessed.current = true;
+
+    try {
+      let userData = null;
+      if (userParam) {
+        userData = JSON.parse(decodeURIComponent(userParam));
+      }
+
+      // 1. Process login immediately (saves to storage)
+      loginUser(userData || {}, tokenParam, true);
+
+      // 2. Decode token to get the definitive role (same logic as ProtectedRoute)
+      const decoded = extractUserFromToken(); 
+      // Note: extractUserFromToken reads from storage, so we need to ensure loginUser finished its sync storage updates
+      
+      const role = (decoded?.role || userData?.role || "").toString().trim().toLowerCase();
+      const allowedRoles = ['super_admin', 'administrator', 'super admin'];
+
+      // 3. Wait a bit for Context State to catch up before navigating
+      setTimeout(() => {
         if (role && allowedRoles.includes(role)) {
           navigate('/dashboard', { replace: true });
         } else if (role === 'member') {
@@ -84,12 +101,13 @@ function AnimatedRoutes() {
         } else {
           navigate('/login?error=access_denied', { replace: true });
         }
-      } catch (error) {
-        console.error('Error parsing social login data:', error);
-        navigate('/login?error=parse_error', { replace: true });
-      }
+      }, 100);
+
+    } catch (error) {
+      console.error('Error parsing social login data:', error);
+      navigate('/login?error=parse_error', { replace: true });
     }
-  }, [location.search, location.pathname, navigate, loginUser]);
+  }, [location.search, navigate, loginUser]);
 
   // Auto-redirect when remember me and valid token (role from token)
   useEffect(() => {
