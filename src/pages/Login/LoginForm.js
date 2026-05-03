@@ -311,7 +311,7 @@ export default function LoginForm() {
 
                     <div 
                         id="recaptcha-container" 
-                        className="g-recaptcha mt-3 mb-3 d-flex justify-content-center" 
+                        className={`g-recaptcha d-flex justify-content-center ${showCaptcha ? 'mt-3 mb-3' : ''}`}
                         style={{ display: showCaptcha ? 'flex' : 'none' }}
                     />
 
