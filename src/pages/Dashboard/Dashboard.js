@@ -118,7 +118,11 @@ const UserDashboard = () => {
             {/* SIDEBAR */}
             <aside className={`dashboard-sidebar ${sidebarOpen ? "is-open" : ""}`}>
                 <div className="dashboard-sidebar-logo">
-                    <img src={logoUrl || "/assets/MeetzaLogo.png"} alt={systemName} style={{ maxHeight: '45px', objectFit: 'contain' }} />
+                    <img 
+                        src={(logoUrl && systemName?.toLowerCase() !== 'meetza') ? logoUrl : "/assets/MeetzaLogo.png"} 
+                        alt={systemName} 
+                        style={{ maxHeight: '45px', objectFit: 'contain' }} 
+                    />
                 </div>
 
                 <nav className="dashboard-sidebar-nav">

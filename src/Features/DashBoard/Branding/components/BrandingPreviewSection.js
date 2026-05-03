@@ -6,8 +6,12 @@ const BrandingPreviewSection = ({ logoDraft, nameDraft, colorDraft }) => {
             <h4 className="fw-bold mb-3">Live Preview</h4>
             <div className="preview-navbar p-3 rounded-4 shadow-sm bg-white d-flex align-items-center justify-content-between mb-4">
                 <div className="d-flex flex-column">
-                    <img src={logoDraft || "/assets/MeetzaLogo.png"} alt="Logo" style={{ height: '40px', objectFit: 'contain' }} />
-                    {logoDraft && (
+                    <img 
+                        src={(logoDraft && nameDraft?.toLowerCase() !== 'meetza') ? logoDraft : "/assets/MeetzaLogo.png"} 
+                        alt="Logo" 
+                        style={{ height: '40px', objectFit: 'contain' }} 
+                    />
+                    {logoDraft && nameDraft?.toLowerCase() !== 'meetza' && (
                         <div className="d-flex align-items-center mt-1" style={{ opacity: 0.6 }}>
                             <span style={{ fontSize: '8px', marginRight: '3px' }}>Powered by</span>
                             <img src="/assets/MeetzaLogo.png" alt="Meetza" style={{ height: '10px' }} />
