@@ -59,9 +59,10 @@ export const useBrandingSettings = () => {
             const data = await brandingService.getCompanyData();
             const settings = data?.settings || {};
             
-            setHasCompany(true);
+            // Only consider it a real company if it has an ID
+            setHasCompany(!!data?.id);
             
-            if (!userEditedName) setNameDraft(data.name || '');
+            if (!userEditedName) setNameDraft(data?.name || '');
             
             if (!userEditedLogo) {
                 const fetchedLogoUrl = settings.logo_url || '';

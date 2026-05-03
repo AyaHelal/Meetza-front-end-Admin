@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const BrandingContext = createContext();
 
@@ -67,17 +67,7 @@ export const BrandingProvider = ({ children }) => {
                 }
             }
 
-            // Get token from the same place AuthContext uses
-            let token = localStorage.getItem("authToken");
-            if (!token) {
-                token = sessionStorage.getItem("authToken");
-            }
-            
-            // Using /id endpoint, no need for companyId logic
-            const requestConfig = token
-                ? { headers: { Authorization: `Bearer ${token}` } }
-                : undefined;
-            const res = await axios.get(`${API_BASE_URL}/companies/id`, requestConfig);
+            const res = await api.get(`/companies/id`);
             const data = res.data?.data || res.data;
             const settings = data?.settings || {};
             
@@ -104,8 +94,11 @@ export const BrandingProvider = ({ children }) => {
                 setBranding(prev => ({ ...prev, loading: false }));
             }
         } catch (error) {
-            console.error('Branding fetch error:', error);
-            console.error('Error details:', error.response?.data);
+            // Only log if it's not a 404 or 401 (expected for default branding)
+            if (error.response?.status !== 404 && error.response?.status !== 401) {
+                console.error('Branding fetch error:', error);
+                console.error('Error details:', error.response?.data);
+            }
             
             // If company not found/unauthorized, clear localStorage and use defaults
             if (error.response?.status === 404 || error.response?.status === 401) {
