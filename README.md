@@ -9,9 +9,6 @@ A comprehensive React-based admin dashboard for managing the Meetza platform. Th
 /exe   → Executable files (if applicable)
 README.md
 ```
-
-> This repository provides **source code** and full setup/build/run instructions. Add any optional executables to `exe/`.
-
 ## ✨ Features
 
 - **User Management**: Create, read, update, and delete user accounts with role-based access control
@@ -24,9 +21,9 @@ README.md
 - **Position Management**: Define and assign user positions/roles
 - **Authentication**: Secure login/logout with token-based authentication
 - **Responsive Design**: Optimized for both desktop and mobile devices
-- **Real-time Notifications**: Toast notifications for user feedback
 - **Form Validation**: Comprehensive client-side validation
 - **API Integration**: Seamless integration with Meetza backend API
+- **Branding**: Assign or configure a custom domain for the company platform
 
 ## 🛠 Tech Stack
 
@@ -39,26 +36,14 @@ README.md
 - **React Toastify 11.0.5**: Toast notifications
 - **Phosphor React 1.4.1**: Icon library
 - **Lottie React 2.4.1**: Lottie animations for React
-- **Create React App**: Build setup and development server
-- **ESLint**: Code linting
-- **Cross-env**: Cross-platform environment variable setting
-
-## 📌 Status
-This project is completed as a submission.
 
 ## ⚙️ Setup & Env
 
 ### Prerequisites and Dependencies
 
-#### System Requirements
-
-- OS: Windows / macOS / Linux
-- RAM: 4GB minimum (8GB recommended)
-- Disk: 1GB+ free space
-
 #### Required Software / Tools
 
-- Node.js: **v18+ recommended**
+- Node.js: **v22.19 recommended**
 - npm (or yarn)
 - Git
 
@@ -90,7 +75,7 @@ Optional:
 
 1. Clone the repository
 
-    git clone <repository-url>
+    git clone [<repository-url>](https://github.com/AyaHelal/Meetza-front-end-Admin.git)
     cd meetza-admin
 
 2. Install dependencies
@@ -121,26 +106,13 @@ Build output will be generated in the `build/` folder.
 
 ## 🚀 Deployment
 
-### Vercel / Netlify
+### Vercel
 
 - Build command: `npm run build`
 - Output directory: `build/`
 - Set environment variables in the platform dashboard (at least `REACT_APP_API_BASE`)
 
-### CI/CD (GitHub Actions / GitLab CI)
-
-- `npm ci` → `npm test` → `npm run build` → deploy artifacts
-
 ## 🔧 Configuration
-
-### API Configuration
-
-The application uses Axios for API communication. The base URL is configured in `src/utils/api.js`:
-
-```javascript
-const API_BASE =
-  process.env.REACT_APP_API_BASE || "https://meetza-backend.vercel.app/api";
-```
 
 ### Authentication
 
@@ -206,11 +178,5 @@ For support or questions, please contact the development team.
 
 - Live application: [https://meetza-front-end-admin.vercel.app/](https://meetza-front-end-admin.vercel.app/)
 - Figma design: [https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Farida-Meetza?node-id=0-1&p=f&t=ehzpvGrgs7fbkPe3-0](https://www.figma.com/design/BCnIDNN5fdPOiVv5tXTYXE/Farida-Meetza?node-id=0-1&p=f&t=ehzpvGrgs7fbkPe3-0)
-
-## 📊 Presentation
-
-- Project Presentation on Canva: https://www.canva.com/design/DAG6wME9m9I/6szllu6C4vuPiD5iRwwTcQ/edit
-
----
 
 **Meetza Admin Dashboard** - Empowering administrators to efficiently manage the Meetza platform.
