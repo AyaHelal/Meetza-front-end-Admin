@@ -1,9 +1,11 @@
 import React from 'react';
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/themes/light.css";
-import { CalendarBlank } from "phosphor-react";
+import { CalendarBlank, X } from "phosphor-react";
 
 const AnalysisHeader = ({ currentUser, dateRange, setDateRange }) => {
+    const hasDate = dateRange && dateRange.length > 0;
+
     return (
         <div
             className="branded-card-bg border-bottom px-4 py-3 mx-4 rounded-3 d-flex justify-content-between align-items-center"
@@ -39,6 +41,7 @@ const AnalysisHeader = ({ currentUser, dateRange, setDateRange }) => {
                         className="form-control text-center"
                         style={{
                             paddingLeft: '44px',
+                            paddingRight: hasDate ? '44px' : '12px',
                             paddingTop: '10px',
                             paddingBottom: '10px',
                             borderRadius: '30px',
@@ -53,6 +56,28 @@ const AnalysisHeader = ({ currentUser, dateRange, setDateRange }) => {
                         }}
                         placeholder="Select Date Range"
                     />
+                    {hasDate && (
+                        <button
+                            type="button"
+                            className="position-absolute top-50 translate-middle-y border-0 bg-transparent p-0 d-flex align-items-center justify-content-center"
+                            style={{ 
+                                right: '16px', 
+                                zIndex: 10, 
+                                cursor: 'pointer',
+                                color: 'var(--text-muted)',
+                                transition: 'color 0.2s'
+                            }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setDateRange([]);
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
+                            title="Clear date"
+                        >
+                            <X size={18} weight="bold" />
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

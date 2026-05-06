@@ -12,10 +12,7 @@ import './Analysis.css';
 
 const Analysis = ({ currentUser }) => {
     // Default to the last 7 days or a specific range
-    const [dateRange, setDateRange] = useState([
-        new Date("2026-04-01"),
-        new Date("2026-04-30")
-    ]);
+    const [dateRange, setDateRange] = useState([]);
 
     // Format dates to YYYY-MM-DD for API in local timezone to avoid off-by-one errors
     const formatDate = (date) => {
@@ -26,7 +23,7 @@ const Analysis = ({ currentUser }) => {
         return `${year}-${month}-${day}`;
     };
     const startDate = dateRange[0] ? formatDate(dateRange[0]) : null;
-    const endDate = dateRange[1] ? formatDate(dateRange[1]) : startDate;
+    const endDate = dateRange[1] ? formatDate(dateRange[1]) : null;
 
     const { cardsData, comparisonData, dailyActivityData, groupsData, meetingsData, videosData, reviewsData } = useAnalysisData(startDate, endDate);
 
