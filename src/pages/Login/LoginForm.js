@@ -245,7 +245,16 @@ export default function LoginForm() {
 
     // Handle browser back button to redirect to landing page
     useEffect(() => {
-        const landingUrl = 'https://meetza-front-end.vercel.app/landing';
+        let landingUrl;
+        const hostname = window.location.hostname;
+        const port = window.location.port;
+
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            const targetPort = port ? parseInt(port) - 1 : 3000;
+            landingUrl = `http://${hostname}:${targetPort}/landing`;
+        } else {
+            landingUrl = 'https://meetza-front-end.vercel.app/landing';
+        }
 
         // Push landing page entry to history before current login page
         // This makes back button go to landing instead of dashboard
