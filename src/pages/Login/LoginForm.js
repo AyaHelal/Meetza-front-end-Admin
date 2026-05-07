@@ -18,7 +18,7 @@ export default function LoginForm() {
     const [isLoading, setIsLoading] = useState(false);
     const [apiError, setApiError] = useState("");
     const { loginUser } = useAuth();
-    const { systemName, authGoogleEnabled } = useBranding();
+    const { systemName, authGoogleEnabled, domains } = useBranding();
     const [rememberMe, setRememberMe] = useState(false);
     const [showCaptcha, setShowCaptcha] = useState(false);
     const [captchaToken, setCaptchaToken] = useState('');
@@ -122,6 +122,17 @@ export default function LoginForm() {
 
     const submitLogin = async (recaptchaTokenToSend = null) => {
         if (!validateForm()) return;
+        
+        // Domain validation: Only apply when Google Auth is DISABLED
+        if (!authGoogleEnabled && domains && domains.length > 0) {
+            const emailDomain = formData.email.split('@')[1]?.toLowerCase();
+            const brandingDomains = domains.map(d => d.domain_name.toLowerCase());
+            
+            if (!brandingDomains.includes(emailDomain)) {
+                setApiError(`This email domain is not authorized. Allowed domains: ${domains.map(d => d.domain_name).join(', ')}.`);
+                return;
+            }
+        }
 
         if (captchaRequiredByBackend && !recaptchaTokenToSend) {
             setApiError("Please complete the reCAPTCHA.");
@@ -184,7 +195,12 @@ export default function LoginForm() {
                 setShowCaptcha(true);
                 setApiError(msg);
             } else {
-                setApiError(msg);
+                // If it's a network error, use a clean message
+                if (!res && (error.message === 'Network Error' || error.code === 'ERR_NETWORK')) {
+                    setApiError("Network Error");
+                } else {
+                    setApiError(msg);
+                }
             }
         } finally {
             setIsLoading(false);
@@ -270,7 +286,11 @@ export default function LoginForm() {
                             </div>
                             <div className="login-error-text">
                                 <div className="login-error-title">{apiError}</div>
-                                <div className="login-error-message">Please check your credentials and try again.</div>
+                                <div className="login-error-message">
+                                    {apiError.toLowerCase().includes('network') 
+                                        ? "Please check your internet connection and try again." 
+                                        : "Please check your credentials and try again."}
+                                </div>
                             </div>
                         </motion.div>
                     )}

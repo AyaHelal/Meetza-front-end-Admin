@@ -14,6 +14,7 @@ export const BrandingProvider = ({ children }) => {
         systemNameColor: '#2c3e50',
         showPoweredBy: true,
         authGoogleEnabled: true,
+        domains: [],
         loading: true
     });
 
@@ -82,6 +83,7 @@ export const BrandingProvider = ({ children }) => {
                     systemNameColor: settings.system_name_color || '#2c3e50',
                     showPoweredBy: true,
                     authGoogleEnabled: settings.auth_google_enabled !== false && settings.auth_google_enabled !== 0 && settings.auth_google_enabled !== '0',
+                    domains: data.domains || [],
                     loading: false
                 };
                 
@@ -151,6 +153,7 @@ export const BrandingProvider = ({ children }) => {
             systemNameColor: settings.system_name_color || '#2c3e50',
             showPoweredBy: true,
             authGoogleEnabled: settings.auth_google_enabled !== false && settings.auth_google_enabled !== 0 && settings.auth_google_enabled !== '0',
+            domains: provisionData.domains || [],
             loading: false
         };
         
