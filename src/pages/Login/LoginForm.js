@@ -123,12 +123,12 @@ export default function LoginForm() {
     const submitLogin = async (recaptchaTokenToSend = null) => {
         if (!validateForm()) return;
         
-        // Domain validation: Only apply when Google Auth is DISABLED
-        if (!authGoogleEnabled && domains && domains.length > 0) {
+        // Domain validation: Only apply when Google Auth is DISABLED and NOT the default platform
+        if (!authGoogleEnabled && domains && domains.length > 0 && systemName !== 'Meetza') {
             const emailDomain = formData.email.split('@')[1]?.toLowerCase();
             const brandingDomains = domains.map(d => d.domain_name.toLowerCase());
             
-            if (!brandingDomains.includes(emailDomain)) {
+            if (!brandingDomains.includes(emailDomain) && emailDomain !== 'meetza.com') {
                 setApiError(`This email domain is not authorized. Allowed domains: ${domains.map(d => d.domain_name).join(', ')}.`);
                 return;
             }
