@@ -733,6 +733,19 @@ const VideoDisplay = ({ currentUser: currentUserProp }) => {
                                     </div>
 
                                     <div className="mb-3">
+                                        <label className="form-label fw-semibold video-edit-form-label">
+                                            Description
+                                        </label>
+                                        <textarea
+                                            className="form-control rounded-3 video-edit-form-textarea"
+                                            value={editFormData.description || ''}
+                                            onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                                            placeholder="Enter video description"
+                                            rows="3"
+                                        />
+                                    </div>
+
+                                    <div className="mb-3">
                                         <label className="form-label fw-semibold video-edit-form-label">Poster (image)</label>
                                         <input
                                             type="file"

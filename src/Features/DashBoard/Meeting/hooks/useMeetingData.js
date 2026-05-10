@@ -88,7 +88,7 @@ export default function useMeetingData() {
             formData.append("start_time", meetingService.formatForAPI(data.start_time));
             formData.append("end_time", meetingService.formatForAPI(data.end_time));
             formData.append("group_id", groupId);
-            formData.append("status", data.status);
+            // formData.append("status", data.status); // User requested not to send status on create
             formData.append("recording", (data.recordMeeting || data.record_meeting) === "Recording" ? "1" : "0");
             formData.append("weekly", (data.weekly || data.weekly_option) === "Active" ? "1" : (data.weekly || data.weekly_option) === "Inactive" ? "0" : "");
             // description is optional and not displayed, but sent to backend

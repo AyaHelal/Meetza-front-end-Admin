@@ -81,6 +81,17 @@ const MeetingModal = ({ mode, data, groups = [], onChange, onClose, onSubmit }) 
                         onChange={(e) => onChange({ ...data, description: e.target.value })}
                     />
 
+                    {mode !== 'create' && (
+                        <>
+                            <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Status <span style={{ color: "#FF0000" }}>*</span></label>
+                            <select className="form-select mb-3 rounded-3" value={data.status || 'Scheduled'} onChange={(e) => onChange({ ...data, status: e.target.value })}>
+                                <option>Scheduled</option>
+                                <option>Completed</option>
+                                <option>Cancelled</option>
+                            </select>
+                        </>
+                    )}
+
                     <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Poster image <span style={{ color: "#FF0000" }}>*</span></label>
                     <input
                         type="file"
@@ -163,13 +174,6 @@ const MeetingModal = ({ mode, data, groups = [], onChange, onClose, onSubmit }) 
                             Inactive Weekly
                         </label>
                     </div>
-
-                    <label className="form-label" style={{ fontSize: 13, color: '#6c757d' }}>Status <span style={{ color: "#FF0000" }}>*</span></label>
-                    <select className="form-select mb-3 rounded-3" value={data.status || 'Scheduled'} onChange={(e) => onChange({ ...data, status: e.target.value })}>
-                        <option>Scheduled</option>
-                        <option>Completed</option>
-                        <option>Cancelled</option>
-                    </select>
 
                     <div className="d-flex gap-2" style={{ marginTop: 12 }}>
                         <button
