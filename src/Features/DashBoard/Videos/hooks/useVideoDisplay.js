@@ -50,7 +50,7 @@ export function useVideoDisplay(currentUserProp) {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const searchContainerRef = useRef(null);
     const [showEditModal, setShowEditModal] = useState(false);
-    const [editFormData, setEditFormData] = useState({ title: '', poster_file: null, id: null });
+    const [editFormData, setEditFormData] = useState({ title: '', description: '', poster_file: null, id: null });
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [videoToDelete, setVideoToDelete] = useState(null);
@@ -230,7 +230,7 @@ export function useVideoDisplay(currentUserProp) {
 
     const handleEditVideo = (video) => {
         const videoId = video._id || video.id;
-        setEditFormData({ title: video.title || '', poster_file: null, id: videoId });
+        setEditFormData({ title: video.title || '', description: video.description || '', poster_file: null, id: videoId });
         setShowEditModal(true);
     };
 
@@ -248,6 +248,9 @@ export function useVideoDisplay(currentUserProp) {
         try {
             const formData = new FormData();
             formData.append('title', editFormData.title.trim());
+            if (editFormData.description !== undefined) {
+                formData.append('description', editFormData.description.trim());
+            }
             if (hasPosterFile) formData.append('poster_file', editFormData.poster_file);
             const newPosterUrl = await updateVideoApi(videoId, formData);
             toast.success('Video updated successfully');
@@ -258,13 +261,13 @@ export function useVideoDisplay(currentUserProp) {
             setVideos((prev) =>
                 prev.map((v) =>
                     v._id === videoId || v.id === videoId
-                        ? { ...v, title: editFormData.title.trim(), ...(finalPosterUrl && { poster_url: finalPosterUrl }) }
+                        ? { ...v, title: editFormData.title.trim(), description: editFormData.description?.trim() || '', ...(finalPosterUrl && { poster_url: finalPosterUrl }) }
                         : v
                 )
             );
             setCurrentVideo((prev) => {
                 if (!prev || (prev._id !== videoId && prev.id !== videoId)) return prev;
-                return { ...prev, title: editFormData.title.trim(), ...(finalPosterUrl && { poster_url: finalPosterUrl }) };
+                return { ...prev, title: editFormData.title.trim(), description: editFormData.description?.trim() || '', ...(finalPosterUrl && { poster_url: finalPosterUrl }) };
             });
             setShowEditModal(false);
         } catch (err) {
