@@ -9,6 +9,7 @@ A comprehensive React-based admin dashboard for managing the Meetza platform. Th
 /exe   → Executable files (if applicable)
 README.md
 ```
+
 ## ✨ Features
 
 - **User Management**: Create, read, update, and delete user accounts with role-based access control
@@ -24,6 +25,7 @@ README.md
 - **Form Validation**: Comprehensive client-side validation
 - **API Integration**: Seamless integration with Meetza backend API
 - **Branding**: Assign or configure a custom domain for the company platform
+- **Analytics & Reports**: Generate detailed analytics and performance reports on user activity, group engagement, meetings, and overall platform usage to support data-driven decision-making.
 
 ## 🛠 Tech Stack
 
@@ -75,16 +77,16 @@ Optional:
 
 1. Clone the repository
 
-    git clone [<repository-url>](https://github.com/AyaHelal/Meetza-front-end-Admin.git)
-    cd meetza-admin
+   git clone [<repository-url>](https://github.com/AyaHelal/Meetza-front-end-Admin.git)
+   cd Meetza-front-end-Admin
 
 2. Install dependencies
 
-    npm install
+   npm install
 
 3. Configure the environment
 
-    copy .env.example .env
+   copy .env.example .env
 
 4. Make sure backend is running
 
